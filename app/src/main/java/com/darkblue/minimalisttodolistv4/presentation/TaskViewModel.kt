@@ -110,14 +110,18 @@ class TaskViewModel(
                 viewModelScope.launch {
                     dao.upsertTask(task)
                 }
-                _state.update { it.copy(
-                    isAddingTask = false,
-                    title = "",
-                    priority = 0,
-                    note = "",
-                    recurrenceType = RecurrenceType.NONE,
-                    nextDueDate = null
-                ) }
+                _state.update {
+                    it.copy(
+                        isAddingTask = false,
+                        title = "",
+                        priority = 0,
+                        note = "",
+                        dueDate = null,
+                        recurrenceType = RecurrenceType.NONE,
+                        nextDueDate = null,
+                        editingTaskId = null
+                    )
+                }
             }
             is TaskEvent.SetTitle -> {
                 _state.update { it.copy(
