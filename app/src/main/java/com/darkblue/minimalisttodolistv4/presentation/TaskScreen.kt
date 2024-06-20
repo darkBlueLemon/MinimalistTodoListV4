@@ -1,5 +1,8 @@
 package com.darkblue.minimalisttodolistv4.presentation
 
+import android.os.Build
+import android.util.Log
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
@@ -9,6 +12,8 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material3.Button
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -22,7 +27,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.darkblue.minimalisttodolistv4.data.SortType
+import com.darkblue.minimalisttodolistv4.data.Task
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun TaskScreen(
     state: TaskState,
@@ -32,6 +41,8 @@ fun TaskScreen(
         floatingActionButton = {
             FloatingActionButton(onClick = {
                 onEvent(TaskEvent.ShowDialog)
+                Log.d("TAG", "clicked")
+                TaskEvent.ShowDatePicker
             }) {
                 Icon(
                     imageVector = Icons.Default.Add,
@@ -44,12 +55,11 @@ fun TaskScreen(
         if(state.isAddingTask) {
             AddTaskDialog(state = state, onEvent = onEvent)
         }
-
         LazyColumn(
             contentPadding = PaddingValues(16.dp),
             modifier = Modifier.fillMaxSize(),
             verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
+        ){
             item {
                 Row(
                     modifier = Modifier
@@ -77,27 +87,29 @@ fun TaskScreen(
                 }
             }
             items(state.tasks) { task ->
-                Row(
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Column(
-                        modifier = Modifier.weight(1f)
-                    ) {
-                        Text(
-                            text = "${task.title} ${task.priority} ${task.note} ${task.dueDate} ${task.completed}",
-                            fontSize = 20.sp
-                        )
-                        Text(text = task.completed.toString(), fontSize = 12.sp)
-                    }
-                    IconButton(onClick = {
-                        onEvent(TaskEvent.DeleteTask(task))
-                    }) {
-                        Icon(
-                            imageVector = Icons.Default.Delete,
-                            contentDescription = "Delete task"
-                        )
-                    }
-                }
+                TaskItem(
+                    task = task,
+                    onEdit = { onEvent(TaskEvent.EditTask(it)) },
+                    onDelete = { onEvent(TaskEvent.DeleteTask(it)) }
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun TaskItem(task: Task, onEdit: (Task) -> Unit, onDelete: (Task) -> Unit) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Text(text = task.title)
+        Row {
+            IconButton(onClick = { onEdit(task) }) {
+                Icon(Icons.Default.Edit, contentDescription = "Edit")
+            }
+            IconButton(onClick = { onDelete(task) }) {
+                Icon(Icons.Default.Delete, contentDescription = "Delete")
             }
         }
     }

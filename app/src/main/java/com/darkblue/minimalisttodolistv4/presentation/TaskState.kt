@@ -1,5 +1,6 @@
 package com.darkblue.minimalisttodolistv4.presentation
 
+import com.darkblue.minimalisttodolistv4.data.RecurrenceType
 import com.darkblue.minimalisttodolistv4.data.SortType
 import com.darkblue.minimalisttodolistv4.data.Task
 
@@ -12,4 +13,11 @@ data class TaskState(
     val isAddingTask: Boolean = false,
     val sortType: SortType = SortType.PRIORITY,
     val completed: Boolean = false,
+
+    val isDatePickerVisible: Boolean = false,
+
+    val recurrenceType: RecurrenceType = RecurrenceType.NONE,
+    val nextDueDate: Long? = null,
+
+    val editingTaskId: Int? = null
 )

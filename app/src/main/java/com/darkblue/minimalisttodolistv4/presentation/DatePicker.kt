@@ -1,5 +1,7 @@
 package com.darkblue.minimalisttodolistv4.presentation
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -17,13 +19,66 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import java.time.LocalDate
+
+@RequiresApi(Build.VERSION_CODES.O)
+@Composable
+fun DatePicker(onDateSelected: (LocalDate) -> Unit) {
+    val context = LocalContext.current
+    val today = LocalDate.now()
+
+    // A state to trigger the dialog
+    var showDialog by remember { mutableStateOf(true) }
+
+    if (showDialog) {
+        val datePickerDialog = android.app.DatePickerDialog(
+            context,
+            { _, year, month, dayOfMonth ->
+                val selectedDate = LocalDate.of(year, month + 1, dayOfMonth)
+                onDateSelected(selectedDate)
+                showDialog = false // Close the dialog
+            },
+            today.year, today.monthValue - 1, today.dayOfMonth
+        )
+
+        // Show the date picker dialog
+        LaunchedEffect(Unit) {
+            datePickerDialog.show()
+        }
+    }
+}
+
+//@RequiresApi(Build.VERSION_CODES.O)
+//@Composable
+//fun DatePicker(onDateSelected: (LocalDate) -> Unit) {
+//    val context = LocalContext.current
+//    val today = LocalDate.now()
+//
+//    val datePickerDialog = android.app.DatePickerDialog(
+//        context,
+//        { _, year, month, dayOfMonth ->
+//            val selectedDate = LocalDate.of(year, month + 1, dayOfMonth)
+//            onDateSelected(selectedDate)
+//        },
+//        today.year, today.monthValue - 1, today.dayOfMonth
+//    )
+//
+//    LaunchedEffect(Unit) {
+//        datePickerDialog.show()
+//    }
+//}
+
 
 //@OptIn(ExperimentalMaterial3Api::class)
 //@Composable

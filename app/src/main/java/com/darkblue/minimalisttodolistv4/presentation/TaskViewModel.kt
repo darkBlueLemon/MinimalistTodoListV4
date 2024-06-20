@@ -1,13 +1,20 @@
 package com.darkblue.minimalisttodolistv4.presentation
 
+import android.os.Build
+import android.util.Log
+import androidx.annotation.RequiresApi
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.darkblue.minimalisttodolistv4.data.RecurrenceType
 import com.darkblue.minimalisttodolistv4.data.SortType
 import com.darkblue.minimalisttodolistv4.data.Task
 import com.darkblue.minimalisttodolistv4.data.TaskDao
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import java.time.Instant
+import java.time.LocalDate
+import java.time.ZoneId
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class TaskViewModel(
@@ -34,6 +41,7 @@ class TaskViewModel(
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), TaskState())
 
+    @RequiresApi(Build.VERSION_CODES.O)
     fun onEvent(event: TaskEvent) {
         when(event) {
             is TaskEvent.DeleteTask -> {
@@ -53,6 +61,11 @@ class TaskViewModel(
                 val dueDate = state.value.dueDate
                 val completed = state.value.completed
 
+                val recurrenceType = state.value.recurrenceType
+                val nextDueDate = calculateNextDueDate(dueDate, recurrenceType)
+
+                val id = state.value.editingTaskId
+
                 if(title.isBlank() || note.isBlank()) {
                     return
                 }
@@ -62,8 +75,11 @@ class TaskViewModel(
                     priority = priority,
                     note = note,
                     dueDate = dueDate,
-                    completed = completed
+                    completed = completed,
+                    recurrenceType = recurrenceType,
+                    nextDueDate = nextDueDate
                 )
+                if(id != null) task.id = id
                 viewModelScope.launch {
                     dao.upsertTask(task)
                 }
@@ -71,7 +87,9 @@ class TaskViewModel(
                     isAddingTask = false,
                     title = "",
                     priority = 0,
-                    note = ""
+                    note = "",
+                    recurrenceType = RecurrenceType.NONE,
+                    nextDueDate = null
                 ) }
             }
             is TaskEvent.SetTitle -> {
@@ -91,12 +109,12 @@ class TaskViewModel(
             }
             is TaskEvent.SetDueDate -> {
                 _state.update { it.copy(
-                    note = event.dueDate.toString()
+                    dueDate = event.dueDate
                 ) }
             }
             is TaskEvent.SetCompleted -> {
                 _state.update { it.copy(
-                    note = event.completed.toString()
+                    completed = event.completed
                 ) }
             }
             TaskEvent.ShowDialog -> {
@@ -107,6 +125,55 @@ class TaskViewModel(
             is TaskEvent.SortTasks -> {
                 _sortType.value = event.sortType
             }
+
+            // Date Picker
+            TaskEvent.ShowDatePicker -> {
+                Log.d("TAG", "viewModel")
+                _state.update { it.copy(
+                    isDatePickerVisible = true
+                ) }
+            }
+            TaskEvent.HideDatePicker -> {
+                _state.update { it.copy(
+                    isDatePickerVisible = false
+                ) }
+            }
+
+            // Recurrence
+            is TaskEvent.SetRecurrenceType -> {
+                _state.update { it.copy(recurrenceType = event.recurrenceType) }
+            }
+
+            // Editing
+            is TaskEvent.EditTask -> {
+                _state.update {
+                    it.copy(
+                        title = event.task.title,
+                        priority = event.task.priority,
+                        note = event.task.note,
+                        dueDate = event.task.dueDate,
+                        completed = event.task.completed,
+                        recurrenceType = event.task.recurrenceType,
+                        nextDueDate = event.task.nextDueDate,
+                        isAddingTask = true,
+                        editingTaskId = event.task.id
+                    )
+                }
+            }
         }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun calculateNextDueDate(dueDate: Long?, recurrenceType: RecurrenceType): Long? {
+        if (dueDate == null) return null
+        val date = Instant.ofEpochMilli(dueDate).atZone(ZoneId.systemDefault()).toLocalDate()
+        val nextDate = when (recurrenceType) {
+            RecurrenceType.DAILY -> date.plusDays(1)
+            RecurrenceType.WEEKLY -> date.plusWeeks(1)
+            RecurrenceType.MONTHLY -> date.plusMonths(1)
+            RecurrenceType.YEARLY -> date.plusYears(1)
+            else -> return null
+        }
+        return nextDate.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
     }
 }
