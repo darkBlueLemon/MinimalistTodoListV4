@@ -1,13 +1,13 @@
-package com.darkblue.minimalisttodolistv4
+package com.darkblue.minimalisttodolistv4.data
 
 import androidx.room.Database
 import androidx.room.RoomDatabase
 
 @Database(
-    entities = [Contact::class],
+    entities = [Task::class],
     version = 1
 )
 abstract class ContactDatabase: RoomDatabase() {
 
-    abstract val dao: ContactDao
+    abstract val dao: TaskDao
 }

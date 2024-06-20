@@ -1,4 +1,4 @@
-package com.darkblue.minimalisttodolistv4
+package com.darkblue.minimalisttodolistv4.presentation
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
@@ -22,27 +21,28 @@ import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.darkblue.minimalisttodolistv4.data.SortType
 
 @Composable
-fun ContactScreen(
-    state: ContactState,
-    onEvent: (ContactEvent) -> Unit
+fun TaskScreen(
+    state: TaskState,
+    onEvent: (TaskEvent) -> Unit
 ) {
     Scaffold(
         floatingActionButton = {
             FloatingActionButton(onClick = {
-                onEvent(ContactEvent.ShowDialog)
+                onEvent(TaskEvent.ShowDialog)
             }) {
                 Icon(
                     imageVector = Icons.Default.Add,
-                    contentDescription = "Add contact"
+                    contentDescription = "Add task"
                 )
             }
         },
     ) { padding ->
         padding
-        if(state.isAddingContact) {
-            AddContactDialog(state = state, onEvent = onEvent)
+        if(state.isAddingTask) {
+            AddTaskDialog(state = state, onEvent = onEvent)
         }
 
         LazyColumn(
@@ -61,14 +61,14 @@ fun ContactScreen(
                         Row(
                             modifier = Modifier
                                 .clickable {
-                                    onEvent(ContactEvent.SortContacts(sortType))
+                                    onEvent(TaskEvent.SortTasks(sortType))
                                 },
                             verticalAlignment = CenterVertically
                         ) {
                             RadioButton(
                                 selected = state.sortType == sortType,
                                 onClick = {
-                                    onEvent(ContactEvent.SortContacts(sortType))
+                                    onEvent(TaskEvent.SortTasks(sortType))
                                 }
                             )
                             Text(text = sortType.name)
@@ -76,7 +76,7 @@ fun ContactScreen(
                     }
                 }
             }
-            items(state.contacts) { contact ->
+            items(state.tasks) { task ->
                 Row(
                     modifier = Modifier.fillMaxWidth()
                 ) {
@@ -84,17 +84,17 @@ fun ContactScreen(
                         modifier = Modifier.weight(1f)
                     ) {
                         Text(
-                            text = "${contact.firstName} ${contact.lastName}",
+                            text = "${task.title} ${task.priority} ${task.note} ${task.dueDate} ${task.completed}",
                             fontSize = 20.sp
                         )
-                        Text(text = contact.phoneNumber, fontSize = 12.sp)
+                        Text(text = task.completed.toString(), fontSize = 12.sp)
                     }
                     IconButton(onClick = {
-                        onEvent(ContactEvent.DeleteContact(contact))
+                        onEvent(TaskEvent.DeleteTask(task))
                     }) {
                         Icon(
                             imageVector = Icons.Default.Delete,
-                            contentDescription = "Delete contact"
+                            contentDescription = "Delete task"
                         )
                     }
                 }

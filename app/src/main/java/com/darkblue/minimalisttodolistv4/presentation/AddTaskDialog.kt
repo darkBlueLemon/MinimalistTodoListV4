@@ -1,4 +1,4 @@
-package com.darkblue.minimalisttodolistv4
+package com.darkblue.minimalisttodolistv4.presentation
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -16,45 +16,63 @@ import androidx.compose.ui.unit.dp
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AddContactDialog(
-    state: ContactState,
-    onEvent: (ContactEvent) -> Unit,
+fun AddTaskDialog(
+    state: TaskState,
+    onEvent: (TaskEvent) -> Unit,
     modifier: Modifier = Modifier
 ) {
     AlertDialog(
         modifier = modifier,
         onDismissRequest = {
-            onEvent(ContactEvent.HideDialog)
+            onEvent(TaskEvent.HideDialog)
         }
     ) {
         Column(
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             TextField(
-                value = state.firstName,
+                value = state.title,
                 onValueChange = {
-                    onEvent(ContactEvent.SetFirstName(it))
+                    onEvent(TaskEvent.SetTitle(it))
                 },
                 placeholder = {
-                    Text(text = "First name")
+                    Text(text = "Title")
                 }
             )
             TextField(
-                value = state.lastName,
+                value = state.priority.toString(),
                 onValueChange = {
-                    onEvent(ContactEvent.SetLastName(it))
+                    onEvent(TaskEvent.SetPriority(it.toInt()))
                 },
                 placeholder = {
-                    Text(text = "Last name")
+                    Text(text = "Priority")
                 }
             )
             TextField(
-                value = state.phoneNumber,
+                value = state.note,
                 onValueChange = {
-                    onEvent(ContactEvent.SetPhoneNumber(it))
+                    onEvent(TaskEvent.SetNote(it))
                 },
                 placeholder = {
-                    Text(text = "Phone number")
+                    Text(text = "Note")
+                }
+            )
+            TextField(
+                value = state.dueDate.toString(),
+                onValueChange = {
+                    onEvent(TaskEvent.SetDueDate(it.toLong()))
+                },
+                placeholder = {
+                    Text(text = "Due Date")
+                }
+            )
+            TextField(
+                value = state.completed.toString(),
+                onValueChange = {
+                    onEvent(TaskEvent.SetCompleted(it.toBoolean()))
+                },
+                placeholder = {
+                    Text(text = "Due Date")
                 }
             )
         }
@@ -63,7 +81,7 @@ fun AddContactDialog(
             contentAlignment = Alignment.CenterEnd
         ) {
             Button(onClick = {
-                onEvent(ContactEvent.SaveContact)
+                onEvent(TaskEvent.SaveTask)
             }) {
                 Text(text = "Save")
             }
