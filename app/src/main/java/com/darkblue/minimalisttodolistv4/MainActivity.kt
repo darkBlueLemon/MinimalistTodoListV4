@@ -13,6 +13,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.room.Room
 import com.darkblue.minimalisttodolistv4.data.ContactDatabase
+import com.darkblue.minimalisttodolistv4.presentation.NavGraph
 import com.darkblue.minimalisttodolistv4.presentation.TaskScreen
 import com.darkblue.minimalisttodolistv4.presentation.TaskViewModel
 import com.darkblue.minimalisttodolistv4.ui.theme.MinimalistTodoListV4Theme
@@ -42,8 +43,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             MinimalistTodoListV4Theme {
-                val state by viewModel.state.collectAsState()
-                TaskScreen(state = state, onEvent = viewModel::onEvent)
+                NavGraph(viewModel = viewModel)
             }
         }
     }

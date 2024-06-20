@@ -117,17 +117,6 @@ fun AddTaskDialog(
                 val nextDueDate = Instant.ofEpochMilli(it).atZone(ZoneId.systemDefault()).toLocalDate()
                 Text(text = "Next Due Date: ${nextDueDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))}")
             }
-
-            // Completed / History
-            TextField(
-                value = state.completed.toString(),
-                onValueChange = {
-                    onEvent(TaskEvent.SetCompleted(it.toBoolean()))
-                },
-                label = {
-                    Text(text = "Completed")
-                }
-            )
         }
         Box(
             modifier = Modifier.fillMaxWidth(),

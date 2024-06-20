@@ -13,6 +13,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.Button
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -26,6 +27,7 @@ import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import com.darkblue.minimalisttodolistv4.data.SortType
 import com.darkblue.minimalisttodolistv4.data.Task
 import java.time.LocalDate
@@ -35,19 +37,34 @@ import java.time.format.DateTimeFormatter
 @Composable
 fun TaskScreen(
     state: TaskState,
-    onEvent: (TaskEvent) -> Unit
+    onEvent: (TaskEvent) -> Unit,
+    navController: NavController
 ) {
     Scaffold(
         floatingActionButton = {
-            FloatingActionButton(onClick = {
-                onEvent(TaskEvent.ShowDialog)
-                Log.d("TAG", "clicked")
-                TaskEvent.ShowDatePicker
-            }) {
-                Icon(
-                    imageVector = Icons.Default.Add,
-                    contentDescription = "Add task"
-                )
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.End
+            ) {
+                FloatingActionButton(onClick = {
+                    onEvent(TaskEvent.ShowDialog)
+                    TaskEvent.ShowDatePicker
+                }) {
+                    Icon(
+                        imageVector = Icons.Default.Add,
+                        contentDescription = "Add task"
+                    )
+                }
+                FloatingActionButton(onClick = {
+                    navController.navigate("history")
+                }) {
+                    Icon(
+                        imageVector = Icons.Default.Menu,
+                        contentDescription = "History"
+                    )
+                }
             }
         },
     ) { padding ->

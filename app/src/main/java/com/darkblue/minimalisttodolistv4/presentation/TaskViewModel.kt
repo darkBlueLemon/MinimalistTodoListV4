@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.darkblue.minimalisttodolistv4.data.DeletedTask
 import com.darkblue.minimalisttodolistv4.data.RecurrenceType
 import com.darkblue.minimalisttodolistv4.data.SortType
 import com.darkblue.minimalisttodolistv4.data.Task
@@ -41,14 +42,42 @@ class TaskViewModel(
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), TaskState())
 
+    private val _deletedTasks = MutableStateFlow<List<DeletedTask>>(emptyList())
+    val deletedTasks: StateFlow<List<DeletedTask>> = _deletedTasks
+
+    init {
+        viewModelScope.launch {
+            dao.getDeletedTasks().collect { deletedTasks ->
+                _deletedTasks.value = deletedTasks
+            }
+        }
+    }
+
     @RequiresApi(Build.VERSION_CODES.O)
     fun onEvent(event: TaskEvent) {
         when(event) {
             is TaskEvent.DeleteTask -> {
                 viewModelScope.launch {
-                    dao.deleteTask(event.task)
+                    val task = event.task
+                    dao.deleteTask(task)
+                    dao.insertDeletedTask(
+                        DeletedTask(
+                            title = task.title,
+                            priority = task.priority,
+                            note = task.note,
+                            dueDate = task.dueDate,
+                            recurrenceType = task.recurrenceType,
+                            nextDueDate = task.nextDueDate,
+                            deletedAt = System.currentTimeMillis()
+                        )
+                    )
                 }
             }
+//            is TaskEvent.DeleteTask -> {
+//                viewModelScope.launch {
+//                    dao.deleteTask(event.task)
+//                }
+//            }
             TaskEvent.HideDialog -> {
                 _state.update { it.copy(
                     isAddingTask = false
@@ -59,7 +88,6 @@ class TaskViewModel(
                 val priority = state.value.priority
                 val note = state.value.note
                 val dueDate = state.value.dueDate
-                val completed = state.value.completed
 
                 val recurrenceType = state.value.recurrenceType
                 val nextDueDate = calculateNextDueDate(dueDate, recurrenceType)
@@ -75,7 +103,6 @@ class TaskViewModel(
                     priority = priority,
                     note = note,
                     dueDate = dueDate,
-                    completed = completed,
                     recurrenceType = recurrenceType,
                     nextDueDate = nextDueDate
                 )
@@ -110,11 +137,6 @@ class TaskViewModel(
             is TaskEvent.SetDueDate -> {
                 _state.update { it.copy(
                     dueDate = event.dueDate
-                ) }
-            }
-            is TaskEvent.SetCompleted -> {
-                _state.update { it.copy(
-                    completed = event.completed
                 ) }
             }
             TaskEvent.ShowDialog -> {
@@ -152,7 +174,6 @@ class TaskViewModel(
                         priority = event.task.priority,
                         note = event.task.note,
                         dueDate = event.task.dueDate,
-                        completed = event.task.completed,
                         recurrenceType = event.task.recurrenceType,
                         nextDueDate = event.task.nextDueDate,
                         isAddingTask = true,

@@ -4,7 +4,7 @@ import androidx.room.Database
 import androidx.room.RoomDatabase
 
 @Database(
-    entities = [Task::class],
+    entities = [Task::class, DeletedTask::class],
     version = 1
 )
 abstract class ContactDatabase: RoomDatabase() {

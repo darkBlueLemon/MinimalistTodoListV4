@@ -12,7 +12,6 @@ data class TaskState(
     val dueDate: Long? = null,
     val isAddingTask: Boolean = false,
     val sortType: SortType = SortType.PRIORITY,
-    val completed: Boolean = false,
 
     val isDatePickerVisible: Boolean = false,
 

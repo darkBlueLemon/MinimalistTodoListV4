@@ -10,7 +10,6 @@ sealed interface TaskEvent {
     data class SetPriority(val priority: Int): TaskEvent
     data class SetNote(val note: String): TaskEvent
     data class SetDueDate(val dueDate: Long): TaskEvent
-    data class SetCompleted(val completed: Boolean): TaskEvent
     data class SortTasks(val sortType: SortType): TaskEvent
     data class DeleteTask(val task: Task): TaskEvent
 
