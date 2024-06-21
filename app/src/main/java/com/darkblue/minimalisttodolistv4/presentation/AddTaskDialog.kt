@@ -135,26 +135,24 @@ fun AddTaskDialog(
                 }
                 if (state.isDatePickerVisible) {
                     Log.d("TAG", "clicked")
-                    DatePicker(closeSelection = {
+                    DatePicker(onDateSelected = { date ->
+                        val epochMilli =
+                            date.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
+                        onEvent(TaskEvent.SetDueDate(epochMilli))
+                        onEvent(TaskEvent.HideDatePicker)
+                    }, closeSelection = {
                         onEvent(TaskEvent.HideDatePicker)
                     })
-//                    DatePicker(onDateSelected = { date ->
-//                        val epochMilli =
-//                            date.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
-//                        onEvent(TaskEvent.SetDueDate(epochMilli))
-//                        onEvent(TaskEvent.HideDatePicker)
-//                    })
                 }
 
 //                // Time
-//
-//                TextButton(
-//                    onClick = {
-//                        onEvent(TaskEvent.ShowDatePicker)
-//                    }
-//                ) {
-//                    Text(text = "Time Due")
-//                }
+                TextButton(
+                    onClick = {
+//                        onEvent(TaskEvent.ShowTimePicker)
+                    }
+                ) {
+                    Text(text = "Time Due")
+                }
 
                 // Recurrence
                 RecurrenceTypeSelector(

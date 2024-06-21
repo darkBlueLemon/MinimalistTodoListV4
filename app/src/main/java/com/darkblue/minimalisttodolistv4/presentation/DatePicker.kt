@@ -28,22 +28,40 @@ import java.time.LocalTime
 @OptIn(ExperimentalMaterial3Api::class)
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun DatePicker(modifier: Modifier = Modifier, closeSelection: () -> Unit, ) {
+fun DatePicker(modifier: Modifier = Modifier, onDateSelected: (LocalDate) -> Unit, closeSelection: () -> Unit) {
     val selectedDate = remember { mutableStateOf<LocalDate?>(null) }
-//    CustomBox {
-        CalendarDialog(
-            state = rememberUseCaseState(visible = true, onCloseRequest = { closeSelection() }),
-            config = CalendarConfig(
-                yearSelection = true,
-                monthSelection = true,
-                style = CalendarStyle.MONTH,
-            ),
-            selection = CalendarSelection.Date { newDate ->
-                selectedDate.value = newDate
-            },
-        )
-//    }
+    val state = rememberUseCaseState(visible = true, onCloseRequest = { closeSelection() })
+
+    CalendarDialog(
+        state = state,
+        config = CalendarConfig(
+            yearSelection = true,
+            monthSelection = true,
+            style = CalendarStyle.MONTH,
+        ),
+        selection = CalendarSelection.Date { newDate ->
+            selectedDate.value = newDate
+            onDateSelected(newDate)
+//            closeSelection()
+        },
+    )
 }
+//fun DatePicker(modifier: Modifier = Modifier, closeSelection: () -> Unit, ) {
+//    val selectedDate = remember { mutableStateOf<LocalDate?>(null) }
+////    CustomBox {
+//        CalendarDialog(
+//            state = rememberUseCaseState(visible = true, onCloseRequest = { closeSelection() }),
+//            config = CalendarConfig(
+//                yearSelection = true,
+//                monthSelection = true,
+//                style = CalendarStyle.MONTH,
+//            ),
+//            selection = CalendarSelection.Date { newDate ->
+//                selectedDate.value = newDate
+//            },
+//        )
+////    }
+//}
 
 @RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)

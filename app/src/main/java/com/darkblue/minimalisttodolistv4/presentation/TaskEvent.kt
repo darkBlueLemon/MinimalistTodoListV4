@@ -20,6 +20,10 @@ sealed interface TaskEvent {
     object ShowDatePicker: TaskEvent
     object HideDatePicker: TaskEvent
 
+    // Time Picker
+//    object ShowTimePicker: TaskEvent
+//    object HideTimePicker: TaskEvent
+
     data class SetRecurrenceType(val recurrenceType: RecurrenceType) : TaskEvent
 
     data class EditTask(val task: Task) : TaskEvent
