@@ -24,6 +24,8 @@ sealed interface TaskEvent {
 
     data class EditTask(val task: Task) : TaskEvent
 
+    data class SetRecurrenceFilter(val recurrenceType: RecurrenceType) : TaskEvent
+
 //    object ShowAddTaskDialog: TaskEvent
 //    object HideAddTaskDialog: TaskEvent
 //    object ShowSettingsDialog: TaskEvent

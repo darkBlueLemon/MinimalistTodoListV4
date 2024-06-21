@@ -22,12 +22,16 @@ import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.darkblue.minimalisttodolistv4.data.RecurrenceType
 import com.darkblue.minimalisttodolistv4.data.SortType
 import com.darkblue.minimalisttodolistv4.data.Task
 import java.time.LocalDate
@@ -50,7 +54,6 @@ fun TaskScreen(
             ) {
                 FloatingActionButton(onClick = {
                     onEvent(TaskEvent.ShowDialog)
-                    TaskEvent.ShowDatePicker
                 }) {
                     Icon(
                         imageVector = Icons.Default.Add,
@@ -72,44 +75,31 @@ fun TaskScreen(
         if(state.isAddingTask) {
             AddTaskDialog(state = state, onEvent = onEvent)
         }
-        LazyColumn(
-            contentPadding = PaddingValues(16.dp),
-            modifier = Modifier.fillMaxSize(),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
-        ){
-            item {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .horizontalScroll(rememberScrollState()),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    SortType.values().forEach { sortType ->
-                        Row(
-                            modifier = Modifier
-                                .clickable {
-                                    onEvent(TaskEvent.SortTasks(sortType))
-                                },
-                            verticalAlignment = CenterVertically
-                        ) {
-                            RadioButton(
-                                selected = state.sortType == sortType,
-                                onClick = {
-                                    onEvent(TaskEvent.SortTasks(sortType))
-                                }
-                            )
-                            Text(text = sortType.name)
-                        }
-                    }
-                }
-            }
-            items(state.tasks) { task ->
-                TaskItem(
-                    task = task,
-                    onEdit = { onEvent(TaskEvent.EditTask(it)) },
-                    onDelete = { onEvent(TaskEvent.DeleteTask(it)) }
-                )
-            }
+        Column {
+            SortAndFilterControls(
+                currentSortType = state.sortType,
+                onSortChange = { onEvent(TaskEvent.SortTasks(it)) },
+                currentRecurrenceFilter = state.recurrenceFilter,
+                onRecurrenceFilterChange = { onEvent(TaskEvent.SetRecurrenceFilter(it)) }
+            )
+            TaskList(onEvent = onEvent, state = state)
+        }
+    }
+}
+
+@Composable
+fun TaskList(onEvent: (TaskEvent) -> Unit, state: TaskState) {
+    LazyColumn(
+        contentPadding = PaddingValues(16.dp),
+        modifier = Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
+    ){
+        items(state.tasks) { task ->
+            TaskItem(
+                task = task,
+                onEdit = { onEvent(TaskEvent.EditTask(it)) },
+                onDelete = { onEvent(TaskEvent.DeleteTask(it)) }
+            )
         }
     }
 }
@@ -120,13 +110,62 @@ fun TaskItem(task: Task, onEdit: (Task) -> Unit, onDelete: (Task) -> Unit) {
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        Text(text = task.title)
+        Column {
+            Text("Title: ${task.title}")
+            Text("Priority: ${task.priority}")
+            Text("Note: ${task.note}")
+            Text("Due Date: ${task.dueDate}")
+            Text("Recurrence: ${task.recurrenceType}")
+            Text("Next Due Date: ${task.nextDueDate}")
+        }
         Row {
             IconButton(onClick = { onEdit(task) }) {
                 Icon(Icons.Default.Edit, contentDescription = "Edit")
             }
             IconButton(onClick = { onDelete(task) }) {
                 Icon(Icons.Default.Delete, contentDescription = "Delete")
+            }
+        }
+    }
+}
+
+@Composable
+fun SortAndFilterControls(
+    currentSortType: SortType,
+    onSortChange: (SortType) -> Unit,
+    currentRecurrenceFilter: RecurrenceType,
+    onRecurrenceFilterChange: (RecurrenceType) -> Unit
+) {
+    Column {
+        Text("Sort by:")
+        Row (
+            modifier = Modifier
+                .fillMaxWidth()
+                .horizontalScroll(rememberScrollState()),
+            verticalAlignment = Alignment.CenterVertically
+        ){
+            SortType.entries.forEach { sortType ->
+                RadioButton(
+                    selected = currentSortType == sortType,
+                    onClick = { onSortChange(sortType) }
+                )
+                Text(sortType.name)
+            }
+        }
+
+        Text("Filter by Recurrence:")
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .horizontalScroll(rememberScrollState()),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            RecurrenceType.entries.forEach { recurrenceType ->
+                RadioButton(
+                    selected = currentRecurrenceFilter == recurrenceType,
+                    onClick = { onRecurrenceFilterChange(recurrenceType) }
+                )
+                Text(recurrenceType.name)
             }
         }
     }

@@ -23,22 +23,30 @@ class TaskViewModel(
 ): ViewModel() {
 
     private val _sortType = MutableStateFlow(SortType.PRIORITY)
-    private val _tasks = _sortType
-        .flatMapLatest { sortType ->
+    private val _recurrenceFilter = MutableStateFlow(RecurrenceType.NONE)
+    private val _tasks = combine(_sortType, _recurrenceFilter) { sortType, recurrenceType ->
+        Pair(sortType, recurrenceType)
+    }
+        .flatMapLatest { (sortType, recurrenceType) ->
             when(sortType) {
                 SortType.ALPHABETICAL -> dao.getTasksOrderedAlphabetically()
                 SortType.ALPHABETICAL_REV -> dao.getTasksOrderedAlphabeticallyRev()
                 SortType.DUE_DATE -> dao.getTasksSortedByDueDate()
                 SortType.PRIORITY -> dao.getTasksSortedByPriority()
+            }.map { tasks ->
+                tasks.filter { task ->
+                    recurrenceType == RecurrenceType.NONE || task.recurrenceType == recurrenceType
+                }
             }
         }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
 
     private val _state = MutableStateFlow(TaskState())
-    val state = combine(_state, _sortType, _tasks) { state, sortType, tasks ->
+    val state = combine(_state, _sortType, _recurrenceFilter, _tasks) { state, sortType, recurrenceType, tasks ->
         state.copy(
             tasks = tasks,
             sortType = sortType,
+            recurrenceFilter = recurrenceType
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), TaskState())
 
@@ -73,11 +81,6 @@ class TaskViewModel(
                     )
                 }
             }
-//            is TaskEvent.DeleteTask -> {
-//                viewModelScope.launch {
-//                    dao.deleteTask(event.task)
-//                }
-//            }
             TaskEvent.HideDialog -> {
                 _state.update { it.copy(
                     isAddingTask = false
@@ -184,6 +187,11 @@ class TaskViewModel(
                         editingTaskId = event.task.id
                     )
                 }
+            }
+
+            // Recurrence Filter
+            is TaskEvent.SetRecurrenceFilter -> {
+                _recurrenceFilter.value = event.recurrenceType
             }
         }
     }

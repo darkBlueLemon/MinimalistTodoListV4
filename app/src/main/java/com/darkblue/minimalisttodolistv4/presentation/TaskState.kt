@@ -18,5 +18,7 @@ data class TaskState(
     val recurrenceType: RecurrenceType = RecurrenceType.NONE,
     val nextDueDate: Long? = null,
 
-    val editingTaskId: Int? = null
+    val editingTaskId: Int? = null,
+
+    val recurrenceFilter: RecurrenceType = RecurrenceType.NONE,
 )
