@@ -8,13 +8,18 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DatePickerDefaults
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberDatePickerState
@@ -24,11 +29,21 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.dp
+
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import java.time.LocalDate
 
@@ -59,30 +74,9 @@ fun DatePicker(onDateSelected: (LocalDate) -> Unit) {
     }
 }
 
-//@RequiresApi(Build.VERSION_CODES.O)
-//@Composable
-//fun DatePicker(onDateSelected: (LocalDate) -> Unit) {
-//    val context = LocalContext.current
-//    val today = LocalDate.now()
-//
-//    val datePickerDialog = android.app.DatePickerDialog(
-//        context,
-//        { _, year, month, dayOfMonth ->
-//            val selectedDate = LocalDate.of(year, month + 1, dayOfMonth)
-//            onDateSelected(selectedDate)
-//        },
-//        today.year, today.monthValue - 1, today.dayOfMonth
-//    )
-//
-//    LaunchedEffect(Unit) {
-//        datePickerDialog.show()
-//    }
-//}
-
-
 //@OptIn(ExperimentalMaterial3Api::class)
 //@Composable
-//fun DatePicker(viewModel: TaskViewModel, onClickAction: () -> Unit) {
+//fun DatePicker(onClickAction: () -> Unit) {
 //    val state = rememberDatePickerState()
 //    val openDialog = remember { mutableStateOf(true) }
 //
@@ -95,7 +89,7 @@ fun DatePicker(onDateSelected: (LocalDate) -> Unit) {
 //            ),
 //            onDismissRequest = {
 //                openDialog.value = false
-//                viewModel.setDate("")
+////                viewModel.setDate("")
 //                onClickAction.invoke()
 //            },
 //            confirmButton = {
@@ -169,7 +163,7 @@ fun DatePicker(onDateSelected: (LocalDate) -> Unit) {
 //                        TextButton(
 //                            onClick = {
 //                                openDialog.value = false
-//                                viewModel.setDate("")
+////                                viewModel.setDate("")
 //                                onClickAction.invoke()
 //                            }
 //                        ) {
@@ -189,7 +183,7 @@ fun DatePicker(onDateSelected: (LocalDate) -> Unit) {
 //        }
 //    }
 //
-////    viewModel.setDate(state.selectedDateMillis?.let { viewModel.convertMillisToDate(it) }.toString())
-////    if(state.selectedDateMillis != null) Log.d("MYTAG", state.selectedDateMillis.toString())
-//    if(state.selectedDateMillis != null) viewModel.setDate(state.selectedDateMillis.toString())
+//////    viewModel.setDate(state.selectedDateMillis?.let { viewModel.convertMillisToDate(it) }.toString())
+//////    if(state.selectedDateMillis != null) Log.d("MYTAG", state.selectedDateMillis.toString())
+////    if(state.selectedDateMillis != null) viewModel.setDate(state.selectedDateMillis.toString())
 //}

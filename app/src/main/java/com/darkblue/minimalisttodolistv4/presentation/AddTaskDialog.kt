@@ -3,13 +3,17 @@ package com.darkblue.minimalisttodolistv4.presentation
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenu
@@ -19,9 +23,11 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.darkblue.minimalisttodolistv4.data.RecurrenceType
@@ -43,79 +49,126 @@ fun AddTaskDialog(
             onEvent(TaskEvent.HideDialog)
         }
     ) {
-        Column(
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+        Box(
+            modifier = Modifier
+                .clip(shape = RoundedCornerShape(percent = 7))
+                .background(MaterialTheme.colorScheme.background)
+                .size(width = 350.dp, height = 360.dp)
+                .border(
+                    width = 2.dp,
+                    color = MaterialTheme.colorScheme.onBackground,
+                    shape = RoundedCornerShape(percent = 7)
+                ),
         ) {
-            TextField(
-                value = state.title,
-                onValueChange = {
-                    onEvent(TaskEvent.SetTitle(it))
-                },
-                label = {
-                    Text(text = "Title")
-                }
-            )
-            TextField(
-                value = state.priority.toString(),
-                onValueChange = {
-                    onEvent(TaskEvent.SetPriority(it.toInt()))
-                },
-                label = {
-                    Text(text = "Priority")
-                }
+            Column(
+                modifier = Modifier
+                    .padding(15.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                TextField(
+                    value = state.title,
+                    onValueChange = {
+                        onEvent(TaskEvent.SetTitle(it))
+                    },
+                    label = {
+                        Text(text = "Title")
+                    },
+                    colors = TextFieldDefaults.colors(
+                        focusedContainerColor = Color.Transparent,
+                        unfocusedContainerColor = Color.Transparent,
+                        disabledContainerColor = Color.Transparent,
+                        focusedIndicatorColor = Color.Transparent,
+                        unfocusedIndicatorColor = Color.Transparent,
+                        unfocusedTextColor = MaterialTheme.colorScheme.primary,
+                        focusedTextColor = MaterialTheme.colorScheme.primary,
+                    ),
+                )
+                TextField(
+                    value = state.priority.toString(),
+                    onValueChange = {
+                        onEvent(TaskEvent.SetPriority(it.toInt()))
+                    },
+                    label = {
+                        Text(text = "Priority")
+                    },
+                    colors = TextFieldDefaults.colors(
+                        focusedContainerColor = Color.Transparent,
+                        unfocusedContainerColor = Color.Transparent,
+                        disabledContainerColor = Color.Transparent,
+                        focusedIndicatorColor = Color.Transparent,
+                        unfocusedIndicatorColor = Color.Transparent,
+                        unfocusedTextColor = MaterialTheme.colorScheme.primary,
+                        focusedTextColor = MaterialTheme.colorScheme.primary,
+                        ),
 //                placeholder = {
 //                    Text(text = "Priority")
 //                }
-            )
-            TextField(
-                value = state.note,
-                onValueChange = {
-                    onEvent(TaskEvent.SetNote(it))
-                },
-                label = {
-                    Text(text = "Note")
-                }
-            )
+                )
+                TextField(
+                    value = state.note,
+                    onValueChange = {
+                        onEvent(TaskEvent.SetNote(it))
+                    },
+                    label = {
+                        Text(text = "Note")
+                    },
+                    colors = TextFieldDefaults.colors(
+                        focusedContainerColor = Color.Transparent,
+                        unfocusedContainerColor = Color.Transparent,
+                        disabledContainerColor = Color.Transparent,
+                        focusedIndicatorColor = Color.Transparent,
+                        unfocusedIndicatorColor = Color.Transparent,
+                        unfocusedTextColor = MaterialTheme.colorScheme.primary,
+                        focusedTextColor = MaterialTheme.colorScheme.primary,
+                    ),
+                )
 
-            // Date
-            TextButton(
-                onClick = {
-                    onEvent(TaskEvent.ShowDatePicker)
-                }
-            ) {
-                Text(text = "Due Date")
-            }
-            TextField(
-                value = state.dueDate.toString(),
-                onValueChange = {
-                    onEvent(TaskEvent.SetDueDate(it.toLong()))
-                },
-                label = {
+                // Date
+                TextButton(
+                    onClick = {
+                        onEvent(TaskEvent.ShowDatePicker)
+                    }
+                ) {
                     Text(text = "Due Date")
                 }
-            )
-            state.dueDate?.let {
-                val dueDate = Instant.ofEpochMilli(it).atZone(ZoneId.systemDefault()).toLocalDate()
-                Text(text = "Due Date: ${dueDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))}")
-            }
-            if (state.isDatePickerVisible) {
-                DatePicker(onDateSelected = { date ->
-                    val epochMilli = date.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
-                    onEvent(TaskEvent.SetDueDate(epochMilli))
-                    onEvent(TaskEvent.HideDatePicker)
-                })
-            }
-
-            // Recurrence
-            RecurrenceTypeSelector(
-                selectedRecurrenceType = state.recurrenceType,
-                onRecurrenceTypeSelected = { recurrenceType ->
-                    onEvent(TaskEvent.SetRecurrenceType(recurrenceType))
+                TextField(
+                    value = state.dueDate.toString(),
+                    onValueChange = {
+                        onEvent(TaskEvent.SetDueDate(it.toLong()))
+                    },
+                    label = {
+                        Text(text = "Due Date")
+                    }
+                )
+                state.dueDate?.let {
+                    val dueDate =
+                        Instant.ofEpochMilli(it).atZone(ZoneId.systemDefault()).toLocalDate()
+                    Text(text = "Due Date: ${dueDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))}")
                 }
-            )
-            state.nextDueDate?.let {
-                val nextDueDate = Instant.ofEpochMilli(it).atZone(ZoneId.systemDefault()).toLocalDate()
-                Text(text = "Next Due Date: ${nextDueDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))}")
+                if (state.isDatePickerVisible) {
+//                    DatePicker {
+//
+//                    }
+                    DatePicker(onDateSelected = { date ->
+                        val epochMilli =
+                            date.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
+                        onEvent(TaskEvent.SetDueDate(epochMilli))
+                        onEvent(TaskEvent.HideDatePicker)
+                    })
+                }
+
+                // Recurrence
+                RecurrenceTypeSelector(
+                    selectedRecurrenceType = state.recurrenceType,
+                    onRecurrenceTypeSelected = { recurrenceType ->
+                        onEvent(TaskEvent.SetRecurrenceType(recurrenceType))
+                    }
+                )
+                state.nextDueDate?.let {
+                    val nextDueDate =
+                        Instant.ofEpochMilli(it).atZone(ZoneId.systemDefault()).toLocalDate()
+                    Text(text = "Next Due Date: ${nextDueDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))}")
+                }
             }
         }
         Box(
@@ -140,7 +193,7 @@ fun RecurrenceTypeSelector(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceEvenly
     ) {
-        RecurrenceType.values().forEach { recurrenceType ->
+        RecurrenceType.entries.forEach { recurrenceType ->
             Text(
                 text = recurrenceType.name,
                 modifier = Modifier
