@@ -1,5 +1,10 @@
 package com.darkblue.minimalisttodolistv4.presentation
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.darkblue.minimalisttodolistv4.data.SortType
@@ -13,6 +18,12 @@ import kotlinx.coroutines.launch
 class TaskViewModel(
     private val dao: TaskDao
 ): ViewModel() {
+    public var taskColor by mutableStateOf(Color(0xFF6200EE)) // Default color
+
+
+    fun updateTaskColor(newColor: Color) {
+        taskColor = newColor
+    }
 
     private val _sortType = MutableStateFlow(SortType.PRIORITY)
     private val _tasks = _sortType

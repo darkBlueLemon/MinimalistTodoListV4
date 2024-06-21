@@ -70,4 +70,12 @@ dependencies {
 
     implementation(libs.androidx.room.ktx)
     kapt("androidx.room:room-compiler:2.6.1")
+
+    implementation(libs.androidx.core.ktx.v1101)
+    implementation(libs.androidx.lifecycle.runtime.ktx.v261)
+    implementation(libs.androidx.activity.compose.v172)
+    implementation(libs.ui)
+    implementation(libs.androidx.material)
+    implementation(libs.ui.tooling.preview)
+    debugImplementation(libs.ui.tooling)
 }

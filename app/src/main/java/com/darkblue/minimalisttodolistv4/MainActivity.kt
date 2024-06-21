@@ -1,5 +1,6 @@
 package com.darkblue.minimalisttodolistv4
 
+import TaskScreen
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -11,7 +12,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.room.Room
 import com.darkblue.minimalisttodolistv4.data.ContactDatabase
-import com.darkblue.minimalisttodolistv4.presentation.TaskScreen
 import com.darkblue.minimalisttodolistv4.presentation.TaskViewModel
 import com.darkblue.minimalisttodolistv4.ui.theme.MinimalistTodoListV4Theme
 
@@ -40,7 +40,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             MinimalistTodoListV4Theme {
                 val state by viewModel.state.collectAsState()
-                TaskScreen(state = state, onEvent = viewModel::onEvent)
+                TaskScreen(state = state, onEvent = viewModel::onEvent,viewModel)
             }
         }
     }
