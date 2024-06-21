@@ -3,6 +3,7 @@ package com.darkblue.minimalisttodolistv4.ui.theme
 import android.app.Activity
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.material3.ListItemColors
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.dynamicDarkColorScheme
@@ -37,7 +38,13 @@ private val LightColorScheme2 = lightColorScheme(
     primary = White,
     secondary = Black,
     background = Black,
-    onBackground = White
+    onBackground = White,
+    surface = Black,
+
+    onPrimary = Black,
+    onSecondary = White,
+    onTertiary = Black,
+    onSurface = Black
 )
 
 @Composable
@@ -56,7 +63,8 @@ fun MinimalistTodoListV4Theme(
 //        darkTheme -> DarkColorScheme
 //        else -> LightColorScheme
 //    }
-    val colorScheme = LightColorScheme2
+    var colorScheme = LightColorScheme2
+//    colorScheme = LightColorScheme
 
     MaterialTheme(
         colorScheme = colorScheme,

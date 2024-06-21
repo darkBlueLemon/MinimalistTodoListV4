@@ -71,4 +71,16 @@ dependencies {
 
     implementation(libs.androidx.room.ktx)
     kapt("androidx.room:room-compiler:2.6.1")
+
+    // Sheets Compose Dialog
+    implementation (libs.core)
+
+    // CALENDAR
+    implementation ("com.maxkeppeler.sheets-compose-dialogs:calendar:1.3.0")
+
+    // CLOCK
+    implementation ("com.maxkeppeler.sheets-compose-dialogs:clock:1.3.0")
+
+    // DATE TIME
+    implementation ("com.maxkeppeler.sheets-compose-dialogs:date-time:1.3.0")
 }

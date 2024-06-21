@@ -1,6 +1,7 @@
 package com.darkblue.minimalisttodolistv4.presentation
 
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -9,15 +10,12 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -49,17 +47,7 @@ fun AddTaskDialog(
             onEvent(TaskEvent.HideDialog)
         }
     ) {
-        Box(
-            modifier = Modifier
-                .clip(shape = RoundedCornerShape(percent = 7))
-                .background(MaterialTheme.colorScheme.background)
-                .size(width = 350.dp, height = 360.dp)
-                .border(
-                    width = 2.dp,
-                    color = MaterialTheme.colorScheme.onBackground,
-                    shape = RoundedCornerShape(percent = 7)
-                ),
-        ) {
+        CustomBox {
             Column(
                 modifier = Modifier
                     .padding(15.dp),
@@ -146,16 +134,27 @@ fun AddTaskDialog(
                     Text(text = "Due Date: ${dueDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))}")
                 }
                 if (state.isDatePickerVisible) {
-//                    DatePicker {
-//
-//                    }
-                    DatePicker(onDateSelected = { date ->
-                        val epochMilli =
-                            date.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
-                        onEvent(TaskEvent.SetDueDate(epochMilli))
+                    Log.d("TAG", "clicked")
+                    DatePicker(closeSelection = {
                         onEvent(TaskEvent.HideDatePicker)
                     })
+//                    DatePicker(onDateSelected = { date ->
+//                        val epochMilli =
+//                            date.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
+//                        onEvent(TaskEvent.SetDueDate(epochMilli))
+//                        onEvent(TaskEvent.HideDatePicker)
+//                    })
                 }
+
+//                // Time
+//
+//                TextButton(
+//                    onClick = {
+//                        onEvent(TaskEvent.ShowDatePicker)
+//                    }
+//                ) {
+//                    Text(text = "Time Due")
+//                }
 
                 // Recurrence
                 RecurrenceTypeSelector(
@@ -169,16 +168,11 @@ fun AddTaskDialog(
                         Instant.ofEpochMilli(it).atZone(ZoneId.systemDefault()).toLocalDate()
                     Text(text = "Next Due Date: ${nextDueDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))}")
                 }
-            }
-        }
-        Box(
-            modifier = Modifier.fillMaxWidth(),
-            contentAlignment = Alignment.CenterEnd
-        ) {
-            Button(onClick = {
-                onEvent(TaskEvent.SaveTask)
-            }) {
-                Text(text = "Save")
+                Button(onClick = {
+                    onEvent(TaskEvent.SaveTask)
+                }) {
+                    Text(text = "Save")
+                }
             }
         }
     }
