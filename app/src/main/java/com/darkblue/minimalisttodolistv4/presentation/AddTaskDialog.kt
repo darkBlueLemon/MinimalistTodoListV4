@@ -28,6 +28,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.darkblue.minimalisttodolistv4.data.RecurrenceType
 import java.time.Instant
 import java.time.ZoneId
@@ -119,10 +120,13 @@ fun AddTaskDialog(
                 ) {
                     Text(text = "Due Date")
                 }
+                // Inside your Composable function
+                val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
                 TextField(
-                    value = state.dueDate.toString(),
+                    value = state.dueDate?.let {
+                        Instant.ofEpochMilli(it).atZone(ZoneId.systemDefault()).toLocalDateTime().format(formatter)
+                    } ?: "",
                     onValueChange = {
-                        onEvent(TaskEvent.SetDueDate(it.toLong()))
                     },
                     label = {
                         Text(text = "Due Date")
@@ -134,12 +138,11 @@ fun AddTaskDialog(
                     Text(text = "Due Date: ${dueDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))}")
                 }
                 if (state.isDatePickerVisible) {
-                    Log.d("TAG", "clicked")
                     DatePicker(onDateSelected = { date ->
-                        val epochMilli =
-                            date.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
-                        onEvent(TaskEvent.SetDueDate(epochMilli))
-                        onEvent(TaskEvent.HideDatePicker)
+//                        val epochMilli =
+//                            date.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
+//                        onEvent(TaskEvent.SetDueDate(epochMilli))
+                        onEvent(TaskEvent.SetDueDate(date))
                     }, closeSelection = {
                         onEvent(TaskEvent.HideDatePicker)
                     })
@@ -148,10 +151,22 @@ fun AddTaskDialog(
 //                // Time
                 TextButton(
                     onClick = {
-//                        onEvent(TaskEvent.ShowTimePicker)
+                        onEvent(TaskEvent.ShowTimePicker)
                     }
                 ) {
                     Text(text = "Time Due")
+                }
+                if(state.isTimePickerVisible) {
+                    TimePicker(
+                        onTimeSelected = { time ->
+                            onEvent(TaskEvent.SetDueTime(time))
+//                            onEvent(TaskEvent.HideTimePicker)
+                        },
+                        closeSelection = {
+                            onEvent(TaskEvent.HideTimePicker)
+                        }
+                    )
+
                 }
 
                 // Recurrence
@@ -166,9 +181,10 @@ fun AddTaskDialog(
                         Instant.ofEpochMilli(it).atZone(ZoneId.systemDefault()).toLocalDate()
                     Text(text = "Next Due Date: ${nextDueDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))}")
                 }
+
                 Button(onClick = {
                     onEvent(TaskEvent.SaveTask)
-                }) {
+                }, modifier = Modifier.align(Alignment.CenterHorizontally)) {
                     Text(text = "Save")
                 }
             }
@@ -188,9 +204,10 @@ fun RecurrenceTypeSelector(
         RecurrenceType.entries.forEach { recurrenceType ->
             Text(
                 text = recurrenceType.name,
+                fontSize = 12.sp,
                 modifier = Modifier
                     .clickable { onRecurrenceTypeSelected(recurrenceType) }
-                    .padding(8.dp)
+                    .padding(1.dp)
                     .background(
                         if (recurrenceType == selectedRecurrenceType) MaterialTheme.colorScheme.primary
                         else Color.Transparent

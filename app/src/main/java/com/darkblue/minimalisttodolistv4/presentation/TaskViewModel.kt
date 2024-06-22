@@ -81,11 +81,6 @@ class TaskViewModel(
                     )
                 }
             }
-            TaskEvent.HideDialog -> {
-                _state.update { it.copy(
-                    isAddingTask = false
-                ) }
-            }
             TaskEvent.SaveTask -> {
                 val title = state.value.title
                 val priority = state.value.priority
@@ -97,7 +92,7 @@ class TaskViewModel(
 
                 val id = state.value.editingTaskId
 
-                if(title.isBlank() || note.isBlank()) {
+                if(title.isBlank()) {
                     return
                 }
 
@@ -141,31 +136,25 @@ class TaskViewModel(
                     note = event.note
                 ) }
             }
-            is TaskEvent.SetDueDate -> {
-                _state.update { it.copy(
-                    dueDate = event.dueDate
-                ) }
-            }
             TaskEvent.ShowDialog -> {
                 _state.update { it.copy(
                     isAddingTask = true
                 ) }
             }
+            TaskEvent.HideDialog -> {
+                _state.update { it.copy(
+                    isAddingTask = false,
+                    title = "",
+                    priority = 0,
+                    note = "",
+                    dueDate = null,
+                    recurrenceType = RecurrenceType.NONE,
+                    nextDueDate = null,
+                    editingTaskId = null
+                ) }
+            }
             is TaskEvent.SortTasks -> {
                 _sortType.value = event.sortType
-            }
-
-            // Date Picker
-            TaskEvent.ShowDatePicker -> {
-                Log.d("TAG", "viewModel")
-                _state.update { it.copy(
-                    isDatePickerVisible = true
-                ) }
-            }
-            TaskEvent.HideDatePicker -> {
-                _state.update { it.copy(
-                    isDatePickerVisible = false
-                ) }
             }
 
             // Recurrence
@@ -193,6 +182,44 @@ class TaskViewModel(
             is TaskEvent.SetRecurrenceFilter -> {
                 _recurrenceFilter.value = event.recurrenceType
             }
+
+            // Date Picker
+            TaskEvent.ShowDatePicker -> {
+                _state.update { it.copy(
+                    isDatePickerVisible = true
+                ) }
+            }
+            TaskEvent.HideDatePicker -> {
+                _state.update { it.copy(
+                    isDatePickerVisible = false
+                ) }
+            }
+            is TaskEvent.SetDueDate -> {
+                _state.update { it.copy(
+                    dueDateOnly = event.dueDate
+                ).also {
+                    combineDateAndTime(it)
+                } }
+            }
+
+            // Time Picker
+            TaskEvent.ShowTimePicker -> {
+                _state.update { it.copy(
+                    isTimePickerVisible = true
+                ) }
+            }
+            TaskEvent.HideTimePicker -> {
+                _state.update { it.copy(
+                    isTimePickerVisible = false
+                ) }
+            }
+            is TaskEvent.SetDueTime -> {
+                _state.update { it.copy(
+                    dueTimeOnly = event.dueTime
+                ).also {
+                    combineDateAndTime(it)
+                } }
+            }
         }
     }
 
@@ -208,5 +235,17 @@ class TaskViewModel(
             else -> return null
         }
         return nextDate.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun combineDateAndTime(state: TaskState) {
+        val date = state.dueDateOnly
+        val time = state.dueTimeOnly
+        if (date != null) {
+            val combinedDateTime = if(time != null) date.atTime(time) else date.atStartOfDay()
+            _state.update { it.copy(
+                dueDate = combinedDateTime.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
+            ) }
+        }
     }
 }

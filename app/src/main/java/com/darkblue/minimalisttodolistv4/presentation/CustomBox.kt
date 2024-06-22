@@ -19,7 +19,7 @@ fun CustomBox(
 //    width: Dp,
 //    height: Dp,
     padding: Dp = 10.dp,
-    backgroundColor: Color = Color.Red,
+    backgroundColor: Color = MaterialTheme.colorScheme.background,
     borderColor: Color = MaterialTheme.colorScheme.onBackground,
     borderWidth: Dp = 2.dp,
     cornerRadiusPercent: Int = 7,
@@ -29,7 +29,7 @@ fun CustomBox(
         modifier = Modifier
 //            .size(width = width, height = height)
 //            .size(width = 350.dp, height = 360.dp)
-            .size(800.dp)
+//            .size(800.dp)
             .padding(padding)
             .clip(RoundedCornerShape(percent = cornerRadiusPercent))
             .background(backgroundColor)

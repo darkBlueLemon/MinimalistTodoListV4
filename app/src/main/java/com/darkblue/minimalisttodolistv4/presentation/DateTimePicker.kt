@@ -1,11 +1,8 @@
 package com.darkblue.minimalisttodolistv4.presentation
 
 import android.os.Build
-import android.util.Log
 import androidx.annotation.RequiresApi
-import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -19,17 +16,15 @@ import com.maxkeppeler.sheets.calendar.models.CalendarStyle
 import com.maxkeppeler.sheets.clock.ClockDialog
 import com.maxkeppeler.sheets.clock.models.ClockConfig
 import com.maxkeppeler.sheets.clock.models.ClockSelection
-import com.maxkeppeler.sheets.date_time.DateTimeDialog
-import com.maxkeppeler.sheets.date_time.models.DateTimeSelection
 import java.time.LocalDate
-import java.time.LocalDateTime
 import java.time.LocalTime
 
 @OptIn(ExperimentalMaterial3Api::class)
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun DatePicker(modifier: Modifier = Modifier, onDateSelected: (LocalDate) -> Unit, closeSelection: () -> Unit) {
-    val selectedDate = remember { mutableStateOf<LocalDate?>(null) }
+    val today = LocalDate.now()
+    val selectedDate = remember { mutableStateOf(today) }
     val state = rememberUseCaseState(visible = true, onCloseRequest = { closeSelection() })
 
     CalendarDialog(
@@ -39,75 +34,41 @@ fun DatePicker(modifier: Modifier = Modifier, onDateSelected: (LocalDate) -> Uni
             monthSelection = true,
             style = CalendarStyle.MONTH,
         ),
-        selection = CalendarSelection.Date { newDate ->
+        selection = CalendarSelection.Date(
+            selectedDate = today // highlight today's date
+        ) { newDate ->
             selectedDate.value = newDate
             onDateSelected(newDate)
-//            closeSelection()
         },
     )
 }
-//fun DatePicker(modifier: Modifier = Modifier, closeSelection: () -> Unit, ) {
-//    val selectedDate = remember { mutableStateOf<LocalDate?>(null) }
-////    CustomBox {
-//        CalendarDialog(
-//            state = rememberUseCaseState(visible = true, onCloseRequest = { closeSelection() }),
-//            config = CalendarConfig(
-//                yearSelection = true,
-//                monthSelection = true,
-//                style = CalendarStyle.MONTH,
-//            ),
-//            selection = CalendarSelection.Date { newDate ->
-//                selectedDate.value = newDate
-//            },
-//        )
-////    }
-//}
 
 @RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TimePicker(modifier: Modifier = Modifier, closeSelection: () -> Unit) {
-    val selectedTime = remember { mutableStateOf(LocalTime.of(8, 20, 0)) }
+fun TimePicker(
+    modifier: Modifier = Modifier,
+    onTimeSelected: (LocalTime) -> Unit,
+    closeSelection: () -> Unit
+) {
+    val selectedTime = remember { mutableStateOf<LocalTime?>(null) }
+
     ClockDialog(
-        state = rememberUseCaseState(visible = true, onCloseRequest = { closeSelection() }),
+        state = rememberUseCaseState(visible = true, onCloseRequest = {
+            closeSelection()
+        }),
         selection = ClockSelection.HoursMinutes { hours, minutes ->
             selectedTime.value = LocalTime.of(hours, minutes, 0)
+            onTimeSelected(selectedTime.value!!)
+            // closeSelection() // Uncomment this if you want to close the dialog after selection
         },
         config = ClockConfig(
-            boundary = LocalTime.of(0, 0, 0)..LocalTime.of(12, 59, 0),
-            defaultTime = selectedTime.value,
-            is24HourFormat = false
+            boundary = LocalTime.of(0, 0, 0)..LocalTime.of(23, 59, 0),
+            defaultTime = selectedTime.value ?: LocalTime.of(8, 20, 0), // Use a default value if selectedTime is null
+            is24HourFormat = true // Change to false if you want 12-hour format
         ),
     )
 }
-
-//@RequiresApi(Build.VERSION_CODES.O)
-//@Composable
-//fun DatePicker(onDateSelected: (LocalDate) -> Unit) {
-//    val context = LocalContext.current
-//    val today = LocalDate.now()
-//
-//    // A state to trigger the dialog
-//    var showDialog by remember { mutableStateOf(true) }
-//
-//    if (showDialog) {
-//        val datePickerDialog = android.app.DatePickerDialog(
-//            context,
-//            { _, year, month, dayOfMonth ->
-//                val selectedDate = LocalDate.of(year, month + 1, dayOfMonth)
-//                onDateSelected(selectedDate)
-//                showDialog = false // Close the dialog
-//            },
-//            today.year, today.monthValue - 1, today.dayOfMonth
-//        )
-//
-//        // Show the date picker dialog
-//        LaunchedEffect(Unit) {
-//            datePickerDialog.show()
-//        }
-//    }
-//}
-
 //@OptIn(ExperimentalMaterial3Api::class)
 //@Composable
 //fun DatePicker(onClickAction: () -> Unit) {

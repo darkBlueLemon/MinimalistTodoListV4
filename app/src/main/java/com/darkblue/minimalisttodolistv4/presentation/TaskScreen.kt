@@ -21,6 +21,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
@@ -34,7 +35,9 @@ import androidx.navigation.NavController
 import com.darkblue.minimalisttodolistv4.data.RecurrenceType
 import com.darkblue.minimalisttodolistv4.data.SortType
 import com.darkblue.minimalisttodolistv4.data.Task
+import java.time.Instant
 import java.time.LocalDate
+import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -104,6 +107,7 @@ fun TaskList(onEvent: (TaskEvent) -> Unit, state: TaskState) {
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun TaskItem(task: Task, onEdit: (Task) -> Unit, onDelete: (Task) -> Unit) {
     Row(
@@ -114,9 +118,17 @@ fun TaskItem(task: Task, onEdit: (Task) -> Unit, onDelete: (Task) -> Unit) {
             Text("Title: ${task.title}")
             Text("Priority: ${task.priority}")
             Text("Note: ${task.note}")
-            Text("Due Date: ${task.dueDate}")
+            // Inside your Composable function
+            val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
+            val dueDate = task.dueDate?.let {
+                Instant.ofEpochMilli(it).atZone(ZoneId.systemDefault()).toLocalDateTime().format(formatter)
+            } ?: ""
+            Text("Due Date: $dueDate")
             Text("Recurrence: ${task.recurrenceType}")
-            Text("Next Due Date: ${task.nextDueDate}")
+            val nextDueDate = task.nextDueDate?.let {
+                Instant.ofEpochMilli(it).atZone(ZoneId.systemDefault()).toLocalDateTime().format(formatter)
+            } ?: ""
+            Text("Next Due Date: $nextDueDate")
         }
         Row {
             IconButton(onClick = { onEdit(task) }) {
