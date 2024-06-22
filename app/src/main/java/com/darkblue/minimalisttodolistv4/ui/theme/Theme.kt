@@ -64,7 +64,7 @@ fun MinimalistTodoListV4Theme(
 //        else -> LightColorScheme
 //    }
     var colorScheme = LightColorScheme2
-    colorScheme = LightColorScheme
+//    colorScheme = LightColorScheme
 
     MaterialTheme(
         colorScheme = colorScheme,

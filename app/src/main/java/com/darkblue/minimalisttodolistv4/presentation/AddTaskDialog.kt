@@ -212,7 +212,7 @@ fun RecurrenceTypeSelector(
                         if (recurrenceType == selectedRecurrenceType) MaterialTheme.colorScheme.primary
                         else Color.Transparent
                     ),
-                color = if (recurrenceType == selectedRecurrenceType) Color.White else Color.Black
+                color = if (recurrenceType == selectedRecurrenceType) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.primary
             )
         }
     }
