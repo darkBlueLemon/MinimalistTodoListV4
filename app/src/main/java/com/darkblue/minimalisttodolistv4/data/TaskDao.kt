@@ -33,8 +33,12 @@ interface TaskDao {
     @Query("SELECT * FROM task ORDER BY title DESC")
     fun getTasksOrderedAlphabeticallyRev(): Flow<List<Task>>
 
+    // Deleted Tasks
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertDeletedTask(deletedTask: DeletedTask)
+
+    @Delete
+    suspend fun deleteDeletedTask(deletedTask: DeletedTask)
 
     @Query("SELECT * FROM deleted_tasks ORDER BY deletedAt DESC")
     fun getDeletedTasks(): Flow<List<DeletedTask>>

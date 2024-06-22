@@ -220,6 +220,28 @@ class TaskViewModel(
                     combineDateAndTime(it)
                 } }
             }
+
+            // Deletion Events
+            is TaskEvent.RemoveDeletedTask -> {
+                viewModelScope.launch {
+                    dao.deleteDeletedTask(event.deletedTask)
+                }
+            }
+            is TaskEvent.UndoDeleteTask -> {
+                viewModelScope.launch {
+                    val deletedTask = event.deletedTask
+                    val restoredTask = Task(
+                        title = deletedTask.title,
+                        priority = deletedTask.priority,
+                        note = deletedTask.note,
+                        dueDate = deletedTask.dueDate,
+                        recurrenceType = deletedTask.recurrenceType,
+                        nextDueDate = deletedTask.nextDueDate
+                    )
+                    dao.upsertTask(restoredTask)
+                    dao.deleteDeletedTask(deletedTask)
+                }
+            }
         }
     }
 
