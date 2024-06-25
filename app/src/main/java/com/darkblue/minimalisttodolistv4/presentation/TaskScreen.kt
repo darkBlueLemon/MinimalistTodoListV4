@@ -14,6 +14,8 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.rounded.Star
 import androidx.compose.material3.Button
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -29,12 +31,17 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.darkblue.minimalisttodolistv4.data.RecurrenceType
 import com.darkblue.minimalisttodolistv4.data.SortType
 import com.darkblue.minimalisttodolistv4.data.Task
+import com.darkblue.minimalisttodolistv4.ui.theme.Priority0
+import com.darkblue.minimalisttodolistv4.ui.theme.Priority1
+import com.darkblue.minimalisttodolistv4.ui.theme.Priority2
+import com.darkblue.minimalisttodolistv4.ui.theme.Priority3
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
@@ -90,6 +97,7 @@ fun TaskScreen(
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun TaskList(onEvent: (TaskEvent) -> Unit, state: TaskState) {
     LazyColumn(
@@ -110,16 +118,40 @@ fun TaskList(onEvent: (TaskEvent) -> Unit, state: TaskState) {
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun TaskItem(task: Task, onEdit: (Task) -> Unit, onDelete: (Task) -> Unit) {
+    val priorityColor = when (task.priority) {
+        3 -> Priority3
+        2 -> Priority2
+        1 -> Priority1
+        else -> Priority0
+    }
+
     Row(
+        modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
-
     ) {
-        Column {
-            Text("Title: ${task.title}")
+        Icon(
+            imageVector = Icons.Rounded.Star,
+            contentDescription = "Priority",
+            tint = priorityColor,
+            modifier = Modifier.size(24.dp)
+        )
+        Column(
+            modifier = Modifier
+                .weight(1f)
+                .padding(start = 8.dp)
+                .clickable { onEdit(task) }
+        ) {
+            Text(
+                "Title: ${task.title}",
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(end = 8.dp),
+//                maxLines = 1,
+//                overflow = TextOverflow.Ellipsis
+            )
             Text("Priority: ${task.priority}")
             Text("Note: ${task.note}")
-            // Inside your Composable function
             val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
             val dueDate = task.dueDate?.let {
                 Instant.ofEpochMilli(it).atZone(ZoneId.systemDefault()).toLocalDateTime().format(formatter)
@@ -131,16 +163,12 @@ fun TaskItem(task: Task, onEdit: (Task) -> Unit, onDelete: (Task) -> Unit) {
             } ?: ""
             Text("Next Due Date: $nextDueDate")
         }
-        Row {
-            IconButton(onClick = { onEdit(task) }) {
-                Icon(Icons.Default.Edit, contentDescription = "Edit")
-            }
-            IconButton(onClick = { onDelete(task) }) {
-                Icon(Icons.Default.Delete, contentDescription = "Delete")
-            }
+        IconButton(onClick = { onDelete(task) }) {
+            Icon(Icons.Default.Delete, contentDescription = "Delete")
         }
     }
 }
+
 
 @Composable
 fun SortAndFilterControls(

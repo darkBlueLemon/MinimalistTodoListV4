@@ -12,3 +12,9 @@ val Pink40 = Color(0xFF7D5260)
 
 val Black = Color(0xFF000000)
 val White = Color(0xFFFFFFFF)
+
+val Priority3 = Color(0xFFFF5147)
+val Priority2 = Color(0xFFFF964F)
+val Priority1 = Color(0xFFFDFD96)
+val Priority0 = Color.Transparent
+
