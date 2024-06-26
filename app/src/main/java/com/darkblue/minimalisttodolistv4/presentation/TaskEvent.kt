@@ -14,8 +14,13 @@ sealed interface TaskEvent {
     data class SetNote(val note: String): TaskEvent
     data class SortTasks(val sortType: SortType): TaskEvent
 
-    object ShowDialog: TaskEvent
-    object HideDialog: TaskEvent
+    // AddTask Dialog
+    object ShowAddTaskDialog: TaskEvent
+    object HideAddTaskDialog: TaskEvent
+
+    // Menu Dialog
+    object ShowMenuDialog: TaskEvent
+    object HideMenuDialog: TaskEvent
 
     // Date Picker
     object ShowDatePicker: TaskEvent

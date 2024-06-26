@@ -1,57 +1,40 @@
 package com.darkblue.minimalisttodolistv4.presentation
 
+import android.content.Context
 import android.os.Build
-import android.util.Log
+import android.os.VibrationEffect
+import android.os.Vibrator
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
-import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.BasicText
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.rounded.Star
-import androidx.compose.material3.Button
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.FloatingActionButtonDefaults
-import androidx.compose.material3.FloatingActionButtonElevation
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.darkblue.minimalisttodolistv4.data.RecurrenceType
-import com.darkblue.minimalisttodolistv4.data.SortType
 import com.darkblue.minimalisttodolistv4.data.Task
 import com.darkblue.minimalisttodolistv4.ui.theme.Priority0
 import com.darkblue.minimalisttodolistv4.ui.theme.Priority1
@@ -60,10 +43,6 @@ import com.darkblue.minimalisttodolistv4.ui.theme.Priority3
 import com.darkblue.minimalisttodolistv4.ui.theme.dateGray
 import com.darkblue.minimalisttodolistv4.ui.theme.dateRed
 import java.time.Instant
-import java.time.LocalDate
-import java.time.LocalDateTime
-import java.time.ZoneId
-import java.time.format.DateTimeFormatter
 
 @OptIn(ExperimentalFoundationApi::class)
 @RequiresApi(Build.VERSION_CODES.O)
@@ -74,6 +53,8 @@ fun TaskScreen(
     viewModel: TaskViewModel,
     navController: NavController
 ) {
+    val context = LocalContext.current
+
     Scaffold(
         floatingActionButton = {
             FloatingActionButton(
@@ -96,9 +77,16 @@ fun TaskScreen(
                     modifier = Modifier
                         .combinedClickable(
                             onLongClick = {
-                                navController.navigate("history")
-                            }, onClick = {
-                                onEvent(TaskEvent.ShowDialog)
+                                vibrate(context = context, strength = 2)
+//                                navController.navigate("history")
+                                onEvent(TaskEvent.ShowMenuDialog)
+                            },
+                            onClick = {
+
+                                // Vibrate on click?
+                                vibrate(context = context, strength = 1)
+
+                                onEvent(TaskEvent.ShowAddTaskDialog)
                             }
                         )
                 )
@@ -109,15 +97,10 @@ fun TaskScreen(
         if(state.isAddingTask) {
             AddTaskDialog(state = state, onEvent = onEvent)
         }
-        Column {
-            SortAndFilterControls(
-                currentSortType = state.sortType,
-                onSortChange = { onEvent(TaskEvent.SortTasks(it)) },
-                currentRecurrenceFilter = state.recurrenceFilter,
-                onRecurrenceFilterChange = { onEvent(TaskEvent.SetRecurrenceFilter(it)) }
-            )
-            TaskList(onEvent = onEvent, state = state, viewModel = viewModel)
+        if(state.isMenuOpen) {
+            MenuDialog(state = state, onEvent = onEvent)
         }
+        TaskList(onEvent = onEvent, state = state, viewModel = viewModel)
     }
 }
 
@@ -174,7 +157,7 @@ fun TaskItem(task: Task, onEdit: (Task) -> Unit, onDelete: (Task) -> Unit, viewM
 //                    .padding(end = 8.dp),
                     .widthIn(max = 280.dp)
             )
-            Text("Recurrence: ${task.recurrenceType}")
+//            Text("Recurrence: ${task.recurrenceType}")
             DueDateNote(task = task, viewModel = viewModel)
         }
         IconButton(onClick = { onDelete(task) }) {
@@ -224,44 +207,25 @@ fun DueDateNote(
     }
 }
 
-@Composable
-fun SortAndFilterControls(
-    currentSortType: SortType,
-    onSortChange: (SortType) -> Unit,
-    currentRecurrenceFilter: RecurrenceType,
-    onRecurrenceFilterChange: (RecurrenceType) -> Unit
-) {
-    Column {
-        Text("Sort by:")
-        Row (
-            modifier = Modifier
-                .fillMaxWidth()
-                .horizontalScroll(rememberScrollState()),
-            verticalAlignment = Alignment.CenterVertically
-        ){
-            SortType.entries.forEach { sortType ->
-                RadioButton(
-                    selected = currentSortType == sortType,
-                    onClick = { onSortChange(sortType) }
-                )
-                Text(sortType.name)
-            }
+fun vibrate(context: Context, strength: Int) {
+    val vibrator = context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+        val effect = when (strength) {
+            1 -> VibrationEffect.createPredefined(VibrationEffect.EFFECT_CLICK)
+            2 -> VibrationEffect.createPredefined(VibrationEffect.EFFECT_TICK)
+            3 -> VibrationEffect.createPredefined(VibrationEffect.EFFECT_HEAVY_CLICK)
+            4 -> VibrationEffect.createPredefined(VibrationEffect.EFFECT_DOUBLE_CLICK)
+            else -> VibrationEffect.createPredefined(VibrationEffect.EFFECT_CLICK)
         }
-
-        Text("Filter by Recurrence:")
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .horizontalScroll(rememberScrollState()),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            RecurrenceType.entries.forEach { recurrenceType ->
-                RadioButton(
-                    selected = currentRecurrenceFilter == recurrenceType,
-                    onClick = { onRecurrenceFilterChange(recurrenceType) }
-                )
-                Text(recurrenceType.name)
-            }
+        vibrator.vibrate(effect)
+    } else {
+        val duration = when (strength) {
+            1 -> 50L
+            2 -> 100L
+            3 -> 150L
+            4 -> 200L
+            else -> 100L
         }
+        vibrator.vibrate(duration) // Fallback for older devices
     }
 }

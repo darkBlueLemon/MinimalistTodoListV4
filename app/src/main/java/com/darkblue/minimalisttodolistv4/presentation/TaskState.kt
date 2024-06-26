@@ -11,7 +11,6 @@ data class TaskState(
     val title: String = "",
     val priority: Int = 0,
     val note: String = "",
-    val isAddingTask: Boolean = false,
     val sortType: SortType = SortType.PRIORITY,
 
     val isDatePickerVisible: Boolean = false,
@@ -27,4 +26,7 @@ data class TaskState(
     val dueDate: Long? = null,
     val dueDateOnly: LocalDate? = null,
     val dueTimeOnly: LocalTime? = null,
+
+    val isAddingTask: Boolean = false,
+    val isMenuOpen: Boolean = false
 )

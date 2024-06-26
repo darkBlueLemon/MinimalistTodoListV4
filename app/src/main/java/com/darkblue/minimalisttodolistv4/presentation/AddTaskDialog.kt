@@ -45,7 +45,7 @@ fun AddTaskDialog(
     AlertDialog(
         modifier = modifier,
         onDismissRequest = {
-            onEvent(TaskEvent.HideDialog)
+            onEvent(TaskEvent.HideAddTaskDialog)
         }
     ) {
         CustomBox {
