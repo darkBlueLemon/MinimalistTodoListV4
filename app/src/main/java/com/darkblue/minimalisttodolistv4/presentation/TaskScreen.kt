@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.BasicText
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
@@ -20,6 +21,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -32,6 +34,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -42,8 +47,11 @@ import com.darkblue.minimalisttodolistv4.ui.theme.Priority0
 import com.darkblue.minimalisttodolistv4.ui.theme.Priority1
 import com.darkblue.minimalisttodolistv4.ui.theme.Priority2
 import com.darkblue.minimalisttodolistv4.ui.theme.Priority3
+import com.darkblue.minimalisttodolistv4.ui.theme.dateGray
+import com.darkblue.minimalisttodolistv4.ui.theme.dateRed
 import java.time.Instant
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
@@ -143,28 +151,84 @@ fun TaskItem(task: Task, onEdit: (Task) -> Unit, onDelete: (Task) -> Unit) {
                 .clickable { onEdit(task) }
         ) {
             Text(
-                "Title: ${task.title}",
+                task.title,
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(end = 8.dp),
-//                maxLines = 1,
-//                overflow = TextOverflow.Ellipsis
+//                    .padding(start = 5.dp)
+//                    .padding(end = 8.dp),
+                    .widthIn(max = 280.dp)
             )
-            Text("Priority: ${task.priority}")
-            Text("Note: ${task.note}")
-            val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
-            val dueDate = task.dueDate?.let {
-                Instant.ofEpochMilli(it).atZone(ZoneId.systemDefault()).toLocalDateTime().format(formatter)
-            } ?: ""
-            Text("Due Date: $dueDate")
             Text("Recurrence: ${task.recurrenceType}")
-            val nextDueDate = task.nextDueDate?.let {
-                Instant.ofEpochMilli(it).atZone(ZoneId.systemDefault()).toLocalDateTime().format(formatter)
-            } ?: ""
-            Text("Next Due Date: $nextDueDate")
+            DueDateNote(task = task)
         }
         IconButton(onClick = { onDelete(task) }) {
             Icon(Icons.Default.Delete, contentDescription = "Delete")
+        }
+    }
+}
+
+@RequiresApi(Build.VERSION_CODES.O)
+@Composable
+fun DueDateNote(modifier: Modifier = Modifier, task: Task) {
+    val formatter = DateTimeFormatter.ofPattern("MMM dd, yyyy HH:mm")
+    val dateFormatterWithoutTime = DateTimeFormatter.ofPattern("MMM dd, yyyy")
+    val dateFormatterCurrentYear = DateTimeFormatter.ofPattern("MMM dd")
+    val dateTimeFormatterCurrentYear = DateTimeFormatter.ofPattern("MMM dd HH:mm")
+    val timeFormatter = DateTimeFormatter.ofPattern("HH:mm")
+    val currentYear = LocalDateTime.now().year
+    val today = LocalDateTime.now().toLocalDate()
+    val yesterday = today.minusDays(1)
+    val tomorrow = today.plusDays(1)
+
+    fun formatDueDate(epochMilli: Long?): String {
+        epochMilli ?: return ""
+        val dateTime = Instant.ofEpochMilli(epochMilli).atZone(ZoneId.systemDefault()).toLocalDateTime()
+        val isMidnight = dateTime.hour == 0 && dateTime.minute == 0
+        return when (dateTime.toLocalDate()) {
+            today -> "Today" + if (!isMidnight) " ${dateTime.format(timeFormatter)}" else ""
+            yesterday -> "Yesterday" + if (!isMidnight) " ${dateTime.format(timeFormatter)}" else ""
+            tomorrow -> "Tomorrow" + if (!isMidnight) " ${dateTime.format(timeFormatter)}" else ""
+            else -> {
+                if (dateTime.year == currentYear) {
+                    if (isMidnight) dateTime.format(dateFormatterCurrentYear)
+                    else dateTime.format(dateTimeFormatterCurrentYear)
+                } else {
+                    if (isMidnight) dateTime.format(dateFormatterWithoutTime)
+                    else dateTime.format(formatter)
+                }
+            }
+        }
+    }
+
+    val dueDate = formatDueDate(task.dueDate)
+    val nextDueDate = formatDueDate(task.nextDueDate)
+    val note = task.note.orEmpty()
+
+    val textColor = if (task.dueDate?.let { Instant.ofEpochMilli(it).isBefore(Instant.now()) } == true) dateRed else dateGray
+
+    Column {
+        if (dueDate.isNotEmpty()) {
+            Text(
+                buildAnnotatedString {
+                    withStyle(style = SpanStyle(color = textColor)) {
+                        append(dueDate)
+                    }
+                    if (note.isNotBlank()) {
+                        append(" | ")
+                        append(note)
+                    }
+                },
+                style = MaterialTheme.typography.bodyMedium
+            )
+        }
+        if (nextDueDate.isNotEmpty() && nextDueDate != dueDate) {
+            Text(
+                buildAnnotatedString {
+                    withStyle(style = SpanStyle(color = Color.Unspecified)) {
+                        append(nextDueDate)
+                    }
+                },
+                style = MaterialTheme.typography.bodyMedium
+            )
         }
     }
 }

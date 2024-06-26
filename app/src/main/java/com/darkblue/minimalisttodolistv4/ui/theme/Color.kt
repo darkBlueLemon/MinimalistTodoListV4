@@ -16,5 +16,8 @@ val White = Color(0xFFFFFFFF)
 val Priority3 = Color(0xFFFF5147)
 val Priority2 = Color(0xFFFF964F)
 val Priority1 = Color(0xFFFDFD96)
-val Priority0 = Color.Transparent
+val Priority0 = Color.Unspecified
+
+val dateRed = Color(0xFFCB273C)
+val dateGray = Color(0x8FFFFFFF)
 

@@ -70,7 +70,7 @@ dependencies {
     debugImplementation(libs.androidx.ui.test.manifest)
 
     implementation(libs.androidx.room.ktx)
-    kapt("androidx.room:room-compiler:2.6.1")
+    kapt(libs.androidx.room.compiler)
 
     // Sheets Compose Dialog
     implementation (libs.core)
@@ -83,4 +83,7 @@ dependencies {
 
     // DATE TIME
     implementation ("com.maxkeppeler.sheets-compose-dialogs:date-time:1.3.0")
+
+    // Lottie Animation
+    implementation (libs.lottie)
 }
