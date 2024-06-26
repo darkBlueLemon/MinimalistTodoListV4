@@ -16,7 +16,7 @@ fun NavGraph(startDestination: String = "task_list", viewModel: TaskViewModel) {
     val state by viewModel.state.collectAsState()
     NavHost(navController = navController, startDestination = startDestination) {
         composable("task_list") {
-            TaskScreen(state = state, onEvent = viewModel::onEvent, navController = navController)
+            TaskScreen(state = state, onEvent = viewModel::onEvent, navController = navController, viewModel = viewModel)
         }
         composable("history") {
             HistoryScreen(viewModel)

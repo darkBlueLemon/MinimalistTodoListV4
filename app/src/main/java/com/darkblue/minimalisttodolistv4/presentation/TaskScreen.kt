@@ -3,12 +3,17 @@ package com.darkblue.minimalisttodolistv4.presentation
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -16,9 +21,12 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.rounded.Star
 import androidx.compose.material3.Button
 import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.FloatingActionButtonDefaults
+import androidx.compose.material3.FloatingActionButtonElevation
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -33,12 +41,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.darkblue.minimalisttodolistv4.data.RecurrenceType
 import com.darkblue.minimalisttodolistv4.data.SortType
@@ -55,37 +65,43 @@ import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
+@OptIn(ExperimentalFoundationApi::class)
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun TaskScreen(
     state: TaskState,
     onEvent: (TaskEvent) -> Unit,
+    viewModel: TaskViewModel,
     navController: NavController
 ) {
     Scaffold(
         floatingActionButton = {
-            Row(
+            FloatingActionButton(
+                onClick = {},
+                elevation = FloatingActionButtonDefaults.elevation(0.dp, 0.dp, 0.dp, 0.dp),
+
                 modifier = Modifier
-                    .fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.End
+                    .clip(shape = RoundedCornerShape(percent = 7))
+                    .border(
+                        width = 2.dp,
+                        color = MaterialTheme.colorScheme.onBackground,
+                        shape = RoundedCornerShape(percent = 25)
+                    ),
+                containerColor = MaterialTheme.colorScheme.background,
+                contentColor = MaterialTheme.colorScheme.onBackground
             ) {
-                FloatingActionButton(onClick = {
-                    onEvent(TaskEvent.ShowDialog)
-                }) {
-                    Icon(
-                        imageVector = Icons.Default.Add,
-                        contentDescription = "Add task"
-                    )
-                }
-                FloatingActionButton(onClick = {
-                    navController.navigate("history")
-                }) {
-                    Icon(
-                        imageVector = Icons.Default.Menu,
-                        contentDescription = "History"
-                    )
-                }
+                Icon(
+                    imageVector = Icons.Outlined.Add,
+                    contentDescription = "Add task",
+                    modifier = Modifier
+                        .combinedClickable(
+                            onLongClick = {
+                                navController.navigate("history")
+                            }, onClick = {
+                                onEvent(TaskEvent.ShowDialog)
+                            }
+                        )
+                )
             }
         },
     ) { padding ->
@@ -100,14 +116,14 @@ fun TaskScreen(
                 currentRecurrenceFilter = state.recurrenceFilter,
                 onRecurrenceFilterChange = { onEvent(TaskEvent.SetRecurrenceFilter(it)) }
             )
-            TaskList(onEvent = onEvent, state = state)
+            TaskList(onEvent = onEvent, state = state, viewModel = viewModel)
         }
     }
 }
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun TaskList(onEvent: (TaskEvent) -> Unit, state: TaskState) {
+fun TaskList(onEvent: (TaskEvent) -> Unit, state: TaskState, viewModel: TaskViewModel) {
     LazyColumn(
         contentPadding = PaddingValues(16.dp),
         modifier = Modifier.fillMaxSize(),
@@ -117,7 +133,8 @@ fun TaskList(onEvent: (TaskEvent) -> Unit, state: TaskState) {
             TaskItem(
                 task = task,
                 onEdit = { onEvent(TaskEvent.EditTask(it)) },
-                onDelete = { onEvent(TaskEvent.DeleteTask(it)) }
+                onDelete = { onEvent(TaskEvent.DeleteTask(it)) },
+                viewModel = viewModel
             )
         }
     }
@@ -125,7 +142,7 @@ fun TaskList(onEvent: (TaskEvent) -> Unit, state: TaskState) {
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun TaskItem(task: Task, onEdit: (Task) -> Unit, onDelete: (Task) -> Unit) {
+fun TaskItem(task: Task, onEdit: (Task) -> Unit, onDelete: (Task) -> Unit, viewModel: TaskViewModel) {
     val priorityColor = when (task.priority) {
         3 -> Priority3
         2 -> Priority2
@@ -158,7 +175,7 @@ fun TaskItem(task: Task, onEdit: (Task) -> Unit, onDelete: (Task) -> Unit) {
                     .widthIn(max = 280.dp)
             )
             Text("Recurrence: ${task.recurrenceType}")
-            DueDateNote(task = task)
+            DueDateNote(task = task, viewModel = viewModel)
         }
         IconButton(onClick = { onDelete(task) }) {
             Icon(Icons.Default.Delete, contentDescription = "Delete")
@@ -168,39 +185,13 @@ fun TaskItem(task: Task, onEdit: (Task) -> Unit, onDelete: (Task) -> Unit) {
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun DueDateNote(modifier: Modifier = Modifier, task: Task) {
-    val formatter = DateTimeFormatter.ofPattern("MMM dd, yyyy HH:mm")
-    val dateFormatterWithoutTime = DateTimeFormatter.ofPattern("MMM dd, yyyy")
-    val dateFormatterCurrentYear = DateTimeFormatter.ofPattern("MMM dd")
-    val dateTimeFormatterCurrentYear = DateTimeFormatter.ofPattern("MMM dd HH:mm")
-    val timeFormatter = DateTimeFormatter.ofPattern("HH:mm")
-    val currentYear = LocalDateTime.now().year
-    val today = LocalDateTime.now().toLocalDate()
-    val yesterday = today.minusDays(1)
-    val tomorrow = today.plusDays(1)
-
-    fun formatDueDate(epochMilli: Long?): String {
-        epochMilli ?: return ""
-        val dateTime = Instant.ofEpochMilli(epochMilli).atZone(ZoneId.systemDefault()).toLocalDateTime()
-        val isMidnight = dateTime.hour == 0 && dateTime.minute == 0
-        return when (dateTime.toLocalDate()) {
-            today -> "Today" + if (!isMidnight) " ${dateTime.format(timeFormatter)}" else ""
-            yesterday -> "Yesterday" + if (!isMidnight) " ${dateTime.format(timeFormatter)}" else ""
-            tomorrow -> "Tomorrow" + if (!isMidnight) " ${dateTime.format(timeFormatter)}" else ""
-            else -> {
-                if (dateTime.year == currentYear) {
-                    if (isMidnight) dateTime.format(dateFormatterCurrentYear)
-                    else dateTime.format(dateTimeFormatterCurrentYear)
-                } else {
-                    if (isMidnight) dateTime.format(dateFormatterWithoutTime)
-                    else dateTime.format(formatter)
-                }
-            }
-        }
-    }
-
-    val dueDate = formatDueDate(task.dueDate)
-    val nextDueDate = formatDueDate(task.nextDueDate)
+fun DueDateNote(
+    modifier: Modifier = Modifier,
+    task: Task,
+    viewModel: TaskViewModel
+) {
+    val dueDate = viewModel.formatDueDate(task.dueDate)
+    val nextDueDate = viewModel.formatDueDate(task.nextDueDate)
     val note = task.note.orEmpty()
 
     val textColor = if (task.dueDate?.let { Instant.ofEpochMilli(it).isBefore(Instant.now()) } == true) dateRed else dateGray
@@ -223,7 +214,7 @@ fun DueDateNote(modifier: Modifier = Modifier, task: Task) {
         if (nextDueDate.isNotEmpty() && nextDueDate != dueDate) {
             Text(
                 buildAnnotatedString {
-                    withStyle(style = SpanStyle(color = Color.Unspecified)) {
+                    withStyle(style = SpanStyle(color = Color.Transparent)) {
                         append(nextDueDate)
                     }
                 },
@@ -232,7 +223,6 @@ fun DueDateNote(modifier: Modifier = Modifier, task: Task) {
         }
     }
 }
-
 
 @Composable
 fun SortAndFilterControls(

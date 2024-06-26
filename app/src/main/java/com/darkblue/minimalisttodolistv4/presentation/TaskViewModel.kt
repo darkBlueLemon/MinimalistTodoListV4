@@ -15,7 +15,9 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import java.time.Instant
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class TaskViewModel(
@@ -268,6 +270,37 @@ class TaskViewModel(
             _state.update { it.copy(
                 dueDate = combinedDateTime.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
             ) }
+        }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun formatDueDate(epochMilli: Long?): String {
+        val formatter = DateTimeFormatter.ofPattern("MMM dd, yyyy HH:mm")
+        val dateFormatterWithoutTime = DateTimeFormatter.ofPattern("MMM dd, yyyy")
+        val dateFormatterCurrentYear = DateTimeFormatter.ofPattern("MMM dd")
+        val dateTimeFormatterCurrentYear = DateTimeFormatter.ofPattern("MMM dd HH:mm")
+        val timeFormatter = DateTimeFormatter.ofPattern("HH:mm")
+        val currentYear = LocalDateTime.now().year
+        val today = LocalDateTime.now().toLocalDate()
+        val yesterday = today.minusDays(1)
+        val tomorrow = today.plusDays(1)
+
+        epochMilli ?: return ""
+        val dateTime = Instant.ofEpochMilli(epochMilli).atZone(ZoneId.systemDefault()).toLocalDateTime()
+        val isMidnight = dateTime.hour == 0 && dateTime.minute == 0
+        return when (dateTime.toLocalDate()) {
+            today -> "Today" + if (!isMidnight) " ${dateTime.format(timeFormatter)}" else ""
+            yesterday -> "Yesterday" + if (!isMidnight) " ${dateTime.format(timeFormatter)}" else ""
+            tomorrow -> "Tomorrow" + if (!isMidnight) " ${dateTime.format(timeFormatter)}" else ""
+            else -> {
+                if (dateTime.year == currentYear) {
+                    if (isMidnight) dateTime.format(dateFormatterCurrentYear)
+                    else dateTime.format(dateTimeFormatterCurrentYear)
+                } else {
+                    if (isMidnight) dateTime.format(dateFormatterWithoutTime)
+                    else dateTime.format(formatter)
+                }
+            }
         }
     }
 }

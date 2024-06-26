@@ -35,6 +35,19 @@ private val LightColorScheme = lightColorScheme(
 )
 
 private val LightColorScheme2 = lightColorScheme(
+    primary = Black,
+    secondary = White,
+    background = White,
+    onBackground = Black,
+    surface = White,
+
+    onPrimary = White,
+    onSecondary = Black,
+    onTertiary = White,
+    onSurface = White,
+)
+
+private val DarkColorScheme2 = lightColorScheme(
     primary = White,
     secondary = Black,
     background = Black,
@@ -44,7 +57,7 @@ private val LightColorScheme2 = lightColorScheme(
     onPrimary = Black,
     onSecondary = White,
     onTertiary = Black,
-    onSurface = Black
+    onSurface = Black,
 )
 
 @Composable
@@ -63,8 +76,8 @@ fun MinimalistTodoListV4Theme(
 //        darkTheme -> DarkColorScheme
 //        else -> LightColorScheme
 //    }
-    var colorScheme = LightColorScheme2
-//    colorScheme = LightColorScheme
+    var colorScheme = DarkColorScheme2
+    colorScheme = LightColorScheme2
 
     MaterialTheme(
         colorScheme = colorScheme,
