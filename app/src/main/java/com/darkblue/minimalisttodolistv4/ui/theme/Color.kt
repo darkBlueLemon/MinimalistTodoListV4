@@ -21,3 +21,6 @@ val Priority0 = Color.Transparent
 val dateRed = Color(0xFFCB273C)
 val dateGray = Color(0x8FFFFFFF)
 
+val translucentDark = Color(0x4FFFFFFF)
+val translucentLight = Color(0x4F000000)
+

@@ -77,14 +77,17 @@ dependencies {
     implementation (libs.core)
 
     // CALENDAR
-    implementation ("com.maxkeppeler.sheets-compose-dialogs:calendar:1.3.0")
+    implementation (libs.calendar)
 
     // CLOCK
-    implementation ("com.maxkeppeler.sheets-compose-dialogs:clock:1.3.0")
+    implementation (libs.clock)
 
     // DATE TIME
-    implementation ("com.maxkeppeler.sheets-compose-dialogs:date-time:1.3.0")
+    implementation (libs.date.time)
 
     // Lottie Animation
     implementation (libs.lottie)
+
+    // Extra Material Icons
+    implementation (libs.androidx.material.icons.extended)
 }

@@ -283,7 +283,7 @@ class TaskViewModel(
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    fun formatDueDate(epochMilli: Long?): String {
+    fun formatDueDateWithDateTime(epochMilli: Long?): String {
         val formatter = DateTimeFormatter.ofPattern("MMM dd, yyyy HH:mm")
         val dateFormatterWithoutTime = DateTimeFormatter.ofPattern("MMM dd, yyyy")
         val dateFormatterCurrentYear = DateTimeFormatter.ofPattern("MMM dd")
@@ -311,5 +311,38 @@ class TaskViewModel(
                 }
             }
         }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun formatDueDateWithDateOnly(epochMilli: Long?): String {
+        val dateFormatter = DateTimeFormatter.ofPattern("MMM dd, yyyy")
+        val dateFormatterCurrentYear = DateTimeFormatter.ofPattern("MMM dd")
+        val currentYear = LocalDateTime.now().year
+        val today = LocalDateTime.now().toLocalDate()
+        val yesterday = today.minusDays(1)
+        val tomorrow = today.plusDays(1)
+
+        epochMilli ?: return ""
+        val dateTime = Instant.ofEpochMilli(epochMilli).atZone(ZoneId.systemDefault()).toLocalDateTime()
+        return when (dateTime.toLocalDate()) {
+            today -> "Today"
+            yesterday -> "Yesterday"
+            tomorrow -> "Tomorrow"
+            else -> {
+                if (dateTime.year == currentYear) dateTime.format(dateFormatterCurrentYear)
+                else dateTime.format(dateFormatter)
+            }
+        }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun formatDueDateWithTimeOnly(epochMilli: Long?): String {
+        val timeFormatter = DateTimeFormatter.ofPattern("HH:mm")
+        epochMilli ?: return ""
+        val dateTime = Instant.ofEpochMilli(epochMilli).atZone(ZoneId.systemDefault()).toLocalDateTime()
+        if (dateTime.hour == 0 && dateTime.minute == 0) {
+            return ""
+        }
+        return dateTime.format(timeFormatter)
     }
 }

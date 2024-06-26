@@ -10,6 +10,7 @@ import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 
 private val DarkColorScheme = darkColorScheme(
@@ -45,6 +46,8 @@ private val LightColorScheme2 = lightColorScheme(
     onSecondary = Black,
     onTertiary = White,
     onSurface = White,
+
+    tertiary = translucentLight,
 )
 
 private val DarkColorScheme2 = lightColorScheme(
@@ -58,6 +61,8 @@ private val DarkColorScheme2 = lightColorScheme(
     onSecondary = White,
     onTertiary = Black,
     onSurface = Black,
+
+    tertiary = translucentDark,
 )
 
 @Composable
@@ -77,7 +82,7 @@ fun MinimalistTodoListV4Theme(
 //        else -> LightColorScheme
 //    }
     var colorScheme = DarkColorScheme2
-    colorScheme = LightColorScheme2
+//    colorScheme = LightColorScheme2
 
     MaterialTheme(
         colorScheme = colorScheme,

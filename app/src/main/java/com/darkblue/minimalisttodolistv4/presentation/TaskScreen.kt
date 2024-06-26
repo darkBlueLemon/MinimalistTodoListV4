@@ -9,6 +9,7 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -25,10 +26,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -54,6 +55,7 @@ fun TaskScreen(
     navController: NavController
 ) {
     val context = LocalContext.current
+    val interactionSource = remember { MutableInteractionSource() }
 
     Scaffold(
         floatingActionButton = {
@@ -87,7 +89,9 @@ fun TaskScreen(
                                 vibrate(context = context, strength = 1)
 
                                 onEvent(TaskEvent.ShowAddTaskDialog)
-                            }
+                            },
+                            interactionSource = interactionSource,
+                            indication = null,
                         )
                 )
             }
@@ -95,7 +99,7 @@ fun TaskScreen(
     ) { padding ->
         padding
         if(state.isAddingTask) {
-            AddTaskDialog(state = state, onEvent = onEvent)
+            AddTaskDialog(state = state, onEvent = onEvent, viewModel = viewModel)
         }
         if(state.isMenuOpen) {
             MenuDialog(state = state, onEvent = onEvent)
@@ -173,8 +177,8 @@ fun DueDateNote(
     task: Task,
     viewModel: TaskViewModel
 ) {
-    val dueDate = viewModel.formatDueDate(task.dueDate)
-    val nextDueDate = viewModel.formatDueDate(task.nextDueDate)
+    val dueDate = viewModel.formatDueDateWithDateTime(task.dueDate)
+    val nextDueDate = viewModel.formatDueDateWithDateTime(task.nextDueDate)
     val note = task.note.orEmpty()
 
     val textColor = if (task.dueDate?.let { Instant.ofEpochMilli(it).isBefore(Instant.now()) } == true) dateRed else dateGray
@@ -187,21 +191,18 @@ fun DueDateNote(
                         append(dueDate)
                     }
                     if (note.isNotBlank()) {
-                        append(" | ")
-                        append(note)
+                        withStyle(style = SpanStyle(color = textColor)) {
+                            append(" | ")
+                            append(note)
+                        }
                     }
                 },
                 style = MaterialTheme.typography.bodyMedium
             )
-        }
-        if (nextDueDate.isNotEmpty() && nextDueDate != dueDate) {
+        } else if(note.isNotEmpty()) {
             Text(
-                buildAnnotatedString {
-                    withStyle(style = SpanStyle(color = Color.Transparent)) {
-                        append(nextDueDate)
-                    }
-                },
-                style = MaterialTheme.typography.bodyMedium
+                text = note,
+                color = textColor
             )
         }
     }
