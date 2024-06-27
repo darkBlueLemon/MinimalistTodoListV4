@@ -78,8 +78,8 @@ fun MinimalistTodoListV4Theme(
 //            if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
 //        }
 //
-//        darkTheme -> DarkColorScheme
-//        else -> LightColorScheme
+//        darkTheme -> DarkColorScheme2
+//        else -> LightColorScheme2
 //    }
     var colorScheme = DarkColorScheme2
 //    colorScheme = LightColorScheme2
