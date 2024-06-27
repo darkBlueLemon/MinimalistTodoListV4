@@ -39,6 +39,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Matrix
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.darkblue.minimalisttodolistv4.data.DeletedTask
@@ -107,6 +108,8 @@ fun DeletedTaskItem(deletedTask: DeletedTask, onEvent: (TaskEvent) -> Unit, view
                 text = deletedTask.title,
                 color = MaterialTheme.colorScheme.primary,
                 style = MaterialTheme.typography.bodyMedium,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
                 modifier = Modifier
                     .widthIn(max = 280.dp)
             )
