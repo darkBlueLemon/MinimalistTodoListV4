@@ -32,6 +32,7 @@ fun CustomBox(
 //            .size(width = 350.dp, height = 360.dp)
             .clip(RoundedCornerShape(percent = cornerRadiusPercent))
             .background(backgroundColor)
+//            .background(Color.Yellow)
             .border(
                 width = borderWidth,
                 color = borderColor,

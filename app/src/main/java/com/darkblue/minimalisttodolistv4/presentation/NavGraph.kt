@@ -18,8 +18,5 @@ fun NavGraph(startDestination: String = "task_list", viewModel: TaskViewModel) {
         composable("task_list") {
             TaskScreen(state = state, onEvent = viewModel::onEvent, navController = navController, viewModel = viewModel)
         }
-        composable("history") {
-            HistoryScreen(viewModel)
-        }
     }
 }

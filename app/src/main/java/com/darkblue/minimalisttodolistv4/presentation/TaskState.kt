@@ -15,18 +15,17 @@ data class TaskState(
 
     val isDatePickerVisible: Boolean = false,
     val isTimePickerVisible: Boolean = false,
+    val isAddTaskDialogVisible: Boolean = false,
+    val isMenuDialogVisible: Boolean = false,
+    val isHistoryDialogVisible: Boolean = false,
 
     val recurrenceType: RecurrenceType = RecurrenceType.NONE,
-    val nextDueDate: Long? = null,
-
-    val editingTaskId: Int? = null,
-
     val recurrenceFilter: RecurrenceType = RecurrenceType.NONE,
+    val nextDueDate: Long? = null,
 
     val dueDate: Long? = null,
     val dueDateOnly: LocalDate? = null,
     val dueTimeOnly: LocalTime? = null,
 
-    val isAddingTask: Boolean = false,
-    val isMenuOpen: Boolean = false
+    val editingTaskId: Int? = null,
 )

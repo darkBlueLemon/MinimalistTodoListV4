@@ -81,8 +81,8 @@ import java.util.TimeZone
 fun AddTaskDialog(
     state: TaskState,
     onEvent: (TaskEvent) -> Unit,
+    viewModel: TaskViewModel,
     modifier: Modifier = Modifier,
-    viewModel: TaskViewModel
 ) {
     BasicAlertDialog(
         onDismissRequest = { onEvent(TaskEvent.HideAddTaskDialog) },

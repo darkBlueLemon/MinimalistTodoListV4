@@ -10,6 +10,7 @@ import com.darkblue.minimalisttodolistv4.data.SortType
 import com.darkblue.minimalisttodolistv4.data.Task
 import com.darkblue.minimalisttodolistv4.data.TaskDao
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import java.time.Instant
@@ -67,6 +68,7 @@ class TaskViewModel(
             is TaskEvent.DeleteTask -> {
                 viewModelScope.launch {
                     val task = event.task
+                    delay(400)
                     dao.deleteTask(task)
                     dao.insertDeletedTask(
                         DeletedTask(
@@ -110,7 +112,7 @@ class TaskViewModel(
                 }
                 _state.update {
                     it.copy(
-                        isAddingTask = false,
+                        isAddTaskDialogVisible = false,
                         title = "",
                         priority = 0,
                         note = "",
@@ -155,7 +157,7 @@ class TaskViewModel(
                         dueDate = event.task.dueDate,
                         recurrenceType = event.task.recurrenceType,
                         nextDueDate = event.task.nextDueDate,
-                        isAddingTask = true,
+                        isAddTaskDialogVisible = true,
                         editingTaskId = event.task.id
                     )
                 }
@@ -228,12 +230,12 @@ class TaskViewModel(
 
             TaskEvent.ShowAddTaskDialog -> {
                 _state.update { it.copy(
-                    isAddingTask = true
+                    isAddTaskDialogVisible = true
                 ) }
             }
             TaskEvent.HideAddTaskDialog -> {
                 _state.update { it.copy(
-                    isAddingTask = false,
+                    isAddTaskDialogVisible = false,
                     title = "",
                     priority = 0,
                     note = "",
@@ -245,12 +247,23 @@ class TaskViewModel(
             }
             TaskEvent.ShowMenuDialog -> {
                 _state.update { it.copy(
-                    isMenuOpen = true
+                    isMenuDialogVisible = true
                 ) }
             }
             TaskEvent.HideMenuDialog -> {
                 _state.update { it.copy(
-                    isMenuOpen = false
+                    isMenuDialogVisible = false
+                ) }
+            }
+            TaskEvent.ShowHistoryDialog -> {
+                _state.update { it.copy(
+                    isHistoryDialogVisible = true,
+                    isMenuDialogVisible = false
+                ) }
+            }
+            TaskEvent.HideHistoryDialog -> {
+                _state.update { it.copy(
+                    isHistoryDialogVisible = false
                 ) }
             }
         }

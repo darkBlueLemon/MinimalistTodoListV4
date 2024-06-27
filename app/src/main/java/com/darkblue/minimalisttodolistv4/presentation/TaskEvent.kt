@@ -22,6 +22,10 @@ sealed interface TaskEvent {
     object ShowMenuDialog: TaskEvent
     object HideMenuDialog: TaskEvent
 
+    // History Dialog
+    object ShowHistoryDialog: TaskEvent
+    object HideHistoryDialog: TaskEvent
+
     // Date Picker
     object ShowDatePicker: TaskEvent
     object HideDatePicker: TaskEvent
@@ -32,12 +36,13 @@ sealed interface TaskEvent {
     object HideTimePicker: TaskEvent
     data class SetDueTime(val dueTime: LocalTime): TaskEvent
 
+    // Recurrence
     data class SetRecurrenceType(val recurrenceType: RecurrenceType) : TaskEvent
+    data class SetRecurrenceFilter(val recurrenceType: RecurrenceType) : TaskEvent
 
     data class EditTask(val task: Task) : TaskEvent
 
-    data class SetRecurrenceFilter(val recurrenceType: RecurrenceType) : TaskEvent
-
+    // Deletion + History
     data class DeleteTask(val task: Task): TaskEvent
     data class RemoveDeletedTask(val deletedTask: DeletedTask) : TaskEvent
     data class UndoDeleteTask(val deletedTask: DeletedTask) : TaskEvent

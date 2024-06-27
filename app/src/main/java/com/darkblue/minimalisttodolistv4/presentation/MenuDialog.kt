@@ -1,19 +1,25 @@
 package com.darkblue.minimalisttodolistv4.presentation
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.ArrowDropUp
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -24,7 +30,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import com.darkblue.minimalisttodolistv4.data.RecurrenceType
 import com.darkblue.minimalisttodolistv4.data.SortType
 
@@ -35,11 +44,11 @@ fun MenuDialog(
     onEvent: (TaskEvent) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    AlertDialog(
-        modifier = modifier,
+    BasicAlertDialog(
         onDismissRequest = {
             onEvent(TaskEvent.HideMenuDialog)
-        }
+        },
+        modifier = modifier
     ) {
         CustomBox {
             Column(
@@ -47,6 +56,15 @@ fun MenuDialog(
                     .padding(15.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
+                Text(
+                    text = "Menu",
+                    style = MaterialTheme.typography.headlineSmall,
+                    modifier = Modifier.align(Alignment.CenterHorizontally)
+                )
+                HistoryOption(
+                    onHistoryDialogToggle = {
+                    onEvent(TaskEvent.ShowHistoryDialog)
+                })
                 SortAndFilterControls(
                     currentSortType = state.sortType,
                     onSortChange = { onEvent(TaskEvent.SortTasks(it)) },
@@ -56,6 +74,11 @@ fun MenuDialog(
             }
         }
     }
+}
+
+@Composable
+fun HistoryOption(onHistoryDialogToggle: () -> Unit) {
+    Text(text = "History", modifier = Modifier.clickable { onHistoryDialogToggle() })
 }
 
 @Composable

@@ -5,6 +5,12 @@ import android.os.Build
 import android.os.VibrationEffect
 import android.os.Vibrator
 import androidx.annotation.RequiresApi
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -15,18 +21,21 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.outlined.Add
+import androidx.compose.material.icons.outlined.CheckCircle
+import androidx.compose.material.icons.outlined.RadioButtonUnchecked
 import androidx.compose.material.icons.rounded.Star
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -62,7 +71,6 @@ fun TaskScreen(
             FloatingActionButton(
                 onClick = {},
                 elevation = FloatingActionButtonDefaults.elevation(0.dp, 0.dp, 0.dp, 0.dp),
-
                 modifier = Modifier
                     .clip(shape = RoundedCornerShape(percent = 7))
                     .border(
@@ -80,14 +88,11 @@ fun TaskScreen(
                         .combinedClickable(
                             onLongClick = {
                                 vibrate(context = context, strength = 2)
-//                                navController.navigate("history")
                                 onEvent(TaskEvent.ShowMenuDialog)
                             },
                             onClick = {
-
                                 // Vibrate on click?
-                                vibrate(context = context, strength = 1)
-
+//                            vibrate(context = context, strength = 1)
                                 onEvent(TaskEvent.ShowAddTaskDialog)
                             },
                             interactionSource = interactionSource,
@@ -98,13 +103,16 @@ fun TaskScreen(
         },
     ) { padding ->
         padding
-        if(state.isAddingTask) {
-            AddTaskDialog(state = state, onEvent = onEvent, viewModel = viewModel)
+        if(state.isAddTaskDialogVisible) {
+            AddTaskDialog(state, onEvent, viewModel)
         }
-        if(state.isMenuOpen) {
-            MenuDialog(state = state, onEvent = onEvent)
+        if(state.isMenuDialogVisible) {
+            MenuDialog(state, onEvent)
         }
-        TaskList(onEvent = onEvent, state = state, viewModel = viewModel)
+        if(state.isHistoryDialogVisible) {
+            HistoryScreen(viewModel, onEvent)
+        }
+        TaskList(onEvent, state, viewModel)
     }
 }
 
@@ -157,16 +165,11 @@ fun TaskItem(task: Task, onEdit: (Task) -> Unit, onDelete: (Task) -> Unit, viewM
             Text(
                 task.title,
                 modifier = Modifier
-//                    .padding(start = 5.dp)
-//                    .padding(end = 8.dp),
                     .widthIn(max = 280.dp)
             )
-//            Text("Recurrence: ${task.recurrenceType}")
             DueDateNote(task = task, viewModel = viewModel)
         }
-        IconButton(onClick = { onDelete(task) }) {
-            Icon(Icons.Default.Delete, contentDescription = "Delete")
-        }
+        CompleteIcon(onDelete = onDelete, task = task)
     }
 }
 
@@ -191,7 +194,7 @@ fun DueDateNote(
                         append(dueDate)
                     }
                     if (note.isNotBlank()) {
-                        withStyle(style = SpanStyle(color = textColor)) {
+                        withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.tertiary)) {
                             append(" | ")
                             append(note)
                         }
@@ -202,7 +205,7 @@ fun DueDateNote(
         } else if(note.isNotEmpty()) {
             Text(
                 text = note,
-                color = textColor
+                color = MaterialTheme.colorScheme.tertiary
             )
         }
     }
@@ -228,5 +231,44 @@ fun vibrate(context: Context, strength: Int) {
             else -> 100L
         }
         vibrator.vibrate(duration) // Fallback for older devices
+    }
+}
+
+@OptIn(ExperimentalAnimationApi::class)
+@Composable
+fun CompleteIcon(modifier: Modifier = Modifier, onDelete: (Task) -> Unit, task: Task) {
+    var isChecked by remember(task.id) { mutableStateOf(false) }
+
+    Box(
+        modifier = Modifier
+            .clickable(
+                indication = null,
+                interactionSource = remember { MutableInteractionSource() }
+            ) {
+                isChecked = !isChecked
+                onDelete(task)
+            }
+    ) {
+        AnimatedContent(
+            targetState = isChecked,
+                transitionSpec = {
+                    fadeIn(animationSpec = tween(300)) togetherWith
+                            fadeOut(animationSpec = tween(300))
+                }
+        ) { targetChecked ->
+            if (targetChecked) {
+                Icon(
+                    imageVector = Icons.Outlined.CheckCircle,
+                    contentDescription = "Checked",
+                    tint = MaterialTheme.colorScheme.primary
+                )
+            } else {
+                Icon(
+                    imageVector = Icons.Outlined.RadioButtonUnchecked,
+                    contentDescription = "Unchecked",
+                    tint = MaterialTheme.colorScheme.tertiary
+                )
+            }
+        }
     }
 }
