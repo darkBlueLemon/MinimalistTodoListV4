@@ -6,10 +6,14 @@ import android.os.VibrationEffect
 import android.os.Vibrator
 import androidx.annotation.RequiresApi
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkHorizontally
+import androidx.compose.animation.shrinkOut
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.border
@@ -32,9 +36,12 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -50,8 +57,11 @@ import com.darkblue.minimalisttodolistv4.ui.theme.Priority0
 import com.darkblue.minimalisttodolistv4.ui.theme.Priority1
 import com.darkblue.minimalisttodolistv4.ui.theme.Priority2
 import com.darkblue.minimalisttodolistv4.ui.theme.Priority3
-import com.darkblue.minimalisttodolistv4.ui.theme.dateGray
+import com.darkblue.minimalisttodolistv4.ui.theme.dateNoteGray
 import com.darkblue.minimalisttodolistv4.ui.theme.dateRed
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import java.time.Instant
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -123,14 +133,30 @@ fun TaskList(onEvent: (TaskEvent) -> Unit, state: TaskState, viewModel: TaskView
         contentPadding = PaddingValues(16.dp),
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.spacedBy(16.dp)
-    ){
-        items(state.tasks) { task ->
-            TaskItem(
-                task = task,
-                onEdit = { onEvent(TaskEvent.EditTask(it)) },
-                onDelete = { onEvent(TaskEvent.DeleteTask(it)) },
-                viewModel = viewModel
-            )
+    ) {
+        items(state.tasks, key = { it.id }) { task ->
+            var visible by remember { mutableStateOf(true) }
+            val coroutineScope = rememberCoroutineScope()
+
+            AnimatedVisibility(
+                visible = visible,
+                enter = fadeIn(animationSpec = tween(300)),
+                exit = fadeOut(animationSpec = tween(300))
+                        + shrinkVertically(animationSpec = tween(300)),
+            ) {
+                TaskItem(
+                    task = task,
+                    onEdit = { onEvent(TaskEvent.EditTask(it)) },
+                    onDelete = {
+                        coroutineScope.launch {
+                            delay(300)
+                            visible = false
+                            onEvent(TaskEvent.DeleteTask(task))
+                        }
+                    },
+                    viewModel = viewModel
+                )
+            }
         }
     }
 }
@@ -184,7 +210,7 @@ fun DueDateNote(
     val nextDueDate = viewModel.formatDueDateWithDateTime(task.nextDueDate)
     val note = task.note.orEmpty()
 
-    val textColor = if (task.dueDate?.let { Instant.ofEpochMilli(it).isBefore(Instant.now()) } == true) dateRed else dateGray
+    val textColor = if (task.dueDate?.let { Instant.ofEpochMilli(it).isBefore(Instant.now()) } == true) dateRed else dateNoteGray
 
     Column {
         if (dueDate.isNotEmpty()) {
@@ -194,7 +220,7 @@ fun DueDateNote(
                         append(dueDate)
                     }
                     if (note.isNotBlank()) {
-                        withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.tertiary)) {
+                        withStyle(style = SpanStyle(color = dateNoteGray)) {
                             append(" | ")
                             append(note)
                         }
@@ -205,7 +231,7 @@ fun DueDateNote(
         } else if(note.isNotEmpty()) {
             Text(
                 text = note,
-                color = MaterialTheme.colorScheme.tertiary
+                color = dateNoteGray
             )
         }
     }
@@ -237,7 +263,7 @@ fun vibrate(context: Context, strength: Int) {
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun CompleteIcon(modifier: Modifier = Modifier, onDelete: (Task) -> Unit, task: Task) {
-    var isChecked by remember(task.id) { mutableStateOf(false) }
+    var isChecked by remember { mutableStateOf(false) }
 
     Box(
         modifier = Modifier
@@ -251,10 +277,10 @@ fun CompleteIcon(modifier: Modifier = Modifier, onDelete: (Task) -> Unit, task: 
     ) {
         AnimatedContent(
             targetState = isChecked,
-                transitionSpec = {
-                    fadeIn(animationSpec = tween(300)) togetherWith
-                            fadeOut(animationSpec = tween(300))
-                }
+            transitionSpec = {
+                fadeIn(animationSpec = tween(300)) togetherWith
+                        fadeOut(animationSpec = tween(300))
+            }, label = "Complete Task Icon"
         ) { targetChecked ->
             if (targetChecked) {
                 Icon(
