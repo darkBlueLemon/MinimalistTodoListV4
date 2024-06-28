@@ -50,6 +50,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.darkblue.minimalisttodolistv4.data.Task
@@ -112,7 +113,6 @@ fun TaskScreen(
             }
         },
     ) { padding ->
-        padding
         if(state.isAddTaskDialogVisible) {
             AddTaskDialog(state, onEvent, viewModel)
         }
@@ -122,16 +122,19 @@ fun TaskScreen(
         if(state.isHistoryDialogVisible) {
             HistoryScreen(viewModel, onEvent)
         }
-        TaskList(onEvent, state, viewModel)
+        TaskList(onEvent, state, viewModel, padding)
     }
 }
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun TaskList(onEvent: (TaskEvent) -> Unit, state: TaskState, viewModel: TaskViewModel) {
+fun TaskList(onEvent: (TaskEvent) -> Unit, state: TaskState, viewModel: TaskViewModel, padding: PaddingValues) {
     LazyColumn(
         contentPadding = PaddingValues(16.dp),
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(padding)
+        ,
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         items(state.tasks, key = { it.id }) { task ->
@@ -161,6 +164,7 @@ fun TaskList(onEvent: (TaskEvent) -> Unit, state: TaskState, viewModel: TaskView
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun TaskItem(task: Task, onEdit: (Task) -> Unit, onDelete: (Task) -> Unit, viewModel: TaskViewModel) {
@@ -186,7 +190,13 @@ fun TaskItem(task: Task, onEdit: (Task) -> Unit, onDelete: (Task) -> Unit, viewM
             modifier = Modifier
                 .weight(1f)
                 .padding(start = 8.dp)
-                .clickable { onEdit(task) }
+                .combinedClickable(
+                    onClick = {
+                        onEdit(task)
+                    },
+                    indication = null,
+                    interactionSource = remember{MutableInteractionSource() }
+                )
         ) {
             Text(
                 task.title,

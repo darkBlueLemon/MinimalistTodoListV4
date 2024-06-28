@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -64,7 +65,7 @@ fun HistoryScreen(
             Column(
                 modifier = Modifier
                     .padding(15.dp)
-                    .heightIn(min = 400.dp)
+                    .height(400.dp)
             ) {
                 Text(
                     text = "History",
