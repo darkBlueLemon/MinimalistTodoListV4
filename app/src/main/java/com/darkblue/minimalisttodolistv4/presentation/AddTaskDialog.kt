@@ -153,6 +153,7 @@ fun Title(modifier: Modifier = Modifier, state: TaskState, onEvent: (TaskEvent) 
             fontWeight = FontWeight.Light,
             fontSize = MaterialTheme.typography.titleLarge.fontSize
         ),
+        modifier = Modifier.fillMaxWidth()
     )
 }
 
@@ -168,7 +169,7 @@ fun PrioritySelector(
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceEvenly,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)
         ) {
             PriorityStar(index = 1, selectedPriority, Priority1) { priority ->
                 selectedPriority = priority
@@ -186,6 +187,7 @@ fun PrioritySelector(
     } else {
         Row(
             modifier = Modifier
+                .fillMaxWidth()
                 .padding(horizontal = 15.dp)
                 .clickable {
                     isPrioritySelected = true
@@ -229,7 +231,7 @@ fun PriorityStar(index: Int, selectedPriority: Int, color: Color, onClick: (Int)
 @Composable
 fun Note(modifier: Modifier = Modifier, state: TaskState, onEvent: (TaskEvent) -> Unit) {
     Row(
-        modifier = Modifier.padding(start = 15.dp),
+        modifier = Modifier.fillMaxWidth().padding(start = 15.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Icon(
@@ -272,7 +274,8 @@ fun DateSelector(modifier: Modifier = Modifier, state: TaskState, onEvent: (Task
     val text = viewModel.formatDueDateWithDateOnly(state.dueDate).ifEmpty { "Add date" }
 
     Row(
-        modifier = Modifier.padding(start = 15.dp),
+        modifier = Modifier.fillMaxWidth().padding(start = 15.dp, top = 4.dp, bottom = 4.dp)
+            .clickable { onEvent(TaskEvent.ShowDatePicker) },
         verticalAlignment = Alignment.CenterVertically
     ) {
         Icon(
@@ -284,8 +287,7 @@ fun DateSelector(modifier: Modifier = Modifier, state: TaskState, onEvent: (Task
         Text(
             text = text,
             modifier = Modifier
-                .padding(15.dp)
-                .clickable { onEvent(TaskEvent.ShowDatePicker) },
+                .padding(15.dp),
             color = if (text == "Add date") MaterialTheme.colorScheme.tertiary else MaterialTheme.colorScheme.primary,
             fontWeight = FontWeight.Light,
             style = MaterialTheme.typography.bodySmall,
@@ -306,7 +308,7 @@ fun TimeSelector(modifier: Modifier = Modifier, state: TaskState, onEvent: (Task
     val text = viewModel.formatDueDateWithTimeOnly(state.dueDate).ifEmpty { "Add Time" }
 
     Row(
-        modifier = Modifier.padding(start = 15.dp),
+        modifier = Modifier.fillMaxWidth().padding(start = 15.dp, top = 4.dp, bottom = 4.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Icon(
@@ -347,7 +349,7 @@ fun RecurrenceSelector(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(vertical = 8.dp, horizontal = 16.dp),
+                .padding(start = 15.dp, top = 11.dp, bottom = 11.dp),
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
             RecurrenceType.Companion.entries.forEach { recurrenceType ->
@@ -378,7 +380,8 @@ fun RecurrenceSelector(
     } else {
         Row(
             modifier = Modifier
-                .padding(horizontal = 15.dp)
+                .fillMaxWidth()
+                .padding(start = 15.dp, top = 4.dp, bottom = 4.dp)
                 .clickable {
                     isRecurrenceSelected = true
                 },
