@@ -12,10 +12,12 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -59,6 +61,8 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -90,7 +94,8 @@ fun AddTaskDialog(
     ) {
         CustomBox {
             Column(
-                modifier = Modifier.padding(15.dp),
+                // Best thing everrrrr -> IntrinsicSize
+                modifier = Modifier.padding(15.dp).width(IntrinsicSize.Max),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 Title(state = state, onEvent = onEvent)
@@ -104,8 +109,8 @@ fun AddTaskDialog(
                 if (state.dueDate != null)
                     TimeSelector(state = state, onEvent = onEvent, viewModel = viewModel)
 
-                RecurrenceTypeSelector(
-                    selectedRecurrenceType = state.recurrenceType,
+                RecurrenceSelector(
+                    recurrenceFromEdit = state.recurrenceType,
                     onRecurrenceTypeSelected = { recurrenceType ->
                         onEvent(TaskEvent.SetRecurrenceType(recurrenceType))
                     }
@@ -152,7 +157,10 @@ fun Title(modifier: Modifier = Modifier, state: TaskState, onEvent: (TaskEvent) 
 }
 
 @Composable
-fun PrioritySelector(priorityFromEdit: Int, onPriorityChange: (TaskEvent) -> Unit) {
+fun PrioritySelector(
+    priorityFromEdit: Int,
+    onPriorityChange: (TaskEvent) -> Unit
+) {
     var selectedPriority by remember { mutableStateOf(priorityFromEdit) }
     var isPrioritySelected by remember { mutableStateOf(false) }
 
@@ -261,7 +269,7 @@ fun Note(modifier: Modifier = Modifier, state: TaskState, onEvent: (TaskEvent) -
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun DateSelector(modifier: Modifier = Modifier, state: TaskState, onEvent: (TaskEvent) -> Unit, viewModel: TaskViewModel) {
-    val text = viewModel.formatDueDateWithDateOnly(state.dueDate).ifEmpty { "Add Date" }
+    val text = viewModel.formatDueDateWithDateOnly(state.dueDate).ifEmpty { "Add date" }
 
     Row(
         modifier = Modifier.padding(start = 15.dp),
@@ -278,7 +286,7 @@ fun DateSelector(modifier: Modifier = Modifier, state: TaskState, onEvent: (Task
             modifier = Modifier
                 .padding(15.dp)
                 .clickable { onEvent(TaskEvent.ShowDatePicker) },
-            color = if (text == "Add Date") MaterialTheme.colorScheme.tertiary else MaterialTheme.colorScheme.primary,
+            color = if (text == "Add date") MaterialTheme.colorScheme.tertiary else MaterialTheme.colorScheme.primary,
             fontWeight = FontWeight.Light,
             style = MaterialTheme.typography.bodySmall,
         )
@@ -327,6 +335,73 @@ fun TimeSelector(modifier: Modifier = Modifier, state: TaskState, onEvent: (Task
 }
 
 @Composable
+fun RecurrenceSelector(
+    modifier: Modifier = Modifier,
+    recurrenceFromEdit: RecurrenceType,
+    onRecurrenceTypeSelected: (RecurrenceType) -> Unit
+    ) {
+    var selectedRecurrenceType by remember { mutableStateOf(recurrenceFromEdit) }
+    var isRecurrenceSelected by remember { mutableStateOf(false) }
+
+    if (isRecurrenceSelected || selectedRecurrenceType != RecurrenceType.NONE) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 8.dp, horizontal = 16.dp),
+            horizontalArrangement = Arrangement.SpaceEvenly
+        ) {
+            RecurrenceType.Companion.entries.forEach { recurrenceType ->
+                Text(
+                    text = recurrenceType.toDisplayString(),
+                    modifier = Modifier
+                        .clickable {
+                            if (selectedRecurrenceType == recurrenceType) {
+                                selectedRecurrenceType = RecurrenceType.NONE
+                            } else {
+                                selectedRecurrenceType = recurrenceType
+                            }
+                            onRecurrenceTypeSelected(selectedRecurrenceType)
+                        }
+                        .background(
+                            color = if (recurrenceType == selectedRecurrenceType) MaterialTheme.colorScheme.primary
+                            else Color.Transparent,
+                            shape = RoundedCornerShape(8.dp)
+                        )
+                        .padding(horizontal = 16.dp, vertical = 8.dp),
+//                        .padding(horizontal = 4.dp, vertical = 8.dp),
+                    color = if (recurrenceType == selectedRecurrenceType) MaterialTheme.colorScheme.onPrimary
+                    else MaterialTheme.colorScheme.primary,
+                    style = MaterialTheme.typography.bodySmall
+                )
+            }
+        }
+    } else {
+        Row(
+            modifier = Modifier
+                .padding(horizontal = 15.dp)
+                .clickable {
+                    isRecurrenceSelected = true
+                },
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                imageVector = Icons.Rounded.Star,
+                tint = MaterialTheme.colorScheme.tertiary,
+                contentDescription = "Recurrence Toggle Icon",
+                modifier = Modifier.size(20.dp)
+            )
+            Text(
+                text = "Add recurrence",
+                color = MaterialTheme.colorScheme.tertiary,
+                fontWeight = FontWeight.Light,
+                style = MaterialTheme.typography.bodySmall,
+                modifier = Modifier.padding(15.dp)
+            )
+        }
+    }
+}
+
+@Composable
 fun SaveButton(
     onSave: () -> Unit,
     modifier: Modifier = Modifier
@@ -349,35 +424,3 @@ fun SaveButton(
         )
     }
 }
-
-
-@Composable
-fun RecurrenceTypeSelector(
-    selectedRecurrenceType: RecurrenceType,
-    onRecurrenceTypeSelected: (RecurrenceType) -> Unit
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 8.dp, horizontal = 16.dp),
-        horizontalArrangement = Arrangement.SpaceEvenly
-    ) {
-        RecurrenceType.entries.forEach { recurrenceType ->
-            Text(
-                text = recurrenceType.name,
-                modifier = Modifier
-                    .clickable { onRecurrenceTypeSelected(recurrenceType) }
-                    .background(
-                        color = if (recurrenceType == selectedRecurrenceType) MaterialTheme.colorScheme.primary
-                        else Color.Transparent,
-                        shape = RoundedCornerShape(8.dp)
-                    )
-                    .padding(horizontal = 16.dp, vertical = 8.dp),
-                color = if (recurrenceType == selectedRecurrenceType) MaterialTheme.colorScheme.onPrimary
-                else MaterialTheme.colorScheme.primary,
-                style = MaterialTheme.typography.bodyMedium
-            )
-        }
-    }
-}
-

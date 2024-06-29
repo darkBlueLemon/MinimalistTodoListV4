@@ -11,8 +11,6 @@ import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.animation.shrinkHorizontally
-import androidx.compose.animation.shrinkOut
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -36,12 +34,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -50,9 +46,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.withStyle
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.darkblue.minimalisttodolistv4.data.RecurrenceType
 import com.darkblue.minimalisttodolistv4.data.Task
 import com.darkblue.minimalisttodolistv4.ui.theme.Priority0
 import com.darkblue.minimalisttodolistv4.ui.theme.Priority1
@@ -60,7 +56,6 @@ import com.darkblue.minimalisttodolistv4.ui.theme.Priority2
 import com.darkblue.minimalisttodolistv4.ui.theme.Priority3
 import com.darkblue.minimalisttodolistv4.ui.theme.dateNoteGray
 import com.darkblue.minimalisttodolistv4.ui.theme.dateRed
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.time.Instant
@@ -103,7 +98,7 @@ fun TaskScreen(
                             },
                             onClick = {
                                 // Vibrate on click?
-//                            vibrate(context = context, strength = 1)
+                            vibrate(context = context, strength = 1)
                                 onEvent(TaskEvent.ShowAddTaskDialog)
                             },
                             interactionSource = interactionSource,
@@ -203,7 +198,7 @@ fun TaskItem(task: Task, onEdit: (Task) -> Unit, onDelete: (Task) -> Unit, viewM
                 modifier = Modifier
                     .widthIn(max = 280.dp)
             )
-            DueDateNote(task = task, viewModel = viewModel)
+            DueDate_Recurrence_Note(task = task, viewModel = viewModel)
         }
         CompleteIcon(onDelete = onDelete, task = task)
     }
@@ -211,14 +206,14 @@ fun TaskItem(task: Task, onEdit: (Task) -> Unit, onDelete: (Task) -> Unit, viewM
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun DueDateNote(
+fun DueDate_Recurrence_Note(
     modifier: Modifier = Modifier,
     task: Task,
     viewModel: TaskViewModel
 ) {
     val dueDate = viewModel.formatDueDateWithDateTime(task.dueDate)
     val nextDueDate = viewModel.formatDueDateWithDateTime(task.nextDueDate)
-    val note = task.note.orEmpty()
+    val note = task.note
 
     val textColor = if (task.dueDate?.let { Instant.ofEpochMilli(it).isBefore(Instant.now()) } == true) dateRed else dateNoteGray
 
@@ -228,6 +223,11 @@ fun DueDateNote(
                 buildAnnotatedString {
                     withStyle(style = SpanStyle(color = textColor)) {
                         append(dueDate)
+                    }
+                    if(task.recurrenceType != RecurrenceType.NONE) {
+                        withStyle(style = SpanStyle(color = textColor)) {
+                            append(", " + task.recurrenceType.toDisplayString())
+                        }
                     }
                     if (note.isNotBlank()) {
                         withStyle(style = SpanStyle(color = dateNoteGray)) {
