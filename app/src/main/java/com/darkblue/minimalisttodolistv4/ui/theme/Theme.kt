@@ -48,6 +48,7 @@ private val LightColorScheme2 = lightColorScheme(
     onSurface = White,
 
     tertiary = translucentLight,
+
 )
 
 private val DarkColorScheme2 = lightColorScheme(
@@ -72,16 +73,16 @@ fun MinimalistTodoListV4Theme(
     dynamicColor: Boolean = true,
     content: @Composable () -> Unit
 ) {
-//    val colorScheme = when {
-//        dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
-//            val context = LocalContext.current
-//            if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
-//        }
-//
-//        darkTheme -> DarkColorScheme2
-//        else -> LightColorScheme2
-//    }
-    var colorScheme = DarkColorScheme2
+    val colorScheme = when {
+        dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
+            val context = LocalContext.current
+            if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
+        }
+
+        darkTheme -> DarkColorScheme2
+        else -> LightColorScheme2
+    }
+//    var colorScheme = DarkColorScheme2
 //    colorScheme = LightColorScheme2
 
     MaterialTheme(

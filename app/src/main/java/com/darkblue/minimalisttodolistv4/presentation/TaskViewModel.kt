@@ -209,7 +209,7 @@ class TaskViewModel(
             }
 
             // Deletion Events
-            is TaskEvent.RemoveDeletedTask -> {
+            is TaskEvent.DeleteForever -> {
                 viewModelScope.launch {
                     dao.deleteDeletedTask(event.deletedTask)
                 }

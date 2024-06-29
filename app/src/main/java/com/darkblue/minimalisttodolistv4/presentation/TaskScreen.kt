@@ -201,8 +201,6 @@ fun TaskItem(task: Task, onEdit: (Task) -> Unit, onDelete: (Task) -> Unit, viewM
         ) {
             Text(
                 task.title,
-                modifier = Modifier
-                    .widthIn(max = 280.dp)
             )
             DueDate_Recurrence_Note(task = task, viewModel = viewModel)
         }
@@ -221,7 +219,7 @@ fun DueDate_Recurrence_Note(
     val nextDueDate = viewModel.formatDueDateWithDateTime(task.nextDueDate)
     val note = task.note
 
-    val textColor = if (task.dueDate?.let { Instant.ofEpochMilli(it).isBefore(Instant.now()) } == true) dateRed else dateNoteGray
+    val textColor = if (task.dueDate?.let { Instant.ofEpochMilli(it).isBefore(Instant.now()) } == true) dateRed else MaterialTheme.colorScheme.tertiary
 
     Column {
         if (dueDate.isNotEmpty()) {
@@ -236,7 +234,7 @@ fun DueDate_Recurrence_Note(
                         }
                     }
                     if (note.isNotBlank()) {
-                        withStyle(style = SpanStyle(color = dateNoteGray)) {
+                        withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.tertiary)) {
                             append(" | ")
                             append(note)
                         }
@@ -247,7 +245,7 @@ fun DueDate_Recurrence_Note(
         } else if(note.isNotEmpty()) {
             Text(
                 text = note,
-                color = dateNoteGray
+                color = MaterialTheme.colorScheme.tertiary
             )
         }
     }
