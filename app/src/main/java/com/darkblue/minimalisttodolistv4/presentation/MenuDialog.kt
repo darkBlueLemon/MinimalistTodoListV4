@@ -1,30 +1,30 @@
 package com.darkblue.minimalisttodolistv4.presentation
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowDropDown
-import androidx.compose.material.icons.filled.ArrowDropUp
-import androidx.compose.material3.AlertDialog
+import androidx.compose.material.icons.outlined.CheckCircle
+import androidx.compose.material.icons.outlined.RadioButtonUnchecked
 import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -32,13 +32,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
 import com.darkblue.minimalisttodolistv4.data.RecurrenceType
 import com.darkblue.minimalisttodolistv4.data.SortType
+import com.darkblue.minimalisttodolistv4.data.Task
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -52,27 +50,32 @@ fun MenuDialog(
         onDismissRequest = {
             onEvent(TaskEvent.HideMenuDialog)
         },
-        modifier = modifier.width(250.dp)
+        modifier = modifier.width(350.dp)
     ) {
         CustomBox {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(15.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
+                    .padding(30.dp),
+                verticalArrangement = Arrangement.spacedBy(24.dp)
             ) {
+                PrioritySelector(
+                    currentSortType = state.sortType,
+                    onSortChange = { onEvent(TaskEvent.SortTasks(it) ) }
+                )
                 Text(
                     text = "Menu",
                     style = MaterialTheme.typography.headlineSmall,
                     modifier = Modifier.align(Alignment.CenterHorizontally)
                 )
-                HistoryOption(
-                    onHistoryDialogToggle = {
-                    onEvent(TaskEvent.ShowHistoryDialog)
-                })
-                SortAndFilterControls(
+                Text(text = "History", modifier = Modifier.clickable { onEvent(TaskEvent.ShowHistoryDialog) })
+                Text(text = "Theme")
+                Text(text = "Notification")
+                PrioritySelector(
                     currentSortType = state.sortType,
-                    onSortChange = { onEvent(TaskEvent.SortTasks(it)) },
+                    onSortChange = { onEvent(TaskEvent.SortTasks(it) ) }
+                )
+                RecurrenceSelector(
                     currentRecurrenceFilter = state.recurrenceFilter,
                     onRecurrenceFilterChange = { onEvent(TaskEvent.SetRecurrenceFilter(it)) }
                 )
@@ -81,92 +84,98 @@ fun MenuDialog(
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun HistoryOption(onHistoryDialogToggle: () -> Unit) {
-    Text(text = "History", modifier = Modifier.clickable { onHistoryDialogToggle() })
-}
-
-@Composable
-fun SortAndFilterControls(
-    currentSortType: SortType,
-    onSortChange: (SortType) -> Unit,
+fun RecurrenceSelector(
     currentRecurrenceFilter: RecurrenceType,
     onRecurrenceFilterChange: (RecurrenceType) -> Unit
 ) {
-    Column {
-        ExpandableSection(
-            title = "Priority Order",
-            content = {
-                SortOptions(
-                    currentSortType = currentSortType,
-                    onSortChange = onSortChange
-                )
-            }
-        )
-        ExpandableSection(
-            title = "Recurrence Filter",
-            content = {
-                RecurrenceOptions(
-                    currentRecurrenceFilter = currentRecurrenceFilter,
-                    onRecurrenceFilterChange = onRecurrenceFilterChange
-                )
-            }
-        )
-    }
-}
-
-@Composable
-fun ExpandableSection(
-    title: String,
-    content: @Composable () -> Unit
-) {
     var expanded by remember { mutableStateOf(false) }
-    Column {
-        TextButton(onClick = { expanded = !expanded }) {
-            Text(title)
-            Icon(
-                imageVector = if (expanded) Icons.Default.ArrowDropUp else Icons.Default.ArrowDropDown,
-                contentDescription = if (expanded) "Collapse" else "Expand"
-            )
-        }
-        AnimatedVisibility(visible = expanded) {
-            content()
+
+    Text(text = "Recurrence Filter", modifier = Modifier
+        .fillMaxWidth()
+        .clickable { expanded = true })
+    CustomDropdownMenu(
+        expanded = expanded,
+        onDismissRequest = {
+            expanded = false
+        },
+    ) {
+        RecurrenceType.entriesWithNONE.forEach { recurrenceType ->
+            Row(
+                horizontalArrangement = Arrangement.Start,
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .padding(start = 12.dp, end = 25.dp)
+                    .combinedClickable(
+                        indication = null,
+                        interactionSource = remember { MutableInteractionSource() },
+                        onClick = {
+                            onRecurrenceFilterChange(recurrenceType)
+                        }
+                    )
+            ) {
+                CompleteIconWithoutDelay(isChecked = currentRecurrenceFilter == recurrenceType)
+                Text(recurrenceType.toDisplayString())
+            }
         }
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun SortOptions(
+fun PrioritySelector(
     currentSortType: SortType,
     onSortChange: (SortType) -> Unit
 ) {
-    Column {
+    var expanded by remember { mutableStateOf(false) }
+
+    Text(text = "Sorting Option", modifier = Modifier
+        .fillMaxWidth()
+        .clickable { expanded = true })
+    CustomDropdownMenu(
+        expanded = expanded,
+        onDismissRequest = {
+            expanded = false
+        },
+    ) {
         SortType.entries.forEach { sortType ->
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                RadioButton(
-                    selected = currentSortType == sortType,
-                    onClick = { onSortChange(sortType) }
-                )
-                Text(sortType.name)
+            Row(
+                horizontalArrangement = Arrangement.Start,
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .padding(start = 12.dp, end = 25.dp)
+                    .combinedClickable(
+                        indication = null,
+                        interactionSource = remember { MutableInteractionSource() },
+                        onClick = { onSortChange(sortType) }
+                    )
+            ) {
+                CompleteIconWithoutDelay(isChecked = currentSortType == sortType)
+                Text(sortType.toDisplayString())
             }
         }
     }
 }
 
 @Composable
-fun RecurrenceOptions(
-    currentRecurrenceFilter: RecurrenceType,
-    onRecurrenceFilterChange: (RecurrenceType) -> Unit
-) {
-    Column {
-        RecurrenceType.entries.forEach { recurrenceType ->
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                RadioButton(
-                    selected = currentRecurrenceFilter == recurrenceType,
-                    onClick = { onRecurrenceFilterChange(recurrenceType) }
-                )
-                Text(recurrenceType.name)
-            }
+fun CompleteIconWithoutDelay(isChecked: Boolean) {
+    Box(
+        modifier = Modifier
+            .padding(8.dp) // Increase padding for a larger touch area
+    ) {
+        if (isChecked) {
+            Icon(
+                imageVector = Icons.Outlined.CheckCircle,
+                contentDescription = "Checked",
+                tint = MaterialTheme.colorScheme.primary,
+            )
+        } else {
+            Icon(
+                imageVector = Icons.Outlined.RadioButtonUnchecked,
+                contentDescription = "Unchecked",
+                tint = MaterialTheme.colorScheme.tertiary,
+            )
         }
     }
 }

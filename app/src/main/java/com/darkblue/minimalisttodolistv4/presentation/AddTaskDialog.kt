@@ -19,6 +19,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.StickyNote2
 import androidx.compose.material.icons.rounded.AccessTime
 import androidx.compose.material.icons.rounded.DateRange
+import androidx.compose.material.icons.rounded.Repeat
 import androidx.compose.material.icons.rounded.Star
 import androidx.compose.material.icons.rounded.StarOutline
 import androidx.compose.material3.BasicAlertDialog
@@ -73,15 +74,16 @@ fun AddTaskDialog(
 
                 DateSelector(state = state, onEvent = onEvent, viewModel = viewModel)
 
-                if (state.dueDate != null)
+                if (state.dueDate != null) {
                     TimeSelector(state = state, onEvent = onEvent, viewModel = viewModel)
+                    RecurrenceSelector(
+                        recurrenceFromEdit = state.recurrenceType,
+                        onRecurrenceTypeSelected = { recurrenceType ->
+                            onEvent(TaskEvent.SetRecurrenceType(recurrenceType))
+                        }
+                    )
+                }
 
-                RecurrenceSelector(
-                    recurrenceFromEdit = state.recurrenceType,
-                    onRecurrenceTypeSelected = { recurrenceType ->
-                        onEvent(TaskEvent.SetRecurrenceType(recurrenceType))
-                    }
-                )
 //                state.nextDueDate?.let {
 //                    val nextDueDate = Instant.ofEpochMilli(it).atZone(ZoneId.systemDefault()).toLocalDate()
 //                    Text(text = "Next Due Date: ${nextDueDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))}")
@@ -321,7 +323,7 @@ fun RecurrenceSelector(
                 .padding(start = 15.dp, top = 11.dp, bottom = 11.dp),
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
-            RecurrenceType.Companion.entries.forEach { recurrenceType ->
+            RecurrenceType.Companion.entriesWithoutNONE.forEach { recurrenceType ->
                 Text(
                     text = recurrenceType.toDisplayString(),
                     modifier = Modifier
@@ -357,7 +359,7 @@ fun RecurrenceSelector(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Icon(
-                imageVector = Icons.Rounded.Star,
+                imageVector = Icons.Rounded.Repeat,
                 tint = MaterialTheme.colorScheme.tertiary,
                 contentDescription = "Recurrence Toggle Icon",
                 modifier = Modifier.size(20.dp)

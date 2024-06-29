@@ -14,7 +14,6 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
@@ -43,13 +42,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.min
 import androidx.navigation.NavController
 import com.darkblue.minimalisttodolistv4.data.RecurrenceType
 import com.darkblue.minimalisttodolistv4.data.Task
@@ -57,7 +54,6 @@ import com.darkblue.minimalisttodolistv4.ui.theme.Priority0
 import com.darkblue.minimalisttodolistv4.ui.theme.Priority1
 import com.darkblue.minimalisttodolistv4.ui.theme.Priority2
 import com.darkblue.minimalisttodolistv4.ui.theme.Priority3
-import com.darkblue.minimalisttodolistv4.ui.theme.dateNoteGray
 import com.darkblue.minimalisttodolistv4.ui.theme.dateRed
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -104,8 +100,6 @@ fun TaskScreen(
                             vibrate(context = context, strength = 1)
                                 onEvent(TaskEvent.ShowAddTaskDialog)
                             },
-                            interactionSource = interactionSource,
-                            indication = null,
                         )
                 )
             }
@@ -191,13 +185,9 @@ fun TaskItem(task: Task, onEdit: (Task) -> Unit, onDelete: (Task) -> Unit, viewM
             modifier = Modifier
                 .weight(1f)
                 .padding(start = 8.dp)
-                .combinedClickable(
-                    onClick = {
-                        onEdit(task)
-                    },
-                    indication = null,
-                    interactionSource = remember{MutableInteractionSource() }
-                )
+                .clickable {
+                    onEdit(task)
+                }
         ) {
             Text(
                 task.title,
@@ -258,14 +248,10 @@ fun CompleteIcon(modifier: Modifier = Modifier, onDelete: (Task) -> Unit, task: 
 
     Box(
         modifier = Modifier
-            .clickable(
-                indication = null,
-                interactionSource = remember { MutableInteractionSource() }
-            ) {
+            .clickable {
                 isChecked = !isChecked
                 onDelete(task)
             }
-//            .background(Color.Red) // Ensure the background doesn't affect the padding
             .padding(8.dp) // Increase padding for a larger touch area
     ) {
         AnimatedContent(
