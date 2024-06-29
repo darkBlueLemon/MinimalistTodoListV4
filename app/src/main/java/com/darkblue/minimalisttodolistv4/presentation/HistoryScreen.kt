@@ -36,6 +36,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableIntState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -76,7 +77,6 @@ fun HistoryScreen(
                 )
                 LazyColumn(
                     modifier = Modifier
-//                        .fillMaxWidth()
                         .padding(top = 8.dp)
                         .animateContentSize()
                 ) {
@@ -96,7 +96,6 @@ fun HistoryItem(
     onEvent: (TaskEvent) -> Unit,
     viewModel: TaskViewModel
 ) {
-    val context = LocalContext.current
     var expanded by remember { mutableStateOf(false) }
 
     Row(
@@ -126,69 +125,70 @@ fun HistoryItem(
                         expanded = true
                     }
             )
-            MaterialTheme(
-                colorScheme = MaterialTheme.colorScheme,
-                shapes = MaterialTheme.shapes.copy(extraSmall = RoundedCornerShape(16.dp))
-            ){
-                DropdownMenu(
-                    expanded = expanded,
-                    onDismissRequest = { expanded = false },
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(percent = 25))
-                        .background(MaterialTheme.colorScheme.background)
-                        .border(
-                            width = 2.dp,
-                            color = MaterialTheme.colorScheme.onBackground,
-                            shape = RoundedCornerShape(percent = 25)
-                        )
-                ) {
-                    Row(
-                        modifier = Modifier
-                            .padding(start = 20.dp, end = 20.dp, top = 5.dp, bottom = 5.dp)
-                            .fillMaxHeight()
-                    ) {
-                        Column(
-                            verticalArrangement = Arrangement.Center,
-                            horizontalAlignment = Alignment.CenterHorizontally
-                        ) {
-                            Icon(
-                                Icons.AutoMirrored.Outlined.Undo,
-                                contentDescription = "Recover",
-                                tint = MaterialTheme.colorScheme.tertiary,
-                                modifier = Modifier.clickable {
-                                    onEvent(TaskEvent.UndoDeleteTask(deletedTask))
-                                    expanded = false
-                                }
-                            )
-                            Text(
-                                "Recover",
-                                color = MaterialTheme.colorScheme.primary,
-                                style = MaterialTheme.typography.bodySmall
-                            )
-                        }
-                        Spacer(modifier = Modifier.width(30.dp))
-                        Column(
-                            verticalArrangement = Arrangement.Center,
-                            horizontalAlignment = Alignment.CenterHorizontally
-                        ) {
-                            Icon(
-                                Icons.Outlined.Delete,
-                                contentDescription = "Delete",
-                                tint = MaterialTheme.colorScheme.tertiary,
-                                modifier = Modifier.clickable {
-                                    onEvent(TaskEvent.DeleteForever(deletedTask))
-                                    expanded = false
-                                }
-                            )
-                            Text(
-                                "Delete",
-                                color = MaterialTheme.colorScheme.primary,
-                                style = MaterialTheme.typography.bodySmall
-                            )
-                        }
-                    }
+            CustomDropdownMenu(
+                expanded = expanded,
+                onDismissRequest = {
+                    expanded = false
                 }
+            ) {
+                DropDownItem(
+                    onRecoverClick = {
+                        onEvent(TaskEvent.UndoDeleteTask(deletedTask))
+                        expanded = false
+                    },
+                    onDeleteClick = {
+                        onEvent(TaskEvent.DeleteForever(deletedTask))
+                        expanded = false
+                    })
             }
+        }
+    }
+}
+
+
+@Composable
+fun DropDownItem(modifier: Modifier = Modifier, onRecoverClick: () -> Unit, onDeleteClick: () -> Unit) {
+    Row(
+        modifier = Modifier
+            .padding(start = 20.dp, end = 20.dp, top = 5.dp, bottom = 5.dp)
+            .fillMaxHeight()
+    ) {
+        Column(
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Icon(
+                Icons.AutoMirrored.Outlined.Undo,
+                contentDescription = "Recover",
+                tint = MaterialTheme.colorScheme.tertiary,
+                modifier = Modifier.clickable {
+                    onRecoverClick()
+                }
+            )
+            Text(
+                "Recover",
+                color = MaterialTheme.colorScheme.primary,
+                style = MaterialTheme.typography.bodySmall
+            )
+        }
+        Spacer(modifier = Modifier.width(30.dp))
+        Column(
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Icon(
+                Icons.Outlined.Delete,
+                contentDescription = "Delete",
+                tint = MaterialTheme.colorScheme.tertiary,
+                modifier = Modifier.clickable {
+                    onDeleteClick()
+                }
+            )
+            Text(
+                "Delete",
+                color = MaterialTheme.colorScheme.primary,
+                style = MaterialTheme.typography.bodySmall
+            )
         }
     }
 }
