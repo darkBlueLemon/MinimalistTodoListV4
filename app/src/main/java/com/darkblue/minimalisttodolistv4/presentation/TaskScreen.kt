@@ -14,6 +14,7 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
@@ -42,11 +43,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.min
 import androidx.navigation.NavController
 import com.darkblue.minimalisttodolistv4.data.RecurrenceType
 import com.darkblue.minimalisttodolistv4.data.Task
@@ -171,7 +174,10 @@ fun TaskItem(task: Task, onEdit: (Task) -> Unit, onDelete: (Task) -> Unit, viewM
     }
 
     Row(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+//            .background(Color.Green)
+                ,
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
@@ -247,6 +253,49 @@ fun DueDate_Recurrence_Note(
     }
 }
 
+@OptIn(ExperimentalAnimationApi::class)
+@Composable
+fun CompleteIcon(modifier: Modifier = Modifier, onDelete: (Task) -> Unit, task: Task) {
+    var isChecked by remember { mutableStateOf(false) }
+
+    Box(
+        modifier = Modifier
+            .clickable(
+                indication = null,
+                interactionSource = remember { MutableInteractionSource() }
+            ) {
+                isChecked = !isChecked
+                onDelete(task)
+            }
+//            .background(Color.Red) // Ensure the background doesn't affect the padding
+            .padding(8.dp) // Increase padding for a larger touch area
+    ) {
+        AnimatedContent(
+            targetState = isChecked,
+            transitionSpec = {
+                fadeIn(animationSpec = tween(300)) togetherWith
+                        fadeOut(animationSpec = tween(300))
+            }, label = "Complete Task Icon"
+        ) { targetChecked ->
+            if (targetChecked) {
+                Icon(
+                    imageVector = Icons.Outlined.CheckCircle,
+                    contentDescription = "Checked",
+                    tint = MaterialTheme.colorScheme.primary,
+//                    modifier = Modifier.size(36.dp) // Increase icon size if needed
+                )
+            } else {
+                Icon(
+                    imageVector = Icons.Outlined.RadioButtonUnchecked,
+                    contentDescription = "Unchecked",
+                    tint = MaterialTheme.colorScheme.tertiary,
+//                    modifier = Modifier.size(36.dp) // Increase icon size if needed
+                )
+            }
+        }
+    }
+}
+
 fun vibrate(context: Context, strength: Int) {
     val vibrator = context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
@@ -270,41 +319,3 @@ fun vibrate(context: Context, strength: Int) {
     }
 }
 
-@OptIn(ExperimentalAnimationApi::class)
-@Composable
-fun CompleteIcon(modifier: Modifier = Modifier, onDelete: (Task) -> Unit, task: Task) {
-    var isChecked by remember { mutableStateOf(false) }
-
-    Box(
-        modifier = Modifier
-            .clickable(
-                indication = null,
-                interactionSource = remember { MutableInteractionSource() }
-            ) {
-                isChecked = !isChecked
-                onDelete(task)
-            }
-    ) {
-        AnimatedContent(
-            targetState = isChecked,
-            transitionSpec = {
-                fadeIn(animationSpec = tween(300)) togetherWith
-                        fadeOut(animationSpec = tween(300))
-            }, label = "Complete Task Icon"
-        ) { targetChecked ->
-            if (targetChecked) {
-                Icon(
-                    imageVector = Icons.Outlined.CheckCircle,
-                    contentDescription = "Checked",
-                    tint = MaterialTheme.colorScheme.primary
-                )
-            } else {
-                Icon(
-                    imageVector = Icons.Outlined.RadioButtonUnchecked,
-                    contentDescription = "Unchecked",
-                    tint = MaterialTheme.colorScheme.tertiary
-                )
-            }
-        }
-    }
-}
