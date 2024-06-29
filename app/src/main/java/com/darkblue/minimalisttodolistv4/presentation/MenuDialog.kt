@@ -6,6 +6,7 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -14,6 +15,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
@@ -32,11 +34,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.dp
 import com.darkblue.minimalisttodolistv4.data.RecurrenceType
 import com.darkblue.minimalisttodolistv4.data.SortType
 import com.darkblue.minimalisttodolistv4.data.Task
+import com.darkblue.minimalisttodolistv4.data.ThemeType
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -50,7 +54,9 @@ fun MenuDialog(
         onDismissRequest = {
             onEvent(TaskEvent.HideMenuDialog)
         },
-        modifier = modifier.width(350.dp)
+        modifier = modifier
+            .width(350.dp)
+            .height(350.dp)
     ) {
         CustomBox {
             Column(
@@ -59,10 +65,6 @@ fun MenuDialog(
                     .padding(30.dp),
                 verticalArrangement = Arrangement.spacedBy(24.dp)
             ) {
-                PrioritySelector(
-                    currentSortType = state.sortType,
-                    onSortChange = { onEvent(TaskEvent.SortTasks(it) ) }
-                )
                 Text(
                     text = "Menu",
                     style = MaterialTheme.typography.headlineSmall,
@@ -71,13 +73,13 @@ fun MenuDialog(
                 Text(text = "History", modifier = Modifier.clickable { onEvent(TaskEvent.ShowHistoryDialog) })
                 Text(text = "Theme")
                 Text(text = "Notification")
-                PrioritySelector(
-                    currentSortType = state.sortType,
-                    onSortChange = { onEvent(TaskEvent.SortTasks(it) ) }
-                )
                 RecurrenceSelector(
                     currentRecurrenceFilter = state.recurrenceFilter,
                     onRecurrenceFilterChange = { onEvent(TaskEvent.SetRecurrenceFilter(it)) }
+                )
+                PrioritySelector(
+                    currentSortType = state.sortType,
+                    onSortChange = { onEvent(TaskEvent.SortTasks(it) ) }
                 )
             }
         }
@@ -94,7 +96,8 @@ fun RecurrenceSelector(
 
     Text(text = "Recurrence Filter", modifier = Modifier
         .fillMaxWidth()
-        .clickable { expanded = true })
+        .clickable { expanded = true }
+    )
     CustomDropdownMenu(
         expanded = expanded,
         onDismissRequest = {
@@ -132,7 +135,8 @@ fun PrioritySelector(
 
     Text(text = "Sorting Option", modifier = Modifier
         .fillMaxWidth()
-        .clickable { expanded = true })
+        .clickable { expanded = true }
+    )
     CustomDropdownMenu(
         expanded = expanded,
         onDismissRequest = {
@@ -153,6 +157,44 @@ fun PrioritySelector(
             ) {
                 CompleteIconWithoutDelay(isChecked = currentSortType == sortType)
                 Text(sortType.toDisplayString())
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+fun ThemeSelector(
+    modifier: Modifier = Modifier,
+    currentThemeType: ThemeType,
+    onThemeChange: (ThemeType) -> Unit
+) {
+    var expanded by remember { mutableStateOf(false) }
+
+    Text(text = "Theme", modifier = Modifier
+        .fillMaxWidth()
+        .clickable { expanded = true }
+    )
+    CustomDropdownMenu(
+        expanded = expanded,
+        onDismissRequest = {
+            expanded = false
+        },
+    ) {
+        ThemeType.entries.forEach { themeType ->
+            Row(
+                horizontalArrangement = Arrangement.Start,
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .padding(start = 12.dp, end = 25.dp)
+                    .combinedClickable(
+                        indication = null,
+                        interactionSource = remember { MutableInteractionSource() },
+                        onClick = { onThemeChange(themeType) }
+                    )
+            ) {
+                CompleteIconWithoutDelay(isChecked = currentThemeType == themeType)
+                Text(themeType.toDisplayString())
             }
         }
     }
@@ -179,3 +221,4 @@ fun CompleteIconWithoutDelay(isChecked: Boolean) {
         }
     }
 }
+

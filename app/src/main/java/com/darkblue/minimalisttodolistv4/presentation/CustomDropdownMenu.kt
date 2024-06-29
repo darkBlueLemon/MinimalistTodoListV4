@@ -29,6 +29,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 
 @Composable
@@ -37,23 +38,30 @@ fun CustomDropdownMenu(
     onDismissRequest: () -> Unit,
     content: @Composable () -> Unit
 ) {
-    MaterialTheme(
-        colorScheme = MaterialTheme.colorScheme,
-        shapes = MaterialTheme.shapes.copy(extraSmall = RoundedCornerShape(16.dp))
-    ) {
-        DropdownMenu(
-            expanded = expanded,
-            onDismissRequest = onDismissRequest,
-            modifier = Modifier
-                .clip(RoundedCornerShape(16.dp))
-                .background(MaterialTheme.colorScheme.background)
-                .border(
-                    width = 2.dp,
-                    color = MaterialTheme.colorScheme.onBackground,
-                    shape = RoundedCornerShape(16.dp)
-                )
+    // Padding issues without the if statement
+    if(expanded) {
+        Box(
+            modifier = Modifier.background(Color.Green)
         ) {
-            content()
+            MaterialTheme(
+                colorScheme = MaterialTheme.colorScheme,
+                shapes = MaterialTheme.shapes.copy(extraSmall = RoundedCornerShape(16.dp))
+            ) {
+                DropdownMenu(
+                    expanded = expanded,
+                    onDismissRequest = onDismissRequest,
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(16.dp))
+                        .background(MaterialTheme.colorScheme.background)
+                        .border(
+                            width = 2.dp,
+                            color = MaterialTheme.colorScheme.onBackground,
+                            shape = RoundedCornerShape(16.dp)
+                        )
+                ) {
+                    content()
+                }
+            }
         }
     }
 }
