@@ -7,6 +7,8 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
+import androidx.compose.material.ripple.LocalRippleTheme
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.ViewModel
@@ -17,6 +19,7 @@ import com.darkblue.minimalisttodolistv4.presentation.NavGraph
 import com.darkblue.minimalisttodolistv4.presentation.TaskScreen
 import com.darkblue.minimalisttodolistv4.presentation.TaskViewModel
 import com.darkblue.minimalisttodolistv4.ui.theme.MinimalistTodoListV4Theme
+import com.darkblue.minimalisttodolistv4.ui.theme.NoRippleTheme
 
 class MainActivity : ComponentActivity() {
 
