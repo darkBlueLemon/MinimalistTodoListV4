@@ -1,10 +1,6 @@
 package com.darkblue.minimalisttodolistv4.presentation
 
-import android.app.AlarmManager
-import android.graphics.drawable.Icon
 import android.os.Build
-import android.util.Log
-import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -18,37 +14,21 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.outlined.EventNote
-import androidx.compose.material.icons.automirrored.outlined.Note
-import androidx.compose.material.icons.automirrored.outlined.NoteAdd
-import androidx.compose.material.icons.automirrored.outlined.Notes
-import androidx.compose.material.icons.automirrored.outlined.SpeakerNotes
 import androidx.compose.material.icons.automirrored.outlined.StickyNote2
-import androidx.compose.material.icons.filled.EventNote
-import androidx.compose.material.icons.filled.Star
-import androidx.compose.material.icons.outlined.Star
 import androidx.compose.material.icons.rounded.AccessTime
 import androidx.compose.material.icons.rounded.DateRange
 import androidx.compose.material.icons.rounded.Star
-import androidx.compose.material.icons.rounded.StarBorder
 import androidx.compose.material.icons.rounded.StarOutline
-import androidx.compose.material.icons.rounded.StarRate
-import androidx.compose.material.icons.rounded.Stars
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.BasicAlertDialog
-import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
-import androidx.compose.material3.TimePicker
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -56,28 +36,15 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
-import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.content.getSystemService
 import com.darkblue.minimalisttodolistv4.data.RecurrenceType
 import com.darkblue.minimalisttodolistv4.ui.theme.Priority1
 import com.darkblue.minimalisttodolistv4.ui.theme.Priority2
 import com.darkblue.minimalisttodolistv4.ui.theme.Priority3
-import com.darkblue.minimalisttodolistv4.ui.theme.translucentDark
-import com.darkblue.minimalisttodolistv4.ui.theme.translucentDark
-import java.time.Instant
-import java.time.ZoneId
-import java.time.format.DateTimeFormatter
-import java.util.TimeZone
 
 @RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
@@ -297,7 +264,8 @@ fun DateSelector(modifier: Modifier = Modifier, state: TaskState, onEvent: (Task
     if (state.isDatePickerVisible) {
         DatePicker(
             onDateSelected = { date -> onEvent(TaskEvent.SetDueDate(date)) },
-            closeSelection = { onEvent(TaskEvent.HideDatePicker) }
+            closeSelection = { onEvent(TaskEvent.HideDatePicker) },
+            initialDate = viewModel.getLocalDateFromEpochMilli(state.dueDate)
         )
     }
 }
@@ -331,7 +299,8 @@ fun TimeSelector(modifier: Modifier = Modifier, state: TaskState, onEvent: (Task
     if (state.isTimePickerVisible) {
         TimePickerFromOldApp(
             onTimeSelected = { time -> onEvent(TaskEvent.SetDueTime(time)) },
-            closeSelection = { onEvent(TaskEvent.HideTimePicker) }
+            closeSelection = { onEvent(TaskEvent.HideTimePicker) },
+            initialTime = viewModel.getLocalTimeFromEpochMilli(state.dueDate)
         )
     }
 }

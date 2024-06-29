@@ -14,7 +14,9 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import java.time.Instant
+import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.LocalTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
@@ -357,5 +359,17 @@ class TaskViewModel(
             return ""
         }
         return dateTime.format(timeFormatter)
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun getLocalDateFromEpochMilli(epochMilli: Long?): LocalDate {
+        epochMilli ?: return LocalDate.now()
+        return Instant.ofEpochMilli(epochMilli).atZone(ZoneId.systemDefault()).toLocalDate()
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun getLocalTimeFromEpochMilli(epochMilli: Long?): LocalTime {
+        epochMilli ?: return LocalTime.now()
+        return Instant.ofEpochMilli(epochMilli).atZone(ZoneId.systemDefault()).toLocalTime()
     }
 }
