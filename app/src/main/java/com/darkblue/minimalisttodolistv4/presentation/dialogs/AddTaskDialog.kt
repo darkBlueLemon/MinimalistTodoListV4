@@ -49,6 +49,7 @@ import com.darkblue.minimalisttodolistv4.presentation.viewmodel.TaskEvent
 import com.darkblue.minimalisttodolistv4.presentation.viewmodel.TaskState
 import com.darkblue.minimalisttodolistv4.presentation.viewmodel.TaskViewModel
 import com.darkblue.minimalisttodolistv4.presentation.components.TimePickerFromOldApp
+import com.darkblue.minimalisttodolistv4.presentation.viewmodel.PreferencesViewModel
 import com.darkblue.minimalisttodolistv4.ui.theme.Priority1
 import com.darkblue.minimalisttodolistv4.ui.theme.Priority2
 import com.darkblue.minimalisttodolistv4.ui.theme.Priority3
@@ -60,11 +61,10 @@ fun AddTaskDialog(
     state: TaskState,
     onEvent: (TaskEvent) -> Unit,
     viewModel: TaskViewModel,
-    modifier: Modifier = Modifier,
+    preferencesViewModel: PreferencesViewModel
 ) {
     BasicAlertDialog(
         onDismissRequest = { onEvent(TaskEvent.HideAddTaskDialog) },
-        modifier = modifier
     ) {
         CustomBox {
             Column(
@@ -81,7 +81,7 @@ fun AddTaskDialog(
                 DateSelector(state = state, onEvent = onEvent, viewModel = viewModel)
 
                 if (state.dueDate != null) {
-                    TimeSelector(state = state, onEvent = onEvent, viewModel = viewModel)
+                    TimeSelector(state = state, onEvent = onEvent, viewModel = viewModel, preferencesViewModel = preferencesViewModel)
                     RecurrenceSelector(
                         recurrenceFromEdit = state.recurrenceType,
                         onRecurrenceTypeSelected = { recurrenceType ->
@@ -280,7 +280,7 @@ fun DateSelector(modifier: Modifier = Modifier, state: TaskState, onEvent: (Task
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun TimeSelector(modifier: Modifier = Modifier, state: TaskState, onEvent: (TaskEvent) -> Unit, viewModel: TaskViewModel) {
+fun TimeSelector(modifier: Modifier = Modifier, state: TaskState, onEvent: (TaskEvent) -> Unit, viewModel: TaskViewModel, preferencesViewModel: PreferencesViewModel) {
     val text = viewModel.formatDueDateWithTimeOnly(state.dueDate).ifEmpty { "Add Time" }
 
     Row(
@@ -308,7 +308,8 @@ fun TimeSelector(modifier: Modifier = Modifier, state: TaskState, onEvent: (Task
         TimePickerFromOldApp(
             onTimeSelected = { time -> onEvent(TaskEvent.SetDueTime(time)) },
             closeSelection = { onEvent(TaskEvent.HideTimePicker) },
-            initialTime = viewModel.getLocalTimeFromEpochMilli(state.dueDate)
+            initialTime = viewModel.getLocalTimeFromEpochMilli(state.dueDate),
+            preferencesViewModel = preferencesViewModel
         )
     }
 }

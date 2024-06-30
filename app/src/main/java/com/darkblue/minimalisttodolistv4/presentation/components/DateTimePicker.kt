@@ -1,5 +1,6 @@
 package com.darkblue.minimalisttodolistv4.presentation.components
 
+import android.content.res.Configuration
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
@@ -19,13 +20,20 @@ import androidx.compose.material3.TimePicker
 import androidx.compose.material3.TimePickerDefaults
 import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
+import com.darkblue.minimalisttodolistv4.data.model.ClockType
+import com.darkblue.minimalisttodolistv4.data.model.ThemeType
+import com.darkblue.minimalisttodolistv4.data.preferences.AppPreferences
+import com.darkblue.minimalisttodolistv4.presentation.viewmodel.PreferencesViewModel
 import com.maxkeppeker.sheets.core.models.base.rememberUseCaseState
 import com.maxkeppeler.sheets.calendar.CalendarDialog
 import com.maxkeppeler.sheets.calendar.models.CalendarConfig
@@ -68,14 +76,23 @@ fun TimePickerFromOldApp(
     modifier: Modifier = Modifier,
     onTimeSelected: (LocalTime) -> Unit,
     closeSelection: () -> Unit,
-    initialTime: LocalTime
+    initialTime: LocalTime,
+    preferencesViewModel: PreferencesViewModel
 ) {
     val selectedTime = remember { mutableStateOf<LocalTime?>(null) }
+
+    val clockType by preferencesViewModel.clockType.collectAsState()
+    var is24Hour by remember { mutableStateOf(false) }
+    is24Hour = when (clockType) {
+        ClockType.TWELVE_HOUR -> false
+        ClockType.TWENTY_FOUR_HOUR -> true
+    }
     val timePickerState = rememberTimePickerState(
         initialHour = initialTime.hour,
         initialMinute = initialTime.minute,
-        is24Hour = false
+        is24Hour = is24Hour
     )
+
     BasicAlertDialog(
         onDismissRequest = {
             closeSelection()
@@ -87,7 +104,7 @@ fun TimePickerFromOldApp(
                     .clip(RoundedCornerShape(7))
                     .background(MaterialTheme.colorScheme.background)
                     .border(2.dp, MaterialTheme.colorScheme.primary, RoundedCornerShape(7))
-                    .padding(20.dp),
+                    .padding(35.dp),
             ) {
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,

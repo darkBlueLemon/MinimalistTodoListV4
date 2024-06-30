@@ -15,14 +15,27 @@ class AppPreferences(context: Context) {
     val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = PREFERENCES_NAME)
     private val dataStore = context.dataStore
 
-    val THEME_KEY = stringPreferencesKey("theme")
+    private val THEME_KEY = stringPreferencesKey("theme")
     val theme: Flow<String> = dataStore.data
         .map { preferences ->
             preferences[THEME_KEY] ?: "Dark"
         }
+
+    private val CLOCK_TYPE_KEY = stringPreferencesKey("clockType")
+    val clockType: Flow<String> = dataStore.data
+        .map { preferences ->
+            preferences[CLOCK_TYPE_KEY] ?: "12" // Default to 12-hour clock
+        }
+
     suspend fun saveTheme(theme: String) {
         dataStore.edit { preferences ->
             preferences[THEME_KEY] = theme
+        }
+    }
+
+    suspend fun saveClockType(clockType: String) {
+        dataStore.edit { preferences ->
+            preferences[CLOCK_TYPE_KEY] = clockType
         }
     }
 }

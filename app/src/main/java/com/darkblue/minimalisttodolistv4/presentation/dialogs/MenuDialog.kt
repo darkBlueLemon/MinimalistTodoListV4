@@ -30,6 +30,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.dp
+import com.darkblue.minimalisttodolistv4.data.model.ClockType
 import com.darkblue.minimalisttodolistv4.data.model.RecurrenceType
 import com.darkblue.minimalisttodolistv4.data.model.SortType
 import com.darkblue.minimalisttodolistv4.data.model.ThemeType
@@ -82,6 +83,48 @@ fun MenuDialog(
                 )
                 ThemeSelector(preferencesViewModel)
                 Text(text = "Tutorial")
+                ClockTypeSelector(preferencesViewModel = preferencesViewModel)
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+fun ClockTypeSelector(
+    preferencesViewModel: PreferencesViewModel
+) {
+    val clock by preferencesViewModel.clockType.collectAsState()
+    var expanded by remember { mutableStateOf(false) }
+
+    Text(
+        text = "Current Clock Type: ${clock.toDisplayString()}",
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { expanded = true }
+    )
+    CustomDropdownMenu(
+        expanded = expanded,
+        onDismissRequest = {
+            expanded = false
+        },
+    ) {
+        ClockType.entries.forEach { clockType ->
+            Row(
+                horizontalArrangement = Arrangement.Start,
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .padding(start = 12.dp, end = 25.dp)
+                    .combinedClickable(
+                        indication = null,
+                        interactionSource = remember { MutableInteractionSource() },
+                        onClick = {
+                            preferencesViewModel.saveClockType(clockType)
+                        }
+                    )
+            ) {
+                CompleteIconWithoutDelay(isChecked = clock == clockType)
+                Text(clockType.toDisplayString())
             }
         }
     }
@@ -202,7 +245,6 @@ fun ThemeSelector(
             }
         }
     }
-
 }
 
 @Composable

@@ -242,6 +242,7 @@ class TaskViewModel(
                     priority = 0,
                     note = "",
                     dueDate = null,
+                    dueTimeOnly = null,
                     recurrenceType = RecurrenceType.NONE,
                     nextDueDate = null,
                     editingTaskId = null

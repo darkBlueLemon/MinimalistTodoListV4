@@ -3,6 +3,7 @@ package com.darkblue.minimalisttodolistv4.presentation.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.darkblue.minimalisttodolistv4.data.model.ClockType
 import com.darkblue.minimalisttodolistv4.data.preferences.AppPreferences
 import com.darkblue.minimalisttodolistv4.data.model.ThemeType
 import kotlinx.coroutines.flow.SharingStarted
@@ -19,9 +20,21 @@ class PreferencesViewModel(private val appPreferences: AppPreferences) : ViewMod
         }
         .stateIn(viewModelScope, SharingStarted.Eagerly, ThemeType.DARK)
 
+    val clockType: StateFlow<ClockType> = appPreferences.clockType
+        .map { clockTypeString ->
+            ClockType.fromDisplayName(clockTypeString)
+        }
+        .stateIn(viewModelScope, SharingStarted.Eagerly, ClockType.TWELVE_HOUR)
+
     fun saveTheme(themeType: ThemeType) {
         viewModelScope.launch {
             appPreferences.saveTheme(themeType.toDisplayString())
+        }
+    }
+
+    fun saveClockType(clockType: ClockType) {
+        viewModelScope.launch {
+            appPreferences.saveClockType(clockType.toDisplayString())
         }
     }
 }
