@@ -1,6 +1,8 @@
-package com.darkblue.minimalisttodolistv4.data
+package com.darkblue.minimalisttodolistv4.data.database
 
 import androidx.room.*
+import com.darkblue.minimalisttodolistv4.data.model.DeletedTask
+import com.darkblue.minimalisttodolistv4.data.model.Task
 import kotlinx.coroutines.flow.Flow
 
 @Dao

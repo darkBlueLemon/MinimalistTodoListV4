@@ -1,4 +1,4 @@
-package com.darkblue.minimalisttodolistv4.data
+package com.darkblue.minimalisttodolistv4.data.preferences
 
 import android.content.Context
 import androidx.datastore.core.DataStore

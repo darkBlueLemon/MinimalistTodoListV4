@@ -1,13 +1,6 @@
-package com.darkblue.minimalisttodolistv4.presentation
+package com.darkblue.minimalisttodolistv4.presentation.dialogs
 
-import androidx.activity.viewModels
-import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -23,11 +16,9 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.CheckCircle
 import androidx.compose.material.icons.outlined.RadioButtonUnchecked
 import androidx.compose.material3.BasicAlertDialog
-import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -37,14 +28,16 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.darkblue.minimalisttodolistv4.data.RecurrenceType
-import com.darkblue.minimalisttodolistv4.data.SortType
-import com.darkblue.minimalisttodolistv4.data.Task
-import com.darkblue.minimalisttodolistv4.data.ThemeType
+import com.darkblue.minimalisttodolistv4.data.model.RecurrenceType
+import com.darkblue.minimalisttodolistv4.data.model.SortType
+import com.darkblue.minimalisttodolistv4.data.model.ThemeType
+import com.darkblue.minimalisttodolistv4.presentation.components.CustomBox
+import com.darkblue.minimalisttodolistv4.presentation.components.CustomDropdownMenu
+import com.darkblue.minimalisttodolistv4.presentation.viewmodel.PreferencesViewModel
+import com.darkblue.minimalisttodolistv4.presentation.viewmodel.TaskEvent
+import com.darkblue.minimalisttodolistv4.presentation.viewmodel.TaskState
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

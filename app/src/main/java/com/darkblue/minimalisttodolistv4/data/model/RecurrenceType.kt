@@ -1,4 +1,4 @@
-package com.darkblue.minimalisttodolistv4.data
+package com.darkblue.minimalisttodolistv4.data.model
 
 enum class RecurrenceType {
     NONE, DAILY, WEEKLY, MONTHLY, YEARLY;

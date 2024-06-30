@@ -1,4 +1,4 @@
-package com.darkblue.minimalisttodolistv4.presentation
+package com.darkblue.minimalisttodolistv4.presentation.components
 
 import android.os.Build
 import androidx.annotation.RequiresApi

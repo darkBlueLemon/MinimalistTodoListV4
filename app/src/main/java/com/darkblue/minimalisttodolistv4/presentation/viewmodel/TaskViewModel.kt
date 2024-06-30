@@ -1,14 +1,14 @@
-package com.darkblue.minimalisttodolistv4.presentation
+package com.darkblue.minimalisttodolistv4.presentation.viewmodel
 
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.darkblue.minimalisttodolistv4.data.DeletedTask
-import com.darkblue.minimalisttodolistv4.data.RecurrenceType
-import com.darkblue.minimalisttodolistv4.data.SortType
-import com.darkblue.minimalisttodolistv4.data.Task
-import com.darkblue.minimalisttodolistv4.data.TaskDao
+import com.darkblue.minimalisttodolistv4.data.model.DeletedTask
+import com.darkblue.minimalisttodolistv4.data.model.RecurrenceType
+import com.darkblue.minimalisttodolistv4.data.model.SortType
+import com.darkblue.minimalisttodolistv4.data.model.Task
+import com.darkblue.minimalisttodolistv4.data.database.TaskDao
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*

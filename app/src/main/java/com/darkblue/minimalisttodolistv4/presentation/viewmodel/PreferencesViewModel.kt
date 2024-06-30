@@ -1,10 +1,10 @@
-package com.darkblue.minimalisttodolistv4.presentation
+package com.darkblue.minimalisttodolistv4.presentation.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.darkblue.minimalisttodolistv4.data.AppPreferences
-import com.darkblue.minimalisttodolistv4.data.ThemeType
+import com.darkblue.minimalisttodolistv4.data.preferences.AppPreferences
+import com.darkblue.minimalisttodolistv4.data.model.ThemeType
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map

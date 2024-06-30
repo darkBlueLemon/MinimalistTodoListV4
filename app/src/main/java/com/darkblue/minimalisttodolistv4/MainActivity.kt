@@ -16,13 +16,13 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.room.Room
-import com.darkblue.minimalisttodolistv4.data.AppPreferences
-import com.darkblue.minimalisttodolistv4.data.ContactDatabase
-import com.darkblue.minimalisttodolistv4.data.ThemeType
-import com.darkblue.minimalisttodolistv4.presentation.NavGraph
-import com.darkblue.minimalisttodolistv4.presentation.PreferencesViewModel
-import com.darkblue.minimalisttodolistv4.presentation.PreferencesViewModelFactory
-import com.darkblue.minimalisttodolistv4.presentation.TaskViewModel
+import com.darkblue.minimalisttodolistv4.data.preferences.AppPreferences
+import com.darkblue.minimalisttodolistv4.data.database.ContactDatabase
+import com.darkblue.minimalisttodolistv4.data.model.ThemeType
+import com.darkblue.minimalisttodolistv4.presentation.navigation.NavGraph
+import com.darkblue.minimalisttodolistv4.presentation.viewmodel.PreferencesViewModel
+import com.darkblue.minimalisttodolistv4.presentation.viewmodel.PreferencesViewModelFactory
+import com.darkblue.minimalisttodolistv4.presentation.viewmodel.TaskViewModel
 import com.darkblue.minimalisttodolistv4.ui.theme.MinimalistTodoListV4Theme
 
 class MainActivity : ComponentActivity() {

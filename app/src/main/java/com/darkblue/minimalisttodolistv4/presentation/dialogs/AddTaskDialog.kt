@@ -1,4 +1,4 @@
-package com.darkblue.minimalisttodolistv4.presentation
+package com.darkblue.minimalisttodolistv4.presentation.dialogs
 
 import android.os.Build
 import androidx.annotation.RequiresApi
@@ -42,7 +42,13 @@ import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.darkblue.minimalisttodolistv4.data.RecurrenceType
+import com.darkblue.minimalisttodolistv4.data.model.RecurrenceType
+import com.darkblue.minimalisttodolistv4.presentation.components.CustomBox
+import com.darkblue.minimalisttodolistv4.presentation.components.DatePicker
+import com.darkblue.minimalisttodolistv4.presentation.viewmodel.TaskEvent
+import com.darkblue.minimalisttodolistv4.presentation.viewmodel.TaskState
+import com.darkblue.minimalisttodolistv4.presentation.viewmodel.TaskViewModel
+import com.darkblue.minimalisttodolistv4.presentation.components.TimePickerFromOldApp
 import com.darkblue.minimalisttodolistv4.ui.theme.Priority1
 import com.darkblue.minimalisttodolistv4.ui.theme.Priority2
 import com.darkblue.minimalisttodolistv4.ui.theme.Priority3

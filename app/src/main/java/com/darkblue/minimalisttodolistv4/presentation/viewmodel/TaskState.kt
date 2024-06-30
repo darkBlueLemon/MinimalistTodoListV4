@@ -1,8 +1,8 @@
-package com.darkblue.minimalisttodolistv4.presentation
+package com.darkblue.minimalisttodolistv4.presentation.viewmodel
 
-import com.darkblue.minimalisttodolistv4.data.RecurrenceType
-import com.darkblue.minimalisttodolistv4.data.SortType
-import com.darkblue.minimalisttodolistv4.data.Task
+import com.darkblue.minimalisttodolistv4.data.model.RecurrenceType
+import com.darkblue.minimalisttodolistv4.data.model.SortType
+import com.darkblue.minimalisttodolistv4.data.model.Task
 import java.time.LocalDate
 import java.time.LocalTime
 

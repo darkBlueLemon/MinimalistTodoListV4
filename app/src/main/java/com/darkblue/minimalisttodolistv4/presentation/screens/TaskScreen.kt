@@ -1,4 +1,4 @@
-package com.darkblue.minimalisttodolistv4.presentation
+package com.darkblue.minimalisttodolistv4.presentation.screens
 
 import android.content.Context
 import android.os.Build
@@ -47,9 +47,15 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
-import com.darkblue.minimalisttodolistv4.data.RecurrenceType
-import com.darkblue.minimalisttodolistv4.data.Task
+import com.darkblue.minimalisttodolistv4.data.model.RecurrenceType
+import com.darkblue.minimalisttodolistv4.data.model.Task
+import com.darkblue.minimalisttodolistv4.presentation.viewmodel.PreferencesViewModel
+import com.darkblue.minimalisttodolistv4.presentation.viewmodel.TaskEvent
+import com.darkblue.minimalisttodolistv4.presentation.viewmodel.TaskState
+import com.darkblue.minimalisttodolistv4.presentation.viewmodel.TaskViewModel
+import com.darkblue.minimalisttodolistv4.presentation.dialogs.AddTaskDialog
+import com.darkblue.minimalisttodolistv4.presentation.dialogs.HistoryDialog
+import com.darkblue.minimalisttodolistv4.presentation.dialogs.MenuDialog
 import com.darkblue.minimalisttodolistv4.ui.theme.Priority0
 import com.darkblue.minimalisttodolistv4.ui.theme.Priority1
 import com.darkblue.minimalisttodolistv4.ui.theme.Priority2
@@ -112,7 +118,7 @@ fun TaskScreen(
             MenuDialog(state, onEvent, preferencesViewModel = preferencesViewModel)
         }
         if(state.isHistoryDialogVisible) {
-            HistoryScreen(taskViewModel, onEvent)
+            HistoryDialog(taskViewModel, onEvent)
         }
         TaskList(onEvent, state, taskViewModel, padding)
     }
