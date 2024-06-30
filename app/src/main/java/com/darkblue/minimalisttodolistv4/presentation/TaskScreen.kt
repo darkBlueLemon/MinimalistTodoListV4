@@ -65,8 +65,8 @@ import java.time.Instant
 fun TaskScreen(
     state: TaskState,
     onEvent: (TaskEvent) -> Unit,
-    viewModel: TaskViewModel,
-    navController: NavController
+    taskViewModel: TaskViewModel,
+    preferencesViewModel: PreferencesViewModel
 ) {
     val context = LocalContext.current
     val interactionSource = remember { MutableInteractionSource() }
@@ -106,15 +106,15 @@ fun TaskScreen(
         },
     ) { padding ->
         if(state.isAddTaskDialogVisible) {
-            AddTaskDialog(state, onEvent, viewModel)
+            AddTaskDialog(state, onEvent, taskViewModel)
         }
         if(state.isMenuDialogVisible) {
-            MenuDialog(state, onEvent)
+            MenuDialog(state, onEvent, preferencesViewModel = preferencesViewModel)
         }
         if(state.isHistoryDialogVisible) {
-            HistoryScreen(viewModel, onEvent)
+            HistoryScreen(taskViewModel, onEvent)
         }
-        TaskList(onEvent, state, viewModel, padding)
+        TaskList(onEvent, state, taskViewModel, padding)
     }
 }
 

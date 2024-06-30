@@ -1,5 +1,6 @@
 package com.darkblue.minimalisttodolistv4.presentation
 
+import androidx.activity.viewModels
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
@@ -22,12 +23,14 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.CheckCircle
 import androidx.compose.material.icons.outlined.RadioButtonUnchecked
 import androidx.compose.material3.BasicAlertDialog
+import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -37,6 +40,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.darkblue.minimalisttodolistv4.data.RecurrenceType
 import com.darkblue.minimalisttodolistv4.data.SortType
 import com.darkblue.minimalisttodolistv4.data.Task
@@ -47,7 +51,8 @@ import com.darkblue.minimalisttodolistv4.data.ThemeType
 fun MenuDialog(
     state: TaskState,
     onEvent: (TaskEvent) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    preferencesViewModel: PreferencesViewModel
 ) {
     LocalConfiguration.current.screenWidthDp
     BasicAlertDialog(
@@ -71,7 +76,6 @@ fun MenuDialog(
                     modifier = Modifier.align(Alignment.CenterHorizontally)
                 )
                 Text(text = "History", modifier = Modifier.clickable { onEvent(TaskEvent.ShowHistoryDialog) })
-                Text(text = "Theme")
                 Text(text = "Notification")
                 RecurrenceSelector(
                     currentRecurrenceFilter = state.recurrenceFilter,
@@ -81,6 +85,7 @@ fun MenuDialog(
                     currentSortType = state.sortType,
                     onSortChange = { onEvent(TaskEvent.SortTasks(it) ) }
                 )
+                ThemeSelector(preferencesViewModel)
             }
         }
     }
@@ -165,15 +170,16 @@ fun PrioritySelector(
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ThemeSelector(
-    modifier: Modifier = Modifier,
-    currentThemeType: ThemeType,
-    onThemeChange: (ThemeType) -> Unit
+    preferencesViewModel: PreferencesViewModel
 ) {
+    val theme by preferencesViewModel.theme.collectAsState()
     var expanded by remember { mutableStateOf(false) }
 
-    Text(text = "Theme", modifier = Modifier
-        .fillMaxWidth()
-        .clickable { expanded = true }
+    Text(
+        text = "Current Theme: ${theme.toDisplayString()}",
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { expanded = true }
     )
     CustomDropdownMenu(
         expanded = expanded,
@@ -190,14 +196,17 @@ fun ThemeSelector(
                     .combinedClickable(
                         indication = null,
                         interactionSource = remember { MutableInteractionSource() },
-                        onClick = { onThemeChange(themeType) }
+                        onClick = {
+                            preferencesViewModel.saveTheme(themeType)
+                        }
                     )
             ) {
-                CompleteIconWithoutDelay(isChecked = currentThemeType == themeType)
+                CompleteIconWithoutDelay(isChecked = theme == themeType)
                 Text(themeType.toDisplayString())
             }
         }
     }
+
 }
 
 @Composable
