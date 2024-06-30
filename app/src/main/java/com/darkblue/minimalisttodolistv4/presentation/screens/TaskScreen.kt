@@ -83,7 +83,6 @@ fun TaskScreen(
     preferencesViewModel: PreferencesViewModel
 ) {
     val context = LocalContext.current
-    val interactionSource = remember { MutableInteractionSource() }
 
     Scaffold(
         floatingActionButton = {
@@ -255,7 +254,6 @@ fun DueDate_Recurrence_Note(
     }
 }
 
-@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun CompleteIcon(modifier: Modifier = Modifier, onDelete: (Task) -> Unit, task: Task) {
     var isChecked by remember { mutableStateOf(false) }

@@ -69,7 +69,6 @@ private val DarkColorScheme2 = lightColorScheme(
 @Composable
 fun MinimalistTodoListV4Theme(
     darkTheme: Boolean = isSystemInDarkTheme(),
-    // Dynamic color is available on Android 12+
     dynamicColor: Boolean = true,
     content: @Composable () -> Unit
 ) {
@@ -82,8 +81,6 @@ fun MinimalistTodoListV4Theme(
         darkTheme -> DarkColorScheme2
         else -> LightColorScheme2
     }
-//    var colorScheme = DarkColorScheme2
-//    colorScheme = LightColorScheme2
 
     MaterialTheme(
         colorScheme = colorScheme,
