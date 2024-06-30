@@ -8,12 +8,17 @@ import androidx.annotation.RequiresApi
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkOut
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
@@ -34,6 +39,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -42,6 +48,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -133,7 +141,6 @@ fun TaskList(onEvent: (TaskEvent) -> Unit, state: TaskState, viewModel: TaskView
             .fillMaxSize()
             .padding(padding)
         ,
-        verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         items(state.tasks, key = { it.id }) { task ->
             var visible by remember { mutableStateOf(true) }
@@ -147,7 +154,9 @@ fun TaskList(onEvent: (TaskEvent) -> Unit, state: TaskState, viewModel: TaskView
             ) {
                 TaskItem(
                     task = task,
-                    onEdit = { onEvent(TaskEvent.EditTask(it)) },
+                    onEdit = {
+                        onEvent(TaskEvent.EditTask(it))
+                    },
                     onDelete = {
                         coroutineScope.launch {
                             delay(300)
@@ -175,9 +184,8 @@ fun TaskItem(task: Task, onEdit: (Task) -> Unit, onDelete: (Task) -> Unit, viewM
 
     Row(
         modifier = Modifier
-            .fillMaxWidth()
-//            .background(Color.Green)
-                ,
+            .padding(bottom = 16.dp)
+            .fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
@@ -252,9 +260,34 @@ fun DueDate_Recurrence_Note(
 fun CompleteIcon(modifier: Modifier = Modifier, onDelete: (Task) -> Unit, task: Task) {
     var isChecked by remember { mutableStateOf(false) }
 
+    val scaleB = remember { Animatable(initialValue = 1f) }
+    var selected by remember { mutableStateOf(false) }
+
+    LaunchedEffect(key1 = selected) {
+        if(selected) {
+            launch {
+                scaleB.animateTo(
+                    targetValue = 0.6f,
+                    animationSpec = tween(
+                        durationMillis = 50
+                    )
+                )
+                scaleB.animateTo(
+                    targetValue = 1f,
+                    animationSpec = spring(
+                        dampingRatio = Spring.DampingRatioLowBouncy,
+                        stiffness = Spring.StiffnessLow
+                    )
+                )
+            }
+        }
+    }
+
     Box(
         modifier = Modifier
+            .scale(scaleB.value)
             .clickable {
+                selected = !selected
                 isChecked = !isChecked
                 onDelete(task)
             }

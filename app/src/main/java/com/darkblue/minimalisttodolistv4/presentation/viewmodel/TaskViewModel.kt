@@ -70,7 +70,7 @@ class TaskViewModel(
             is TaskEvent.DeleteTask -> {
                 viewModelScope.launch {
                     val task = event.task
-                    delay(200)
+                    delay(500)
                     dao.deleteTask(task)
                     dao.insertDeletedTask(
                         DeletedTask(
