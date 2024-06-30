@@ -8,9 +8,11 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
@@ -21,6 +23,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.Undo
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.outlined.Delete
+import androidx.compose.material.icons.rounded.DeleteForever
+import androidx.compose.material.icons.rounded.Menu
 import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -34,6 +38,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.darkblue.minimalisttodolistv4.data.model.DeletedTask
@@ -59,12 +64,10 @@ fun HistoryDialog(
                 modifier = Modifier
                     .padding(15.dp)
                     .height(400.dp)
+                    .width(350.dp)
             ) {
-                Text(
-                    text = "History",
-                    color = MaterialTheme.colorScheme.primary,
-                    style = MaterialTheme.typography.headlineSmall,
-                    modifier = Modifier.align(Alignment.CenterHorizontally)
+                TitleAndDeleteAll(
+                    onClearHistory = { onEvent(TaskEvent.DeleteAllHistoryTasks)}
                 )
                 LazyColumn(
                     modifier = Modifier
@@ -74,6 +77,64 @@ fun HistoryDialog(
                     items(deletedTasks) { deletedTask ->
                         HistoryItem(deletedTask, viewModel::onEvent, viewModel)
                     }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun TitleAndDeleteAll(onClearHistory: () -> Unit) {
+    var expanded by remember { mutableStateOf(false) }
+
+    Box (
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(IntrinsicSize.Max)
+            .padding(15.dp)
+    ){
+        Text(
+            text = "History",
+            color = MaterialTheme.colorScheme.primary,
+            style = MaterialTheme.typography.headlineSmall,
+            modifier = Modifier.align(Alignment.Center)
+        )
+        Box (
+            modifier =  Modifier
+                .fillMaxHeight()
+        ){
+            Icon(
+                imageVector = Icons.Rounded.Menu,
+                contentDescription = "Menu Toggle",
+                modifier = Modifier
+                    .align(Alignment.CenterStart)
+                    .clickable { expanded = true }
+            )
+            CustomDropdownMenu(
+                expanded = expanded,
+                onDismissRequest = {
+                    expanded = false
+                }
+            ) {
+                Column(
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier.padding(start = 10.dp, end = 10.dp)
+                ) {
+                    Icon(
+                        Icons.Rounded.DeleteForever,
+                        contentDescription = "Clear History",
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.clickable {
+                            onClearHistory()
+                            expanded = false
+                        }
+                    )
+                    Text(
+                        "Clear History",
+                        color = MaterialTheme.colorScheme.tertiary,
+                        style = MaterialTheme.typography.bodySmall
+                    )
                 }
             }
         }
@@ -92,11 +153,12 @@ fun HistoryItem(
     Row(
         modifier = Modifier
             .padding(start = 10.dp, end = 8.dp, top = 8.dp, bottom = 8.dp)
-            .background(MaterialTheme.colorScheme.surface, RoundedCornerShape(8.dp))
+            .fillMaxWidth()
+            .background(MaterialTheme.colorScheme.surface, RoundedCornerShape(8.dp)),
+        horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Column(
-            modifier = Modifier
-                .width(280.dp)
+            modifier = Modifier.weight(1f)
         ) {
             Text(
                 text = deletedTask.title,
@@ -151,14 +213,14 @@ fun DropDownItem(modifier: Modifier = Modifier, onRecoverClick: () -> Unit, onDe
             Icon(
                 Icons.AutoMirrored.Outlined.Undo,
                 contentDescription = "Recover",
-                tint = MaterialTheme.colorScheme.tertiary,
+                tint = MaterialTheme.colorScheme.primary,
                 modifier = Modifier.clickable {
                     onRecoverClick()
                 }
             )
             Text(
                 "Recover",
-                color = MaterialTheme.colorScheme.primary,
+                color = MaterialTheme.colorScheme.tertiary,
                 style = MaterialTheme.typography.bodySmall
             )
         }
@@ -170,14 +232,14 @@ fun DropDownItem(modifier: Modifier = Modifier, onRecoverClick: () -> Unit, onDe
             Icon(
                 Icons.Outlined.Delete,
                 contentDescription = "Delete",
-                tint = MaterialTheme.colorScheme.tertiary,
+                tint = MaterialTheme.colorScheme.primary,
                 modifier = Modifier.clickable {
                     onDeleteClick()
                 }
             )
             Text(
                 "Delete",
-                color = MaterialTheme.colorScheme.primary,
+                color = MaterialTheme.colorScheme.tertiary,
                 style = MaterialTheme.typography.bodySmall
             )
         }

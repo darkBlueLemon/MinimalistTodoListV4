@@ -1,10 +1,10 @@
 package com.darkblue.minimalisttodolistv4.data.model
 
 enum class SortType {
-    ALPHABETICAL,
-    ALPHABETICAL_REV,
+    PRIORITY,
     DUE_DATE,
-    PRIORITY;
+    ALPHABETICAL,
+    ALPHABETICAL_REV;
 
     fun toDisplayString(): String {
         return when (this) {

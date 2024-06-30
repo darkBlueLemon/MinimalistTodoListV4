@@ -268,6 +268,11 @@ class TaskViewModel(
                     isHistoryDialogVisible = false
                 ) }
             }
+            is TaskEvent.DeleteAllHistoryTasks -> {
+                viewModelScope.launch {
+                    dao.deleteAllDeletedTasks()
+                }
+            }
         }
     }
 

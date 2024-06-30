@@ -42,6 +42,9 @@ interface TaskDao {
     @Delete
     suspend fun deleteDeletedTask(deletedTask: DeletedTask)
 
+    @Query("DELETE FROM deleted_tasks")
+    suspend fun deleteAllDeletedTasks()
+
     @Query("SELECT * FROM deleted_tasks ORDER BY deletedAt DESC")
     fun getDeletedTasks(): Flow<List<DeletedTask>>
 }

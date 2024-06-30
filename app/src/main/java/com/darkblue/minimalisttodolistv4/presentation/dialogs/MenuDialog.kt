@@ -54,7 +54,9 @@ fun MenuDialog(
         },
         modifier = modifier
             .width(350.dp)
-            .height(350.dp)
+
+        // to stop it from expanding on box drop down menu click
+//            .height(350.dp)
     ) {
         CustomBox {
             Column(
@@ -79,6 +81,7 @@ fun MenuDialog(
                     onSortChange = { onEvent(TaskEvent.SortTasks(it) ) }
                 )
                 ThemeSelector(preferencesViewModel)
+                Text(text = "Tutorial")
             }
         }
     }

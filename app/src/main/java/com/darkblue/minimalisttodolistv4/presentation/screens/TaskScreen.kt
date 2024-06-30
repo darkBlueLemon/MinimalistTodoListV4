@@ -72,6 +72,8 @@ import com.darkblue.minimalisttodolistv4.ui.theme.dateRed
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.time.Instant
+import java.time.LocalDate
+import java.time.ZoneId
 
 @OptIn(ExperimentalFoundationApi::class)
 @RequiresApi(Build.VERSION_CODES.O)
@@ -222,7 +224,14 @@ fun DueDate_Recurrence_Note(
     val nextDueDate = viewModel.formatDueDateWithDateTime(task.nextDueDate)
     val note = task.note
 
-    val textColor = if (task.dueDate?.let { Instant.ofEpochMilli(it).isBefore(Instant.now()) } == true) dateRed else MaterialTheme.colorScheme.tertiary
+//    val textColor = if (task.dueDate?.let { Instant.ofEpochMilli(it).isBefore(Instant.now()) } == true) dateRed else MaterialTheme.colorScheme.tertiary
+    val textColor = if (task.dueDate?.let {
+            Instant.ofEpochMilli(it).atZone(ZoneId.systemDefault()).toLocalDate().isBefore(LocalDate.now().plusDays(1))
+        } == true) {
+        dateRed
+    } else {
+        MaterialTheme.colorScheme.tertiary
+    }
 
     Column {
         if (dueDate.isNotEmpty()) {
