@@ -24,7 +24,7 @@ class PreferencesViewModel(private val appPreferences: AppPreferences) : ViewMod
         .map { clockTypeString ->
             ClockType.fromDisplayName(clockTypeString)
         }
-        .stateIn(viewModelScope, SharingStarted.Eagerly, ClockType.TWELVE_HOUR)
+        .stateIn(viewModelScope, SharingStarted.Eagerly, ClockType.TWENTY_FOUR_HOUR)
 
     fun saveTheme(themeType: ThemeType) {
         viewModelScope.launch {

@@ -104,7 +104,7 @@ fun TimePickerFromOldApp(
                     .clip(RoundedCornerShape(7))
                     .background(MaterialTheme.colorScheme.background)
                     .border(2.dp, MaterialTheme.colorScheme.primary, RoundedCornerShape(7))
-                    .padding(35.dp),
+                    .padding(45.dp),
             ) {
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
