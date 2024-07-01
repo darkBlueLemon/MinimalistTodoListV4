@@ -53,13 +53,14 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import com.darkblue.minimalisttodolistv4.data.model.RecurrenceType
 import com.darkblue.minimalisttodolistv4.data.model.Task
-import com.darkblue.minimalisttodolistv4.presentation.viewmodel.PreferencesViewModel
+import com.darkblue.minimalisttodolistv4.presentation.viewmodel.DataStoreViewModel
 import com.darkblue.minimalisttodolistv4.presentation.viewmodel.TaskEvent
 import com.darkblue.minimalisttodolistv4.presentation.viewmodel.TaskState
 import com.darkblue.minimalisttodolistv4.presentation.viewmodel.TaskViewModel
 import com.darkblue.minimalisttodolistv4.presentation.dialogs.AddTaskDialog
 import com.darkblue.minimalisttodolistv4.presentation.dialogs.HistoryDialog
 import com.darkblue.minimalisttodolistv4.presentation.dialogs.MenuDialog
+import com.darkblue.minimalisttodolistv4.presentation.dialogs.ScheduleExactAlarmPermissionDialog
 import com.darkblue.minimalisttodolistv4.presentation.viewmodel.AppEvent
 import com.darkblue.minimalisttodolistv4.presentation.viewmodel.AppViewModel
 import com.darkblue.minimalisttodolistv4.ui.theme.Priority0
@@ -80,7 +81,7 @@ fun TaskScreen(
     taskState: TaskState,
     onEvent: (TaskEvent) -> Unit,
     taskViewModel: TaskViewModel,
-    preferencesViewModel: PreferencesViewModel,
+    dataStoreViewModel: DataStoreViewModel,
     appViewModel: AppViewModel
 ) {
     val context = LocalContext.current
@@ -120,13 +121,19 @@ fun TaskScreen(
         },
     ) { padding ->
         if (taskState.isAddTaskDialogVisible) {
-            AddTaskDialog(taskState, onEvent, taskViewModel, preferencesViewModel)
+            AddTaskDialog(taskState, onEvent, taskViewModel, dataStoreViewModel)
         }
         if (appState.isMenuDialogVisible) {
-            MenuDialog(taskState, onEvent, preferencesViewModel = preferencesViewModel, onAppEvent = appViewModel::onEvent)
+            MenuDialog(taskState, onEvent, dataStoreViewModel = dataStoreViewModel, onAppEvent = appViewModel::onEvent)
         }
         if (appState.isHistoryDialogVisible) {
             HistoryDialog(taskViewModel, onEvent, onAppEvent = appViewModel::onEvent)
+        }
+//        appViewModel.onEvent(AppEvent.ShowScheduleExactAlarmPermissionDialog)
+        if (appState.isScheduleExactAlarmPermissionDialogVisible) {
+            ScheduleExactAlarmPermissionDialog(onDismiss = { /*TODO*/ }, onAllow = { /*TODO*/ }) {
+
+            }
         }
         TaskList(onEvent, taskState, taskViewModel, padding)
     }

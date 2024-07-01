@@ -1,6 +1,5 @@
 package com.darkblue.minimalisttodolistv4.presentation.components
 
-import android.content.res.Configuration
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
@@ -31,9 +30,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import com.darkblue.minimalisttodolistv4.data.model.ClockType
-import com.darkblue.minimalisttodolistv4.data.model.ThemeType
-import com.darkblue.minimalisttodolistv4.data.preferences.AppPreferences
-import com.darkblue.minimalisttodolistv4.presentation.viewmodel.PreferencesViewModel
+import com.darkblue.minimalisttodolistv4.presentation.viewmodel.DataStoreViewModel
 import com.maxkeppeker.sheets.core.models.base.rememberUseCaseState
 import com.maxkeppeler.sheets.calendar.CalendarDialog
 import com.maxkeppeler.sheets.calendar.models.CalendarConfig
@@ -77,11 +74,11 @@ fun TimePickerFromOldApp(
     onTimeSelected: (LocalTime) -> Unit,
     closeSelection: () -> Unit,
     initialTime: LocalTime,
-    preferencesViewModel: PreferencesViewModel
+    dataStoreViewModel: DataStoreViewModel
 ) {
     val selectedTime = remember { mutableStateOf<LocalTime?>(null) }
 
-    val clockType by preferencesViewModel.clockType.collectAsState()
+    val clockType by dataStoreViewModel.clockType.collectAsState()
     var is24Hour by remember { mutableStateOf(false) }
     is24Hour = when (clockType) {
         ClockType.TWELVE_HOUR -> false

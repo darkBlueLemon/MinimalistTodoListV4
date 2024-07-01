@@ -12,7 +12,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
-class PreferencesViewModel(private val appPreferences: AppPreferences) : ViewModel() {
+class DataStoreViewModel(private val appPreferences: AppPreferences) : ViewModel() {
 
     val theme: StateFlow<ThemeType> = appPreferences.theme
         .map { themeString ->
@@ -41,9 +41,9 @@ class PreferencesViewModel(private val appPreferences: AppPreferences) : ViewMod
 
 class PreferencesViewModelFactory(private val appPreferences: AppPreferences) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(PreferencesViewModel::class.java)) {
+        if (modelClass.isAssignableFrom(DataStoreViewModel::class.java)) {
             @Suppress("UNCHECKED_CAST")
-            return PreferencesViewModel(appPreferences) as T
+            return DataStoreViewModel(appPreferences) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }

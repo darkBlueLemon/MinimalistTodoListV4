@@ -1,8 +1,12 @@
 package com.darkblue.minimalisttodolistv4.presentation.viewmodel
 
 sealed interface AppEvent {
-    object ShowMenuDialog : AppEvent
-    object HideMenuDialog : AppEvent
-    object ShowHistoryDialog : AppEvent
-    object HideHistoryDialog : AppEvent
+    data object ShowMenuDialog : AppEvent
+    data object HideMenuDialog : AppEvent
+
+    data object ShowHistoryDialog : AppEvent
+    data object HideHistoryDialog : AppEvent
+
+    data object ShowScheduleExactAlarmPermissionDialog: AppEvent
+    data object HideScheduleExactAlarmPermissionDialog : AppEvent
 }

@@ -23,7 +23,7 @@ import com.darkblue.minimalisttodolistv4.data.database.ContactDatabase
 import com.darkblue.minimalisttodolistv4.data.model.ThemeType
 import com.darkblue.minimalisttodolistv4.presentation.navigation.NavGraph
 import com.darkblue.minimalisttodolistv4.presentation.viewmodel.AppViewModel
-import com.darkblue.minimalisttodolistv4.presentation.viewmodel.PreferencesViewModel
+import com.darkblue.minimalisttodolistv4.presentation.viewmodel.DataStoreViewModel
 import com.darkblue.minimalisttodolistv4.presentation.viewmodel.PreferencesViewModelFactory
 import com.darkblue.minimalisttodolistv4.presentation.viewmodel.TaskViewModel
 import com.darkblue.minimalisttodolistv4.ui.theme.MinimalistTodoListV4Theme
@@ -47,7 +47,7 @@ class MainActivity : ComponentActivity() {
     )
     private val appViewModel = AppViewModel()
     private lateinit var appPreferences: AppPreferences
-    private val preferencesViewModel by viewModels<PreferencesViewModel> {
+    private val dataStoreViewModel by viewModels<DataStoreViewModel> {
         PreferencesViewModelFactory(appPreferences)
     }
 
@@ -66,7 +66,7 @@ class MainActivity : ComponentActivity() {
         appPreferences = AppPreferences(this)
 
         setContent {
-            val theme by preferencesViewModel.theme.collectAsState()
+            val theme by dataStoreViewModel.theme.collectAsState()
             var darkTheme by remember { mutableStateOf(false) }
 
             // Update darkTheme based on collected theme
@@ -81,7 +81,7 @@ class MainActivity : ComponentActivity() {
             }
 
             MinimalistTodoListV4Theme(darkTheme = darkTheme) {
-                NavGraph(taskViewModel = taskViewModel, preferencesViewModel = preferencesViewModel, appViewModel = appViewModel)
+                NavGraph(taskViewModel = taskViewModel, dataStoreViewModel = dataStoreViewModel, appViewModel = appViewModel)
             }
         }
     }

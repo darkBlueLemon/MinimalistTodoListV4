@@ -36,7 +36,7 @@ import com.darkblue.minimalisttodolistv4.data.model.ThemeType
 import com.darkblue.minimalisttodolistv4.presentation.components.CustomBox
 import com.darkblue.minimalisttodolistv4.presentation.components.CustomDropdownMenu
 import com.darkblue.minimalisttodolistv4.presentation.viewmodel.AppEvent
-import com.darkblue.minimalisttodolistv4.presentation.viewmodel.PreferencesViewModel
+import com.darkblue.minimalisttodolistv4.presentation.viewmodel.DataStoreViewModel
 import com.darkblue.minimalisttodolistv4.presentation.viewmodel.TaskEvent
 import com.darkblue.minimalisttodolistv4.presentation.viewmodel.TaskState
 
@@ -46,7 +46,7 @@ fun MenuDialog(
     taskState: TaskState,
     onEvent: (TaskEvent) -> Unit,
     modifier: Modifier = Modifier,
-    preferencesViewModel: PreferencesViewModel,
+    dataStoreViewModel: DataStoreViewModel,
     onAppEvent: (AppEvent) -> Unit
 ) {
     LocalConfiguration.current.screenWidthDp
@@ -82,9 +82,9 @@ fun MenuDialog(
                     currentSortType = taskState.sortType,
                     onSortChange = { onEvent(TaskEvent.SortTasks(it) ) }
                 )
-                ThemeSelector(preferencesViewModel)
+                ThemeSelector(dataStoreViewModel)
                 Text(text = "Tutorial")
-                ClockTypeSelector(preferencesViewModel = preferencesViewModel)
+                ClockTypeSelector(dataStoreViewModel = dataStoreViewModel)
             }
         }
     }
@@ -93,9 +93,9 @@ fun MenuDialog(
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ClockTypeSelector(
-    preferencesViewModel: PreferencesViewModel
+    dataStoreViewModel: DataStoreViewModel
 ) {
-    val clock by preferencesViewModel.clockType.collectAsState()
+    val clock by dataStoreViewModel.clockType.collectAsState()
     var expanded by remember { mutableStateOf(false) }
 
     Text(
@@ -120,7 +120,7 @@ fun ClockTypeSelector(
                         indication = null,
                         interactionSource = remember { MutableInteractionSource() },
                         onClick = {
-                            preferencesViewModel.saveClockType(clockType)
+                            dataStoreViewModel.saveClockType(clockType)
                         }
                     )
             ) {
@@ -210,9 +210,9 @@ fun PrioritySelector(
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ThemeSelector(
-    preferencesViewModel: PreferencesViewModel
+    dataStoreViewModel: DataStoreViewModel
 ) {
-    val theme by preferencesViewModel.theme.collectAsState()
+    val theme by dataStoreViewModel.theme.collectAsState()
     var expanded by remember { mutableStateOf(false) }
 
     Text(
@@ -237,7 +237,7 @@ fun ThemeSelector(
                         indication = null,
                         interactionSource = remember { MutableInteractionSource() },
                         onClick = {
-                            preferencesViewModel.saveTheme(themeType)
+                            dataStoreViewModel.saveTheme(themeType)
                         }
                     )
             ) {
