@@ -8,6 +8,8 @@ import androidx.activity.ComponentActivity
 import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
 import androidx.compose.runtime.collectAsState
@@ -45,7 +47,12 @@ class MainActivity : ComponentActivity() {
             }
         }
     )
+
+    private lateinit var permissionManager: PermissionManager
+    private lateinit var postNotificationPermissionLauncher: ActivityResultLauncher<String>
+
     private val appViewModel = AppViewModel()
+
     private lateinit var appPreferences: AppPreferences
     private val dataStoreViewModel by viewModels<DataStoreViewModel> {
         PreferencesViewModelFactory(appPreferences)
@@ -65,11 +72,23 @@ class MainActivity : ComponentActivity() {
 
         appPreferences = AppPreferences(this)
 
+        postNotificationPermissionLauncher = registerForActivityResult(
+            ActivityResultContracts.RequestPermission()
+        ) { isGranted: Boolean ->
+            permissionManager.handlePostNotificationPermissionResult(isGranted)
+        }
+        permissionManager = PermissionManager(
+            context = this,
+            activity = this,
+            postNotificationPermissionLauncher = postNotificationPermissionLauncher,
+            onTaskEvent = appViewModel::onEvent
+        )
+        appViewModel.setPermissionManager(permissionManager)
+
         setContent {
             val theme by dataStoreViewModel.theme.collectAsState()
             var darkTheme by remember { mutableStateOf(false) }
 
-            // Update darkTheme based on collected theme
             darkTheme = when (theme) {
                 ThemeType.DARK -> true
                 ThemeType.LIGHT -> false

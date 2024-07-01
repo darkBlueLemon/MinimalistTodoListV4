@@ -35,12 +35,12 @@ fun ScheduleExactAlarmPermissionDialog(
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 Text(
-                    text = "Schedule Exact Alarm Permission Needed",
+                    text = "Permission for Alarms & reminders",
                     style = MaterialTheme.typography.headlineSmall,
                     color = MaterialTheme.colorScheme.primary
                 )
                 Text(
-                    text = "We need this permission to schedule exact alarms. Would you like to allow it?",
+                    text = "Allow the app to set alarms for scheduling reminders",
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.primary
                 )

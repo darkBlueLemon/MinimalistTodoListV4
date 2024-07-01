@@ -1,6 +1,7 @@
 package com.darkblue.minimalisttodolistv4.presentation.dialogs
 
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -42,6 +43,7 @@ import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.darkblue.minimalisttodolistv4.PermissionManager
 import com.darkblue.minimalisttodolistv4.data.model.RecurrenceType
 import com.darkblue.minimalisttodolistv4.presentation.components.CustomBox
 import com.darkblue.minimalisttodolistv4.presentation.components.DatePicker
@@ -49,6 +51,8 @@ import com.darkblue.minimalisttodolistv4.presentation.viewmodel.TaskEvent
 import com.darkblue.minimalisttodolistv4.presentation.viewmodel.TaskState
 import com.darkblue.minimalisttodolistv4.presentation.viewmodel.TaskViewModel
 import com.darkblue.minimalisttodolistv4.presentation.components.TimePickerFromOldApp
+import com.darkblue.minimalisttodolistv4.presentation.viewmodel.AppEvent
+import com.darkblue.minimalisttodolistv4.presentation.viewmodel.AppViewModel
 import com.darkblue.minimalisttodolistv4.presentation.viewmodel.DataStoreViewModel
 import com.darkblue.minimalisttodolistv4.ui.theme.Priority1
 import com.darkblue.minimalisttodolistv4.ui.theme.Priority2
@@ -61,7 +65,8 @@ fun AddTaskDialog(
     taskState: TaskState,
     onEvent: (TaskEvent) -> Unit,
     viewModel: TaskViewModel,
-    dataStoreViewModel: DataStoreViewModel
+    dataStoreViewModel: DataStoreViewModel,
+    onAppEvent: (AppEvent) -> Unit
 ) {
     BasicAlertDialog(
         onDismissRequest = { onEvent(TaskEvent.HideAddTaskDialog) },
@@ -95,7 +100,15 @@ fun AddTaskDialog(
 //                    Text(text = "Next Due Date: ${nextDueDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))}")
 //                }
 
-                SaveButton(onSave = { onEvent(TaskEvent.SaveTask)}, modifier = Modifier.align(Alignment.CenterHorizontally))
+                SaveButton(
+                    onSave = {
+                        onEvent(TaskEvent.SaveTask)
+                        if (taskState.dueDate != null) {
+                            onAppEvent(AppEvent.CheckNotificationPermissions)
+                        }
+                    },
+                    modifier = Modifier.align(Alignment.CenterHorizontally)
+                )
             }
         }
     }

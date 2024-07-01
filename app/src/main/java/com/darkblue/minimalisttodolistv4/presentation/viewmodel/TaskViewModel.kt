@@ -4,6 +4,7 @@ import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.darkblue.minimalisttodolistv4.PermissionManager
 import com.darkblue.minimalisttodolistv4.data.model.DeletedTask
 import com.darkblue.minimalisttodolistv4.data.model.RecurrenceType
 import com.darkblue.minimalisttodolistv4.data.model.SortType

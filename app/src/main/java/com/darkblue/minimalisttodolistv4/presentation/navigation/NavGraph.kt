@@ -20,18 +20,20 @@ import com.darkblue.minimalisttodolistv4.ui.theme.NoRippleTheme
 @Composable
 fun NavGraph(startDestination: String = "task_list", taskViewModel: TaskViewModel, dataStoreViewModel: DataStoreViewModel, appViewModel: AppViewModel) {
     val navController = rememberNavController()
-    val state by taskViewModel.state.collectAsState()
+    val taskState by taskViewModel.state.collectAsState()
+    val appState by appViewModel.state.collectAsState()
     NavHost(navController = navController, startDestination = startDestination) {
         composable("task_list") {
             CompositionLocalProvider (
                 LocalRippleTheme provides NoRippleTheme
             ){
                 TaskScreen(
-                    taskState = state,
+                    taskState = taskState,
                     onEvent = taskViewModel::onEvent,
                     taskViewModel = taskViewModel,
                     dataStoreViewModel = dataStoreViewModel,
-                    appViewModel = appViewModel
+                    onAppEvent = appViewModel::onEvent,
+                    appState = appState
                 )
             }
         }

@@ -4,13 +4,21 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import com.darkblue.minimalisttodolistv4.PermissionManager
+import com.darkblue.minimalisttodolistv4.data.preferences.AppPreferences
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 
-class AppViewModel : ViewModel() {
+class AppViewModel: ViewModel() {
     private val _state = MutableStateFlow(AppState())
     val state: StateFlow<AppState> = _state
+    private lateinit var permissionManager: PermissionManager
+
+    fun setPermissionManager(permissionManager: PermissionManager) {
+        this.permissionManager = permissionManager
+    }
 
     fun onEvent(event: AppEvent) {
         when (event) {
@@ -33,18 +41,12 @@ class AppViewModel : ViewModel() {
             AppEvent.HideScheduleExactAlarmPermissionDialog -> {
                 _state.update { it.copy(isScheduleExactAlarmPermissionDialogVisible = false) }
             }
+            AppEvent.ShowScheduleExactAlarmPermissionIntent -> {
+                permissionManager.requestScheduleExactAlarmPermission()
+            }
+            AppEvent.CheckNotificationPermissions -> {
+                permissionManager.requestPermissions()
+            }
         }
     }
-
-//    // Permission
-//    var showPermissionDialog by mutableStateOf(false)
-//        private set
-//
-//    fun showPermissionDialog() {
-//        showPermissionDialog = true
-//    }
-//
-//    fun hidePermissionDialog() {
-//        showPermissionDialog = false
-//    }
 }
