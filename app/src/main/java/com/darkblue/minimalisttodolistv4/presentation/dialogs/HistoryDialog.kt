@@ -44,6 +44,7 @@ import androidx.compose.ui.unit.dp
 import com.darkblue.minimalisttodolistv4.data.model.DeletedTask
 import com.darkblue.minimalisttodolistv4.presentation.components.CustomBox
 import com.darkblue.minimalisttodolistv4.presentation.components.CustomDropdownMenu
+import com.darkblue.minimalisttodolistv4.presentation.viewmodel.AppEvent
 import com.darkblue.minimalisttodolistv4.presentation.viewmodel.TaskEvent
 import com.darkblue.minimalisttodolistv4.presentation.viewmodel.TaskViewModel
 
@@ -52,12 +53,13 @@ import com.darkblue.minimalisttodolistv4.presentation.viewmodel.TaskViewModel
 @Composable
 fun HistoryDialog(
     viewModel: TaskViewModel,
-    onEvent: (TaskEvent) -> Unit
+    onEvent: (TaskEvent) -> Unit,
+    onAppEvent: (AppEvent) -> Unit
 ) {
     val deletedTasks by viewModel.deletedTasks.collectAsState()
 
     BasicAlertDialog(onDismissRequest = {
-        onEvent(TaskEvent.HideHistoryDialog)
+        onAppEvent(AppEvent.HideHistoryDialog)
     }) {
         CustomBox {
             Column(

@@ -22,6 +22,7 @@ import com.darkblue.minimalisttodolistv4.data.preferences.AppPreferences
 import com.darkblue.minimalisttodolistv4.data.database.ContactDatabase
 import com.darkblue.minimalisttodolistv4.data.model.ThemeType
 import com.darkblue.minimalisttodolistv4.presentation.navigation.NavGraph
+import com.darkblue.minimalisttodolistv4.presentation.viewmodel.AppViewModel
 import com.darkblue.minimalisttodolistv4.presentation.viewmodel.PreferencesViewModel
 import com.darkblue.minimalisttodolistv4.presentation.viewmodel.PreferencesViewModelFactory
 import com.darkblue.minimalisttodolistv4.presentation.viewmodel.TaskViewModel
@@ -44,6 +45,7 @@ class MainActivity : ComponentActivity() {
             }
         }
     )
+    private val appViewModel = AppViewModel()
     private lateinit var appPreferences: AppPreferences
     private val preferencesViewModel by viewModels<PreferencesViewModel> {
         PreferencesViewModelFactory(appPreferences)
@@ -79,7 +81,7 @@ class MainActivity : ComponentActivity() {
             }
 
             MinimalistTodoListV4Theme(darkTheme = darkTheme) {
-                NavGraph(taskViewModel = taskViewModel, preferencesViewModel = preferencesViewModel)
+                NavGraph(taskViewModel = taskViewModel, preferencesViewModel = preferencesViewModel, appViewModel = appViewModel)
             }
         }
     }

@@ -58,7 +58,7 @@ import com.darkblue.minimalisttodolistv4.ui.theme.Priority3
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddTaskDialog(
-    state: TaskState,
+    taskState: TaskState,
     onEvent: (TaskEvent) -> Unit,
     viewModel: TaskViewModel,
     preferencesViewModel: PreferencesViewModel
@@ -72,18 +72,18 @@ fun AddTaskDialog(
                 modifier = Modifier.padding(15.dp).width(IntrinsicSize.Max),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                Title(state = state, onEvent = onEvent)
+                Title(taskState = taskState, onEvent = onEvent)
 
-                PrioritySelector(priorityFromEdit = state.priority, onPriorityChange = onEvent)
+                PrioritySelector(priorityFromEdit = taskState.priority, onPriorityChange = onEvent)
 
-                Note(state = state, onEvent = onEvent)
+                Note(taskState = taskState, onEvent = onEvent)
 
-                DateSelector(state = state, onEvent = onEvent, viewModel = viewModel)
+                DateSelector(taskState = taskState, onEvent = onEvent, viewModel = viewModel)
 
-                if (state.dueDate != null) {
-                    TimeSelector(state = state, onEvent = onEvent, viewModel = viewModel, preferencesViewModel = preferencesViewModel)
+                if (taskState.dueDate != null) {
+                    TimeSelector(taskState = taskState, onEvent = onEvent, viewModel = viewModel, preferencesViewModel = preferencesViewModel)
                     RecurrenceSelector(
-                        recurrenceFromEdit = state.recurrenceType,
+                        recurrenceFromEdit = taskState.recurrenceType,
                         onRecurrenceTypeSelected = { recurrenceType ->
                             onEvent(TaskEvent.SetRecurrenceType(recurrenceType))
                         }
@@ -102,9 +102,9 @@ fun AddTaskDialog(
 }
 
 @Composable
-fun Title(modifier: Modifier = Modifier, state: TaskState, onEvent: (TaskEvent) -> Unit) {
+fun Title(modifier: Modifier = Modifier, taskState: TaskState, onEvent: (TaskEvent) -> Unit) {
     TextField(
-        value = state.title,
+        value = taskState.title,
         onValueChange = { onEvent(TaskEvent.SetTitle(it)) },
         singleLine = true,
         placeholder = {
@@ -204,7 +204,7 @@ fun PriorityStar(index: Int, selectedPriority: Int, color: Color, onClick: (Int)
 }
 
 @Composable
-fun Note(modifier: Modifier = Modifier, state: TaskState, onEvent: (TaskEvent) -> Unit) {
+fun Note(modifier: Modifier = Modifier, taskState: TaskState, onEvent: (TaskEvent) -> Unit) {
     Row(
         modifier = Modifier.fillMaxWidth().padding(start = 15.dp),
         verticalAlignment = Alignment.CenterVertically
@@ -216,7 +216,7 @@ fun Note(modifier: Modifier = Modifier, state: TaskState, onEvent: (TaskEvent) -
             modifier = Modifier.size(20.dp)
         )
         TextField(
-            value = state.note,
+            value = taskState.note,
             onValueChange = { onEvent(TaskEvent.SetNote(it)) },
             placeholder = {
                 Text(
@@ -245,8 +245,8 @@ fun Note(modifier: Modifier = Modifier, state: TaskState, onEvent: (TaskEvent) -
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun DateSelector(modifier: Modifier = Modifier, state: TaskState, onEvent: (TaskEvent) -> Unit, viewModel: TaskViewModel) {
-    val text = viewModel.formatDueDateWithDateOnly(state.dueDate).ifEmpty { "Add date" }
+fun DateSelector(modifier: Modifier = Modifier, taskState: TaskState, onEvent: (TaskEvent) -> Unit, viewModel: TaskViewModel) {
+    val text = viewModel.formatDueDateWithDateOnly(taskState.dueDate).ifEmpty { "Add date" }
 
     Row(
         modifier = Modifier.fillMaxWidth().padding(start = 15.dp, top = 4.dp, bottom = 4.dp)
@@ -269,19 +269,19 @@ fun DateSelector(modifier: Modifier = Modifier, state: TaskState, onEvent: (Task
         )
     }
 
-    if (state.isDatePickerVisible) {
+    if (taskState.isDatePickerVisible) {
         DatePicker(
             onDateSelected = { date -> onEvent(TaskEvent.SetDueDate(date)) },
             closeSelection = { onEvent(TaskEvent.HideDatePicker) },
-            initialDate = viewModel.getLocalDateFromEpochMilli(state.dueDate)
+            initialDate = viewModel.getLocalDateFromEpochMilli(taskState.dueDate)
         )
     }
 }
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun TimeSelector(modifier: Modifier = Modifier, state: TaskState, onEvent: (TaskEvent) -> Unit, viewModel: TaskViewModel, preferencesViewModel: PreferencesViewModel) {
-    val text = viewModel.formatDueDateWithTimeOnly(state.dueDate).ifEmpty { "Add Time" }
+fun TimeSelector(modifier: Modifier = Modifier, taskState: TaskState, onEvent: (TaskEvent) -> Unit, viewModel: TaskViewModel, preferencesViewModel: PreferencesViewModel) {
+    val text = viewModel.formatDueDateWithTimeOnly(taskState.dueDate).ifEmpty { "Add Time" }
 
     Row(
         modifier = Modifier.fillMaxWidth().padding(start = 15.dp, top = 4.dp, bottom = 4.dp),
@@ -304,11 +304,11 @@ fun TimeSelector(modifier: Modifier = Modifier, state: TaskState, onEvent: (Task
         )
     }
 
-    if (state.isTimePickerVisible) {
+    if (taskState.isTimePickerVisible) {
         TimePickerFromOldApp(
             onTimeSelected = { time -> onEvent(TaskEvent.SetDueTime(time)) },
             closeSelection = { onEvent(TaskEvent.HideTimePicker) },
-            initialTime = viewModel.getLocalTimeFromEpochMilli(state.dueDate),
+            initialTime = viewModel.getLocalTimeFromEpochMilli(taskState.dueDate),
             preferencesViewModel = preferencesViewModel
         )
     }

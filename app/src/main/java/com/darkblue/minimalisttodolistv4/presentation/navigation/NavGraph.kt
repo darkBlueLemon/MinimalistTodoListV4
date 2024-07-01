@@ -12,12 +12,13 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.darkblue.minimalisttodolistv4.presentation.viewmodel.PreferencesViewModel
 import com.darkblue.minimalisttodolistv4.presentation.screens.TaskScreen
+import com.darkblue.minimalisttodolistv4.presentation.viewmodel.AppViewModel
 import com.darkblue.minimalisttodolistv4.presentation.viewmodel.TaskViewModel
 import com.darkblue.minimalisttodolistv4.ui.theme.NoRippleTheme
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun NavGraph(startDestination: String = "task_list", taskViewModel: TaskViewModel, preferencesViewModel: PreferencesViewModel) {
+fun NavGraph(startDestination: String = "task_list", taskViewModel: TaskViewModel, preferencesViewModel: PreferencesViewModel, appViewModel: AppViewModel) {
     val navController = rememberNavController()
     val state by taskViewModel.state.collectAsState()
     NavHost(navController = navController, startDestination = startDestination) {
@@ -26,10 +27,11 @@ fun NavGraph(startDestination: String = "task_list", taskViewModel: TaskViewMode
                 LocalRippleTheme provides NoRippleTheme
             ){
                 TaskScreen(
-                    state = state,
+                    taskState = state,
                     onEvent = taskViewModel::onEvent,
                     taskViewModel = taskViewModel,
-                    preferencesViewModel = preferencesViewModel
+                    preferencesViewModel = preferencesViewModel,
+                    appViewModel = appViewModel
                 )
             }
         }

@@ -16,8 +16,6 @@ data class TaskState(
     val isDatePickerVisible: Boolean = false,
     val isTimePickerVisible: Boolean = false,
     val isAddTaskDialogVisible: Boolean = false,
-    val isMenuDialogVisible: Boolean = false,
-    val isHistoryDialogVisible: Boolean = false,
 
     val recurrenceType: RecurrenceType = RecurrenceType.NONE,
     val recurrenceFilter: RecurrenceType = RecurrenceType.NONE,

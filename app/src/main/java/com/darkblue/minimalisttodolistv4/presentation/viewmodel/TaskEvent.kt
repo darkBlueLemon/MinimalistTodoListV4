@@ -18,14 +18,6 @@ sealed interface TaskEvent {
     object ShowAddTaskDialog: TaskEvent
     object HideAddTaskDialog: TaskEvent
 
-    // Menu Dialog
-    object ShowMenuDialog: TaskEvent
-    object HideMenuDialog: TaskEvent
-
-    // History Dialog
-    object ShowHistoryDialog: TaskEvent
-    object HideHistoryDialog: TaskEvent
-
     // Date Picker
     object ShowDatePicker: TaskEvent
     object HideDatePicker: TaskEvent

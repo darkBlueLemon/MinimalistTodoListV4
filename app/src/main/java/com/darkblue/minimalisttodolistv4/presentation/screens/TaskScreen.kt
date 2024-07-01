@@ -7,22 +7,18 @@ import android.os.Vibrator
 import androidx.annotation.RequiresApi
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.animation.shrinkOut
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -40,6 +36,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -49,7 +46,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -64,6 +60,8 @@ import com.darkblue.minimalisttodolistv4.presentation.viewmodel.TaskViewModel
 import com.darkblue.minimalisttodolistv4.presentation.dialogs.AddTaskDialog
 import com.darkblue.minimalisttodolistv4.presentation.dialogs.HistoryDialog
 import com.darkblue.minimalisttodolistv4.presentation.dialogs.MenuDialog
+import com.darkblue.minimalisttodolistv4.presentation.viewmodel.AppEvent
+import com.darkblue.minimalisttodolistv4.presentation.viewmodel.AppViewModel
 import com.darkblue.minimalisttodolistv4.ui.theme.Priority0
 import com.darkblue.minimalisttodolistv4.ui.theme.Priority1
 import com.darkblue.minimalisttodolistv4.ui.theme.Priority2
@@ -79,12 +77,14 @@ import java.time.ZoneId
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun TaskScreen(
-    state: TaskState,
+    taskState: TaskState,
     onEvent: (TaskEvent) -> Unit,
     taskViewModel: TaskViewModel,
-    preferencesViewModel: PreferencesViewModel
+    preferencesViewModel: PreferencesViewModel,
+    appViewModel: AppViewModel
 ) {
     val context = LocalContext.current
+    val appState by appViewModel.state.collectAsState()
 
     Scaffold(
         floatingActionButton = {
@@ -108,11 +108,10 @@ fun TaskScreen(
                         .combinedClickable(
                             onLongClick = {
                                 vibrate(context = context, strength = 2)
-                                onEvent(TaskEvent.ShowMenuDialog)
+                                appViewModel.onEvent(AppEvent.ShowMenuDialog)
                             },
                             onClick = {
-                                // Vibrate on click?
-                            vibrate(context = context, strength = 1)
+                                vibrate(context = context, strength = 1)
                                 onEvent(TaskEvent.ShowAddTaskDialog)
                             },
                         )
@@ -120,22 +119,22 @@ fun TaskScreen(
             }
         },
     ) { padding ->
-        if(state.isAddTaskDialogVisible) {
-            AddTaskDialog(state, onEvent, taskViewModel, preferencesViewModel)
+        if (taskState.isAddTaskDialogVisible) {
+            AddTaskDialog(taskState, onEvent, taskViewModel, preferencesViewModel)
         }
-        if(state.isMenuDialogVisible) {
-            MenuDialog(state, onEvent, preferencesViewModel = preferencesViewModel)
+        if (appState.isMenuDialogVisible) {
+            MenuDialog(taskState, onEvent, preferencesViewModel = preferencesViewModel, onAppEvent = appViewModel::onEvent)
         }
-        if(state.isHistoryDialogVisible) {
-            HistoryDialog(taskViewModel, onEvent)
+        if (appState.isHistoryDialogVisible) {
+            HistoryDialog(taskViewModel, onEvent, onAppEvent = appViewModel::onEvent)
         }
-        TaskList(onEvent, state, taskViewModel, padding)
+        TaskList(onEvent, taskState, taskViewModel, padding)
     }
 }
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun TaskList(onEvent: (TaskEvent) -> Unit, state: TaskState, viewModel: TaskViewModel, padding: PaddingValues) {
+fun TaskList(onEvent: (TaskEvent) -> Unit, taskState: TaskState, viewModel: TaskViewModel, padding: PaddingValues) {
     LazyColumn(
         contentPadding = PaddingValues(16.dp),
         modifier = Modifier
@@ -143,7 +142,7 @@ fun TaskList(onEvent: (TaskEvent) -> Unit, state: TaskState, viewModel: TaskView
             .padding(padding)
         ,
     ) {
-        items(state.tasks, key = { it.id }) { task ->
+        items(taskState.tasks, key = { it.id }) { task ->
             var visible by remember { mutableStateOf(true) }
             val coroutineScope = rememberCoroutineScope()
 
@@ -172,7 +171,6 @@ fun TaskList(onEvent: (TaskEvent) -> Unit, state: TaskState, viewModel: TaskView
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun TaskItem(task: Task, onEdit: (Task) -> Unit, onDelete: (Task) -> Unit, viewModel: TaskViewModel) {
@@ -224,7 +222,6 @@ fun DueDate_Recurrence_Note(
     val nextDueDate = viewModel.formatDueDateWithDateTime(task.nextDueDate)
     val note = task.note
 
-//    val textColor = if (task.dueDate?.let { Instant.ofEpochMilli(it).isBefore(Instant.now()) } == true) dateRed else MaterialTheme.colorScheme.tertiary
     val textColor = if (task.dueDate?.let {
             Instant.ofEpochMilli(it).atZone(ZoneId.systemDefault()).toLocalDate().isBefore(LocalDate.now().plusDays(1))
         } == true) {

@@ -248,27 +248,6 @@ class TaskViewModel(
                     editingTaskId = null
                 ) }
             }
-            TaskEvent.ShowMenuDialog -> {
-                _state.update { it.copy(
-                    isMenuDialogVisible = true
-                ) }
-            }
-            TaskEvent.HideMenuDialog -> {
-                _state.update { it.copy(
-                    isMenuDialogVisible = false
-                ) }
-            }
-            TaskEvent.ShowHistoryDialog -> {
-                _state.update { it.copy(
-                    isHistoryDialogVisible = true,
-                    isMenuDialogVisible = false
-                ) }
-            }
-            TaskEvent.HideHistoryDialog -> {
-                _state.update { it.copy(
-                    isHistoryDialogVisible = false
-                ) }
-            }
             is TaskEvent.DeleteAllHistoryTasks -> {
                 viewModelScope.launch {
                     dao.deleteAllDeletedTasks()

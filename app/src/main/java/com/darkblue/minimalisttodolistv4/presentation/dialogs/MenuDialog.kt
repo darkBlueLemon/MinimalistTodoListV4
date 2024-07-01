@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
@@ -36,6 +35,7 @@ import com.darkblue.minimalisttodolistv4.data.model.SortType
 import com.darkblue.minimalisttodolistv4.data.model.ThemeType
 import com.darkblue.minimalisttodolistv4.presentation.components.CustomBox
 import com.darkblue.minimalisttodolistv4.presentation.components.CustomDropdownMenu
+import com.darkblue.minimalisttodolistv4.presentation.viewmodel.AppEvent
 import com.darkblue.minimalisttodolistv4.presentation.viewmodel.PreferencesViewModel
 import com.darkblue.minimalisttodolistv4.presentation.viewmodel.TaskEvent
 import com.darkblue.minimalisttodolistv4.presentation.viewmodel.TaskState
@@ -43,15 +43,16 @@ import com.darkblue.minimalisttodolistv4.presentation.viewmodel.TaskState
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MenuDialog(
-    state: TaskState,
+    taskState: TaskState,
     onEvent: (TaskEvent) -> Unit,
     modifier: Modifier = Modifier,
-    preferencesViewModel: PreferencesViewModel
+    preferencesViewModel: PreferencesViewModel,
+    onAppEvent: (AppEvent) -> Unit
 ) {
     LocalConfiguration.current.screenWidthDp
     BasicAlertDialog(
         onDismissRequest = {
-            onEvent(TaskEvent.HideMenuDialog)
+            onAppEvent(AppEvent.HideMenuDialog)
         },
         modifier = modifier
             .width(350.dp)
@@ -71,14 +72,14 @@ fun MenuDialog(
                     style = MaterialTheme.typography.headlineSmall,
                     modifier = Modifier.align(Alignment.CenterHorizontally)
                 )
-                Text(text = "History", modifier = Modifier.clickable { onEvent(TaskEvent.ShowHistoryDialog) })
+                Text(text = "History", modifier = Modifier.clickable { onAppEvent(AppEvent.ShowHistoryDialog) })
                 Text(text = "Notification")
                 RecurrenceSelector(
-                    currentRecurrenceFilter = state.recurrenceFilter,
+                    currentRecurrenceFilter = taskState.recurrenceFilter,
                     onRecurrenceFilterChange = { onEvent(TaskEvent.SetRecurrenceFilter(it)) }
                 )
                 PrioritySelector(
-                    currentSortType = state.sortType,
+                    currentSortType = taskState.sortType,
                     onSortChange = { onEvent(TaskEvent.SortTasks(it) ) }
                 )
                 ThemeSelector(preferencesViewModel)
