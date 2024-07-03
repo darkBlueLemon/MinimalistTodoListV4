@@ -1,4 +1,4 @@
-package com.darkblue.minimalisttodolistv4.presentation.screens
+package com.darkblue.minimalisttodolistv4.ui.screens
 
 import android.content.Context
 import android.os.Build
@@ -36,7 +36,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -53,17 +52,16 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import com.darkblue.minimalisttodolistv4.data.model.RecurrenceType
 import com.darkblue.minimalisttodolistv4.data.model.Task
-import com.darkblue.minimalisttodolistv4.presentation.viewmodel.DataStoreViewModel
-import com.darkblue.minimalisttodolistv4.presentation.viewmodel.TaskEvent
-import com.darkblue.minimalisttodolistv4.presentation.viewmodel.TaskState
-import com.darkblue.minimalisttodolistv4.presentation.viewmodel.TaskViewModel
-import com.darkblue.minimalisttodolistv4.presentation.dialogs.AddTaskDialog
-import com.darkblue.minimalisttodolistv4.presentation.dialogs.HistoryDialog
-import com.darkblue.minimalisttodolistv4.presentation.dialogs.MenuDialog
-import com.darkblue.minimalisttodolistv4.presentation.dialogs.ScheduleExactAlarmPermissionDialog
-import com.darkblue.minimalisttodolistv4.presentation.viewmodel.AppEvent
-import com.darkblue.minimalisttodolistv4.presentation.viewmodel.AppState
-import com.darkblue.minimalisttodolistv4.presentation.viewmodel.AppViewModel
+import com.darkblue.minimalisttodolistv4.viewmodel.DataStoreViewModel
+import com.darkblue.minimalisttodolistv4.viewmodel.TaskEvent
+import com.darkblue.minimalisttodolistv4.viewmodel.TaskState
+import com.darkblue.minimalisttodolistv4.viewmodel.TaskViewModel
+import com.darkblue.minimalisttodolistv4.ui.dialogs.AddTaskDialog
+import com.darkblue.minimalisttodolistv4.ui.dialogs.HistoryDialog
+import com.darkblue.minimalisttodolistv4.ui.dialogs.MenuDialog
+import com.darkblue.minimalisttodolistv4.ui.dialogs.ScheduleExactAlarmPermissionDialog
+import com.darkblue.minimalisttodolistv4.viewmodel.AppEvent
+import com.darkblue.minimalisttodolistv4.viewmodel.AppState
 import com.darkblue.minimalisttodolistv4.ui.theme.Priority0
 import com.darkblue.minimalisttodolistv4.ui.theme.Priority1
 import com.darkblue.minimalisttodolistv4.ui.theme.Priority2
@@ -80,12 +78,13 @@ import java.time.ZoneId
 @Composable
 fun TaskScreen(
     taskState: TaskState,
+    appState: AppState,
     onEvent: (TaskEvent) -> Unit,
+    onAppEvent: (AppEvent) -> Unit,
     taskViewModel: TaskViewModel,
     dataStoreViewModel: DataStoreViewModel,
-    onAppEvent: (AppEvent) -> Unit,
-    appState: AppState
 ) {
+    // Necessary for the vibrate function
     val context = LocalContext.current
 
     Scaffold(
@@ -113,7 +112,7 @@ fun TaskScreen(
                                 onAppEvent(AppEvent.ShowMenuDialog)
                             },
                             onClick = {
-                                vibrate(context = context, strength = 1)
+//                                vibrate(context = context, strength = 1)
                                 onEvent(TaskEvent.ShowAddTaskDialog)
                             },
                         )
@@ -132,16 +131,13 @@ fun TaskScreen(
         }
         if (appState.isScheduleExactAlarmPermissionDialogVisible) {
             ScheduleExactAlarmPermissionDialog(
-                onDismiss = {
+                onDismissOrDisallow = {
                     onAppEvent(AppEvent.HideScheduleExactAlarmPermissionDialog)
-            },
+                },
                 onAllow = {
-                    onAppEvent(AppEvent.HideScheduleExactAlarmPermissionDialog)
                     onAppEvent(AppEvent.ShowScheduleExactAlarmPermissionIntent)
-            },
-                onDisallow = {
                     onAppEvent(AppEvent.HideScheduleExactAlarmPermissionDialog)
-                }
+                },
             )
         }
         TaskList(onEvent, taskState, taskViewModel, padding)
@@ -160,6 +156,8 @@ fun TaskList(onEvent: (TaskEvent) -> Unit, taskState: TaskState, viewModel: Task
     ) {
         items(taskState.tasks, key = { it.id }) { task ->
             var visible by remember { mutableStateOf(true) }
+
+            // For calling the Delay before onEvent(Delete)
             val coroutineScope = rememberCoroutineScope()
 
             AnimatedVisibility(
@@ -190,6 +188,8 @@ fun TaskList(onEvent: (TaskEvent) -> Unit, taskState: TaskState, viewModel: Task
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun TaskItem(task: Task, onEdit: (Task) -> Unit, onDelete: (Task) -> Unit, viewModel: TaskViewModel) {
+
+    // Colors for the Priority Icon
     val priorityColor = when (task.priority) {
         3 -> Priority3
         2 -> Priority2
@@ -220,6 +220,7 @@ fun TaskItem(task: Task, onEdit: (Task) -> Unit, onDelete: (Task) -> Unit, viewM
         ) {
             Text(
                 task.title,
+                style = MaterialTheme.typography.titleLarge
             )
             DueDate_Recurrence_Note(task = task, viewModel = viewModel)
         }
@@ -235,7 +236,7 @@ fun DueDate_Recurrence_Note(
     viewModel: TaskViewModel
 ) {
     val dueDate = viewModel.formatDueDateWithDateTime(task.dueDate)
-    val nextDueDate = viewModel.formatDueDateWithDateTime(task.nextDueDate)
+//    val nextDueDate = viewModel.formatDueDateWithDateTime(task.notificationTime)
     val note = task.note
 
     val textColor = if (task.dueDate?.let {
@@ -270,7 +271,8 @@ fun DueDate_Recurrence_Note(
         } else if(note.isNotEmpty()) {
             Text(
                 text = note,
-                color = MaterialTheme.colorScheme.tertiary
+                color = MaterialTheme.colorScheme.tertiary,
+                style = MaterialTheme.typography.bodyMedium
             )
         }
     }
@@ -279,20 +281,19 @@ fun DueDate_Recurrence_Note(
 @Composable
 fun CompleteIcon(modifier: Modifier = Modifier, onDelete: (Task) -> Unit, task: Task) {
     var isChecked by remember { mutableStateOf(false) }
-
-    val scaleB = remember { Animatable(initialValue = 1f) }
+    val scale = remember { Animatable(initialValue = 1f) }
     var selected by remember { mutableStateOf(false) }
 
     LaunchedEffect(key1 = selected) {
         if(selected) {
             launch {
-                scaleB.animateTo(
+                scale.animateTo(
                     targetValue = 0.6f,
                     animationSpec = tween(
                         durationMillis = 50
                     )
                 )
-                scaleB.animateTo(
+                scale.animateTo(
                     targetValue = 1f,
                     animationSpec = spring(
                         dampingRatio = Spring.DampingRatioLowBouncy,
@@ -305,13 +306,13 @@ fun CompleteIcon(modifier: Modifier = Modifier, onDelete: (Task) -> Unit, task: 
 
     Box(
         modifier = Modifier
-            .scale(scaleB.value)
+            .scale(scale.value)
             .clickable {
                 selected = !selected
                 isChecked = !isChecked
                 onDelete(task)
             }
-            .padding(8.dp) // Increase padding for a larger touch area
+            .padding(8.dp)
     ) {
         AnimatedContent(
             targetState = isChecked,
@@ -325,14 +326,12 @@ fun CompleteIcon(modifier: Modifier = Modifier, onDelete: (Task) -> Unit, task: 
                     imageVector = Icons.Outlined.CheckCircle,
                     contentDescription = "Checked",
                     tint = MaterialTheme.colorScheme.primary,
-//                    modifier = Modifier.size(36.dp) // Increase icon size if needed
                 )
             } else {
                 Icon(
                     imageVector = Icons.Outlined.RadioButtonUnchecked,
                     contentDescription = "Unchecked",
                     tint = MaterialTheme.colorScheme.tertiary,
-//                    modifier = Modifier.size(36.dp) // Increase icon size if needed
                 )
             }
         }
@@ -358,7 +357,7 @@ fun vibrate(context: Context, strength: Int) {
             4 -> 200L
             else -> 100L
         }
-        vibrator.vibrate(duration) // Fallback for older devices
+        vibrator.vibrate(duration)
     }
 }
 

@@ -1,4 +1,4 @@
-package com.darkblue.minimalisttodolistv4.presentation.viewmodel
+package com.darkblue.minimalisttodolistv4.viewmodel
 
 data class AppState(
     val isMenuDialogVisible: Boolean = false,

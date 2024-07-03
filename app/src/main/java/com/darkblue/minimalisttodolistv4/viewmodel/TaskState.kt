@@ -1,4 +1,4 @@
-package com.darkblue.minimalisttodolistv4.presentation.viewmodel
+package com.darkblue.minimalisttodolistv4.viewmodel
 
 import com.darkblue.minimalisttodolistv4.data.model.RecurrenceType
 import com.darkblue.minimalisttodolistv4.data.model.SortType

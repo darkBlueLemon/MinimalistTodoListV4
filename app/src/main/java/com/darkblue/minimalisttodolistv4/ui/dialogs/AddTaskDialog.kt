@@ -1,4 +1,4 @@
-package com.darkblue.minimalisttodolistv4.presentation.dialogs
+package com.darkblue.minimalisttodolistv4.ui.dialogs
 
 import android.os.Build
 import android.util.Log
@@ -43,17 +43,15 @@ import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.darkblue.minimalisttodolistv4.PermissionManager
 import com.darkblue.minimalisttodolistv4.data.model.RecurrenceType
-import com.darkblue.minimalisttodolistv4.presentation.components.CustomBox
-import com.darkblue.minimalisttodolistv4.presentation.components.DatePicker
-import com.darkblue.minimalisttodolistv4.presentation.viewmodel.TaskEvent
-import com.darkblue.minimalisttodolistv4.presentation.viewmodel.TaskState
-import com.darkblue.minimalisttodolistv4.presentation.viewmodel.TaskViewModel
-import com.darkblue.minimalisttodolistv4.presentation.components.TimePickerFromOldApp
-import com.darkblue.minimalisttodolistv4.presentation.viewmodel.AppEvent
-import com.darkblue.minimalisttodolistv4.presentation.viewmodel.AppViewModel
-import com.darkblue.minimalisttodolistv4.presentation.viewmodel.DataStoreViewModel
+import com.darkblue.minimalisttodolistv4.ui.components.CustomBox
+import com.darkblue.minimalisttodolistv4.ui.components.DatePicker
+import com.darkblue.minimalisttodolistv4.viewmodel.TaskEvent
+import com.darkblue.minimalisttodolistv4.viewmodel.TaskState
+import com.darkblue.minimalisttodolistv4.viewmodel.TaskViewModel
+import com.darkblue.minimalisttodolistv4.ui.components.TimePickerFromOldApp
+import com.darkblue.minimalisttodolistv4.viewmodel.AppEvent
+import com.darkblue.minimalisttodolistv4.viewmodel.DataStoreViewModel
 import com.darkblue.minimalisttodolistv4.ui.theme.Priority1
 import com.darkblue.minimalisttodolistv4.ui.theme.Priority2
 import com.darkblue.minimalisttodolistv4.ui.theme.Priority3
@@ -83,7 +81,7 @@ fun AddTaskDialog(
 
                 Note(taskState = taskState, onEvent = onEvent)
 
-                DateSelector(taskState = taskState, onEvent = onEvent, viewModel = viewModel)
+                DateSelector(taskState = taskState, onEvent = onEvent, viewModel = viewModel, onAppEvent = onAppEvent)
 
                 if (taskState.dueDate != null) {
                     TimeSelector(taskState = taskState, onEvent = onEvent, viewModel = viewModel, dataStoreViewModel = dataStoreViewModel)
@@ -91,6 +89,7 @@ fun AddTaskDialog(
                         recurrenceFromEdit = taskState.recurrenceType,
                         onRecurrenceTypeSelected = { recurrenceType ->
                             onEvent(TaskEvent.SetRecurrenceType(recurrenceType))
+                            onAppEvent(AppEvent.CheckNotificationPermissions)
                         }
                     )
                 }
@@ -103,9 +102,6 @@ fun AddTaskDialog(
                 SaveButton(
                     onSave = {
                         onEvent(TaskEvent.SaveTask)
-                        if (taskState.dueDate != null) {
-                            onAppEvent(AppEvent.CheckNotificationPermissions)
-                        }
                     },
                     modifier = Modifier.align(Alignment.CenterHorizontally)
                 )
@@ -258,7 +254,7 @@ fun Note(modifier: Modifier = Modifier, taskState: TaskState, onEvent: (TaskEven
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun DateSelector(modifier: Modifier = Modifier, taskState: TaskState, onEvent: (TaskEvent) -> Unit, viewModel: TaskViewModel) {
+fun DateSelector(modifier: Modifier = Modifier, taskState: TaskState, onEvent: (TaskEvent) -> Unit, viewModel: TaskViewModel, onAppEvent: (AppEvent) -> Unit) {
     val text = viewModel.formatDueDateWithDateOnly(taskState.dueDate).ifEmpty { "Add date" }
 
     Row(
@@ -284,8 +280,15 @@ fun DateSelector(modifier: Modifier = Modifier, taskState: TaskState, onEvent: (
 
     if (taskState.isDatePickerVisible) {
         DatePicker(
-            onDateSelected = { date -> onEvent(TaskEvent.SetDueDate(date)) },
-            closeSelection = { onEvent(TaskEvent.HideDatePicker) },
+            onDateSelected = { date ->
+                onEvent(TaskEvent.SetDueDate(date))
+            },
+            closeSelection = {
+                onEvent(TaskEvent.HideDatePicker)
+                if(viewModel.state.value.dueDate != null) {
+                    onAppEvent(AppEvent.CheckNotificationPermissions)
+                }
+            },
             initialDate = viewModel.getLocalDateFromEpochMilli(taskState.dueDate)
         )
     }
@@ -340,7 +343,7 @@ fun RecurrenceSelector(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(start = 15.dp, top = 11.dp, bottom = 11.dp),
+                .padding(top = 11.dp, bottom = 11.dp),
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
             RecurrenceType.Companion.entriesWithoutNONE.forEach { recurrenceType ->

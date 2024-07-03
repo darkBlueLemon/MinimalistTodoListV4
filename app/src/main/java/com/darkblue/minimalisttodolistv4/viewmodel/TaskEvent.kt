@@ -1,4 +1,4 @@
-package com.darkblue.minimalisttodolistv4.presentation.viewmodel
+package com.darkblue.minimalisttodolistv4.viewmodel
 
 import com.darkblue.minimalisttodolistv4.data.model.DeletedTask
 import com.darkblue.minimalisttodolistv4.data.model.RecurrenceType
@@ -8,24 +8,24 @@ import java.time.LocalDate
 import java.time.LocalTime
 
 sealed interface TaskEvent {
-    object SaveTask: TaskEvent
+    data object SaveTask: TaskEvent
     data class SetTitle(val title: String): TaskEvent
     data class SetPriority(val priority: Int): TaskEvent
     data class SetNote(val note: String): TaskEvent
     data class SortTasks(val sortType: SortType): TaskEvent
 
     // AddTask Dialog
-    object ShowAddTaskDialog: TaskEvent
-    object HideAddTaskDialog: TaskEvent
+    data object ShowAddTaskDialog: TaskEvent
+    data object HideAddTaskDialog: TaskEvent
 
     // Date Picker
-    object ShowDatePicker: TaskEvent
-    object HideDatePicker: TaskEvent
+    data object ShowDatePicker: TaskEvent
+    data object HideDatePicker: TaskEvent
     data class SetDueDate(val dueDate: LocalDate): TaskEvent
 
     // Time Picker
-    object ShowTimePicker: TaskEvent
-    object HideTimePicker: TaskEvent
+    data object ShowTimePicker: TaskEvent
+    data object HideTimePicker: TaskEvent
     data class SetDueTime(val dueTime: LocalTime): TaskEvent
 
     // Recurrence
@@ -38,5 +38,5 @@ sealed interface TaskEvent {
     data class DeleteTask(val task: Task): TaskEvent
     data class DeleteForever(val deletedTask: DeletedTask) : TaskEvent
     data class UndoDeleteTask(val deletedTask: DeletedTask) : TaskEvent
-    object DeleteAllHistoryTasks : TaskEvent
+    data object DeleteAllHistoryTasks : TaskEvent
 }

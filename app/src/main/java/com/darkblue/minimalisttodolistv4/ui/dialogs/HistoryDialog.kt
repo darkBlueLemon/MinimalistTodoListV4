@@ -1,4 +1,4 @@
-package com.darkblue.minimalisttodolistv4.presentation.dialogs
+package com.darkblue.minimalisttodolistv4.ui.dialogs
 
 import android.os.Build
 import androidx.annotation.RequiresApi
@@ -38,15 +38,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.darkblue.minimalisttodolistv4.data.model.DeletedTask
-import com.darkblue.minimalisttodolistv4.presentation.components.CustomBox
-import com.darkblue.minimalisttodolistv4.presentation.components.CustomDropdownMenu
-import com.darkblue.minimalisttodolistv4.presentation.viewmodel.AppEvent
-import com.darkblue.minimalisttodolistv4.presentation.viewmodel.TaskEvent
-import com.darkblue.minimalisttodolistv4.presentation.viewmodel.TaskViewModel
+import com.darkblue.minimalisttodolistv4.ui.components.CustomBox
+import com.darkblue.minimalisttodolistv4.ui.components.CustomDropdownMenu
+import com.darkblue.minimalisttodolistv4.viewmodel.AppEvent
+import com.darkblue.minimalisttodolistv4.viewmodel.TaskEvent
+import com.darkblue.minimalisttodolistv4.viewmodel.TaskViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @RequiresApi(Build.VERSION_CODES.O)
@@ -93,7 +92,7 @@ fun TitleAndDeleteAll(onClearHistory: () -> Unit) {
         modifier = Modifier
             .fillMaxWidth()
             .height(IntrinsicSize.Max)
-            .padding(15.dp)
+            .padding(8.dp)
     ){
         Text(
             text = "History",
@@ -156,6 +155,7 @@ fun HistoryItem(
         modifier = Modifier
             .padding(start = 10.dp, end = 8.dp, top = 8.dp, bottom = 8.dp)
             .fillMaxWidth()
+            .height(IntrinsicSize.Max)
             .background(MaterialTheme.colorScheme.surface, RoundedCornerShape(8.dp)),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
@@ -176,6 +176,7 @@ fun HistoryItem(
                 imageVector = Icons.Default.MoreVert,
                 contentDescription = "More options",
                 modifier = Modifier
+                    .fillMaxHeight()
                     .clickable {
                         expanded = true
                     }

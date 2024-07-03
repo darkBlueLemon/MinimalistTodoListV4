@@ -1,4 +1,4 @@
-package com.darkblue.minimalisttodolistv4.presentation.components
+package com.darkblue.minimalisttodolistv4.ui.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -14,9 +14,6 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun CustomBox(
-//    width: Dp,
-//    height: Dp,
-    padding: Dp = 10.dp,
     backgroundColor: Color = MaterialTheme.colorScheme.background,
     borderColor: Color = MaterialTheme.colorScheme.onBackground,
     borderWidth: Dp = 2.dp,
@@ -25,11 +22,8 @@ fun CustomBox(
 ) {
     Box(
         modifier = Modifier
-//            .size(width = width, height = height)
-//            .size(width = 350.dp, height = 360.dp)
             .clip(RoundedCornerShape(percent = cornerRadiusPercent))
             .background(backgroundColor)
-//            .background(Color.Yellow)
             .border(
                 width = borderWidth,
                 color = borderColor,

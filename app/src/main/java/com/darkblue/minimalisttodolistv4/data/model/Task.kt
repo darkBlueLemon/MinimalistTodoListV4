@@ -14,5 +14,5 @@ data class Task(
     val dueDate: Long?, // Timestamp in milliseconds
 
     val recurrenceType: RecurrenceType = RecurrenceType.NONE,
-    val nextDueDate: Long? = null,
+//    val notificationTime: Long? = null,
 )

@@ -23,14 +23,18 @@ import androidx.room.Room
 import com.darkblue.minimalisttodolistv4.data.preferences.AppPreferences
 import com.darkblue.minimalisttodolistv4.data.database.ContactDatabase
 import com.darkblue.minimalisttodolistv4.data.model.ThemeType
-import com.darkblue.minimalisttodolistv4.presentation.navigation.NavGraph
-import com.darkblue.minimalisttodolistv4.presentation.viewmodel.AppViewModel
-import com.darkblue.minimalisttodolistv4.presentation.viewmodel.DataStoreViewModel
-import com.darkblue.minimalisttodolistv4.presentation.viewmodel.PreferencesViewModelFactory
-import com.darkblue.minimalisttodolistv4.presentation.viewmodel.TaskViewModel
+import com.darkblue.minimalisttodolistv4.ui.navigation.NavGraph
+import com.darkblue.minimalisttodolistv4.viewmodel.AppViewModel
+import com.darkblue.minimalisttodolistv4.viewmodel.DataStoreViewModel
+import com.darkblue.minimalisttodolistv4.viewmodel.PreferencesViewModelFactory
+import com.darkblue.minimalisttodolistv4.viewmodel.TaskViewModel
 import com.darkblue.minimalisttodolistv4.ui.theme.MinimalistTodoListV4Theme
+import com.darkblue.minimalisttodolistv4.util.NotificationHelper
+import com.darkblue.minimalisttodolistv4.util.PermissionManager
 
 class MainActivity : ComponentActivity() {
+
+    // Room Database Initialization
     private val db by lazy {
         Room.databaseBuilder(
             applicationContext,
@@ -38,11 +42,18 @@ class MainActivity : ComponentActivity() {
             "contacts.db"
         ).build()
     }
+
+    // Notification Helper Initialization
+    private val notificationHelper by lazy {
+        NotificationHelper(applicationContext)
+    }
+
+    // TaskViewModel Initialization with Database and Notification Instance
     private val taskViewModel by viewModels<TaskViewModel>(
         factoryProducer = {
             object : ViewModelProvider.Factory {
                 override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                    return TaskViewModel(db.dao) as T
+                    return TaskViewModel(db.dao, notificationHelper) as T
                 }
             }
         }
@@ -50,10 +61,12 @@ class MainActivity : ComponentActivity() {
 
     private lateinit var permissionManager: PermissionManager
     private lateinit var postNotificationPermissionLauncher: ActivityResultLauncher<String>
+    private lateinit var appPreferences: AppPreferences
 
+    // AppViewModel Initialization
     private val appViewModel = AppViewModel()
 
-    private lateinit var appPreferences: AppPreferences
+    // DataStoreViewModel Initialization with AppPreferences Instance (DataStore)
     private val dataStoreViewModel by viewModels<DataStoreViewModel> {
         PreferencesViewModelFactory(appPreferences)
     }
@@ -61,6 +74,8 @@ class MainActivity : ComponentActivity() {
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // Setting Status Bar and Navigation Bar to be Transparent
         enableEdgeToEdge(
             statusBarStyle = SystemBarStyle.light(
                         Color.TRANSPARENT , Color.TRANSPARENT
@@ -70,8 +85,10 @@ class MainActivity : ComponentActivity() {
             )
         )
 
+        // Initializing appPreferences
         appPreferences = AppPreferences(this)
 
+        // Initializing Notification Launcher / Permission Manager
         postNotificationPermissionLauncher = registerForActivityResult(
             ActivityResultContracts.RequestPermission()
         ) { isGranted: Boolean ->
@@ -83,12 +100,14 @@ class MainActivity : ComponentActivity() {
             postNotificationPermissionLauncher = postNotificationPermissionLauncher,
             onTaskEvent = appViewModel::onEvent
         )
+        // Attaching permission Manager to AppViewModel
         appViewModel.setPermissionManager(permissionManager)
 
         setContent {
+
+            // Theme from DataStore through dataStoreViewModel
             val theme by dataStoreViewModel.theme.collectAsState()
             var darkTheme by remember { mutableStateOf(false) }
-
             darkTheme = when (theme) {
                 ThemeType.DARK -> true
                 ThemeType.LIGHT -> false
@@ -100,7 +119,11 @@ class MainActivity : ComponentActivity() {
             }
 
             MinimalistTodoListV4Theme(darkTheme = darkTheme) {
-                NavGraph(taskViewModel = taskViewModel, dataStoreViewModel = dataStoreViewModel, appViewModel = appViewModel)
+                NavGraph(
+                    taskViewModel = taskViewModel,
+                    dataStoreViewModel = dataStoreViewModel,
+                    appViewModel = appViewModel
+                )
             }
         }
     }

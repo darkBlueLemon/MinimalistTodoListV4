@@ -1,4 +1,4 @@
-package com.darkblue.minimalisttodolistv4.presentation.components
+package com.darkblue.minimalisttodolistv4.ui.components
 
 import android.os.Build
 import androidx.annotation.RequiresApi
@@ -30,7 +30,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import com.darkblue.minimalisttodolistv4.data.model.ClockType
-import com.darkblue.minimalisttodolistv4.presentation.viewmodel.DataStoreViewModel
+import com.darkblue.minimalisttodolistv4.viewmodel.DataStoreViewModel
 import com.maxkeppeker.sheets.core.models.base.rememberUseCaseState
 import com.maxkeppeler.sheets.calendar.CalendarDialog
 import com.maxkeppeler.sheets.calendar.models.CalendarConfig
@@ -101,11 +101,12 @@ fun TimePickerFromOldApp(
                     .clip(RoundedCornerShape(7))
                     .background(MaterialTheme.colorScheme.background)
                     .border(2.dp, MaterialTheme.colorScheme.primary, RoundedCornerShape(7))
-                    .padding(45.dp),
             ) {
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center,
+                    modifier = Modifier
+                        .padding(20.dp)
                 ) {
                     TimePicker(
                         state = timePickerState,

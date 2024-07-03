@@ -1,4 +1,4 @@
-package com.darkblue.minimalisttodolistv4.presentation.viewmodel
+package com.darkblue.minimalisttodolistv4.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -13,13 +13,11 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 class DataStoreViewModel(private val appPreferences: AppPreferences) : ViewModel() {
-
     val theme: StateFlow<ThemeType> = appPreferences.theme
         .map { themeString ->
             ThemeType.fromDisplayName(themeString)
         }
         .stateIn(viewModelScope, SharingStarted.Eagerly, ThemeType.DARK)
-
     val clockType: StateFlow<ClockType> = appPreferences.clockType
         .map { clockTypeString ->
             ClockType.fromDisplayName(clockTypeString)
@@ -31,7 +29,6 @@ class DataStoreViewModel(private val appPreferences: AppPreferences) : ViewModel
             appPreferences.saveTheme(themeType.toDisplayString())
         }
     }
-
     fun saveClockType(clockType: ClockType) {
         viewModelScope.launch {
             appPreferences.saveClockType(clockType.toDisplayString())

@@ -8,8 +8,12 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface TaskDao {
 
+    // Will break when Int exceeds limit
     @Upsert
-    suspend fun upsertTask(task: Task)
+    suspend fun upsertTask(task: Task): Long
+
+    @Query("SELECT * FROM task WHERE id = :id")
+    suspend fun getTaskById(id: Int): Task?
 
     @Delete
     suspend fun deleteTask(task: Task)

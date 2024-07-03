@@ -1,4 +1,4 @@
-package com.darkblue.minimalisttodolistv4.presentation.components
+package com.darkblue.minimalisttodolistv4.ui.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border

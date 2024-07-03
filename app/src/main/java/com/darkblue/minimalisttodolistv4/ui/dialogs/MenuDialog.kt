@@ -1,4 +1,4 @@
-package com.darkblue.minimalisttodolistv4.presentation.dialogs
+package com.darkblue.minimalisttodolistv4.ui.dialogs
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
@@ -33,12 +33,12 @@ import com.darkblue.minimalisttodolistv4.data.model.ClockType
 import com.darkblue.minimalisttodolistv4.data.model.RecurrenceType
 import com.darkblue.minimalisttodolistv4.data.model.SortType
 import com.darkblue.minimalisttodolistv4.data.model.ThemeType
-import com.darkblue.minimalisttodolistv4.presentation.components.CustomBox
-import com.darkblue.minimalisttodolistv4.presentation.components.CustomDropdownMenu
-import com.darkblue.minimalisttodolistv4.presentation.viewmodel.AppEvent
-import com.darkblue.minimalisttodolistv4.presentation.viewmodel.DataStoreViewModel
-import com.darkblue.minimalisttodolistv4.presentation.viewmodel.TaskEvent
-import com.darkblue.minimalisttodolistv4.presentation.viewmodel.TaskState
+import com.darkblue.minimalisttodolistv4.ui.components.CustomBox
+import com.darkblue.minimalisttodolistv4.ui.components.CustomDropdownMenu
+import com.darkblue.minimalisttodolistv4.viewmodel.AppEvent
+import com.darkblue.minimalisttodolistv4.viewmodel.DataStoreViewModel
+import com.darkblue.minimalisttodolistv4.viewmodel.TaskEvent
+import com.darkblue.minimalisttodolistv4.viewmodel.TaskState
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

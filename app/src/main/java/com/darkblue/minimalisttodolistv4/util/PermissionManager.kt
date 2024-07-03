@@ -1,4 +1,4 @@
-package com.darkblue.minimalisttodolistv4
+package com.darkblue.minimalisttodolistv4.util
 
 import android.app.Activity
 import android.app.AlarmManager
@@ -7,11 +7,9 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.provider.Settings
-import android.util.Log
 import androidx.activity.result.ActivityResultLauncher
 import androidx.core.content.ContextCompat
-import com.darkblue.minimalisttodolistv4.presentation.viewmodel.AppEvent
-import com.darkblue.minimalisttodolistv4.presentation.viewmodel.AppViewModel
+import com.darkblue.minimalisttodolistv4.viewmodel.AppEvent
 
 class PermissionManager(
     private val context: Context,

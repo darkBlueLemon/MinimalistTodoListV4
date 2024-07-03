@@ -1,10 +1,11 @@
-package com.darkblue.minimalisttodolistv4.presentation.viewmodel
+package com.darkblue.minimalisttodolistv4.viewmodel
 
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.darkblue.minimalisttodolistv4.PermissionManager
+import com.darkblue.minimalisttodolistv4.util.NotificationHelper
 import com.darkblue.minimalisttodolistv4.data.model.DeletedTask
 import com.darkblue.minimalisttodolistv4.data.model.RecurrenceType
 import com.darkblue.minimalisttodolistv4.data.model.SortType
@@ -23,7 +24,8 @@ import java.time.format.DateTimeFormatter
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class TaskViewModel(
-    private val dao: TaskDao
+    private val dao: TaskDao,
+    private val notificationHelper: NotificationHelper
 ): ViewModel() {
 
     private val _sortType = MutableStateFlow(SortType.PRIORITY)
@@ -44,7 +46,6 @@ class TaskViewModel(
             }
         }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
-
     private val _state = MutableStateFlow(TaskState())
     val state = combine(_state, _sortType, _recurrenceFilter, _tasks) { state, sortType, recurrenceType, tasks ->
         state.copy(
@@ -53,7 +54,6 @@ class TaskViewModel(
             recurrenceFilter = recurrenceType
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), TaskState())
-
     private val _deletedTasks = MutableStateFlow<List<DeletedTask>>(emptyList())
     val deletedTasks: StateFlow<List<DeletedTask>> = _deletedTasks
 
@@ -72,7 +72,9 @@ class TaskViewModel(
                 viewModelScope.launch {
                     val task = event.task
                     delay(500)
+                    notificationHelper.cancelNotification(event.task.id.toInt())
                     dao.deleteTask(task)
+                    Log.d("TAG", task.id.toString())
                     dao.insertDeletedTask(
                         DeletedTask(
                             title = task.title,
@@ -80,7 +82,7 @@ class TaskViewModel(
                             note = task.note,
                             dueDate = task.dueDate,
                             recurrenceType = task.recurrenceType,
-                            nextDueDate = task.nextDueDate,
+//                            nextDueDate = task.notificationTime,
                             deletedAt = System.currentTimeMillis()
                         )
                     )
@@ -93,7 +95,7 @@ class TaskViewModel(
                 val dueDate = state.value.dueDate
 
                 val recurrenceType = state.value.recurrenceType
-                val nextDueDate = calculateNextDueDate(dueDate, recurrenceType)
+//                val nextDueDate = calculateNextDueDate(dueDate, recurrenceType)
 
                 val id = state.value.editingTaskId
 
@@ -102,16 +104,23 @@ class TaskViewModel(
                 }
 
                 val task = Task(
+                    id = id ?: 0,
                     title = title,
                     priority = priority,
                     note = note,
                     dueDate = dueDate,
                     recurrenceType = recurrenceType,
-                    nextDueDate = nextDueDate
+//                    notificationTime = nextDueDate
                 )
-                if(id != null) task.id = id
+
                 viewModelScope.launch {
-                    dao.upsertTask(task)
+                    val taskId = dao.upsertTask(task)
+                    val savedTask = if (taskId.toInt() == -1) dao.getTaskById(id!!) else dao.getTaskById(taskId.toInt())
+//                    Log.d("TAG", savedTask!!.title)
+                    Log.d("TAG", id.toString())
+                    savedTask?.let {
+                        notificationHelper.scheduleNotification(it)
+                    }
                 }
                 _state.update {
                     it.copy(
@@ -120,6 +129,7 @@ class TaskViewModel(
                         priority = 0,
                         note = "",
                         dueDate = null,
+                        dueTimeOnly = null,
                         recurrenceType = RecurrenceType.NONE,
                         nextDueDate = null,
                         editingTaskId = null
@@ -159,7 +169,7 @@ class TaskViewModel(
                         note = event.task.note,
                         dueDate = event.task.dueDate,
                         recurrenceType = event.task.recurrenceType,
-                        nextDueDate = event.task.nextDueDate,
+//                        nextDueDate = event.task.notificationTime,
                         isAddTaskDialogVisible = true,
                         editingTaskId = event.task.id
                     )
@@ -224,7 +234,7 @@ class TaskViewModel(
                         note = deletedTask.note,
                         dueDate = deletedTask.dueDate,
                         recurrenceType = deletedTask.recurrenceType,
-                        nextDueDate = deletedTask.nextDueDate
+//                        notificationTime = deletedTask.nextDueDate
                     )
                     dao.upsertTask(restoredTask)
                     dao.deleteDeletedTask(deletedTask)
@@ -257,19 +267,19 @@ class TaskViewModel(
         }
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
-    private fun calculateNextDueDate(dueDate: Long?, recurrenceType: RecurrenceType): Long? {
-        if (dueDate == null) return null
-        val date = Instant.ofEpochMilli(dueDate).atZone(ZoneId.systemDefault()).toLocalDate()
-        val nextDate = when (recurrenceType) {
-            RecurrenceType.DAILY -> date.plusDays(1)
-            RecurrenceType.WEEKLY -> date.plusWeeks(1)
-            RecurrenceType.MONTHLY -> date.plusMonths(1)
-            RecurrenceType.YEARLY -> date.plusYears(1)
-            else -> return null
-        }
-        return nextDate.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
-    }
+//    @RequiresApi(Build.VERSION_CODES.O)
+//    private fun calculateNextDueDate(dueDate: Long?, recurrenceType: RecurrenceType): Long? {
+//        if (dueDate == null) return null
+//        val date = Instant.ofEpochMilli(dueDate).atZone(ZoneId.systemDefault()).toLocalDate()
+//        val nextDate = when (recurrenceType) {
+//            RecurrenceType.DAILY -> date.plusDays(1)
+//            RecurrenceType.WEEKLY -> date.plusWeeks(1)
+//            RecurrenceType.MONTHLY -> date.plusMonths(1)
+//            RecurrenceType.YEARLY -> date.plusYears(1)
+//            else -> return null
+//        }
+//        return nextDate.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
+//    }
 
     @RequiresApi(Build.VERSION_CODES.O)
     private fun combineDateAndTime(state: TaskState) {

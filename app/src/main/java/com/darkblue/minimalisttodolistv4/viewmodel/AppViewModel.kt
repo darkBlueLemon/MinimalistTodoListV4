@@ -1,12 +1,7 @@
-package com.darkblue.minimalisttodolistv4.presentation.viewmodel
+package com.darkblue.minimalisttodolistv4.viewmodel
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import com.darkblue.minimalisttodolistv4.PermissionManager
-import com.darkblue.minimalisttodolistv4.data.preferences.AppPreferences
+import com.darkblue.minimalisttodolistv4.util.PermissionManager
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
@@ -34,7 +29,6 @@ class AppViewModel: ViewModel() {
             AppEvent.HideHistoryDialog -> {
                 _state.update { it.copy(isHistoryDialogVisible = false) }
             }
-
             AppEvent.ShowScheduleExactAlarmPermissionDialog -> {
                 _state.update { it.copy(isScheduleExactAlarmPermissionDialogVisible = true) }
             }
