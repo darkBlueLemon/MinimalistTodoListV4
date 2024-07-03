@@ -30,22 +30,8 @@ class TaskViewModel(
 
     private val _sortType = MutableStateFlow(SortType.PRIORITY)
     private val _recurrenceFilter = MutableStateFlow(RecurrenceType.NONE)
-    private val _tasks = combine(_sortType, _recurrenceFilter) { sortType, recurrenceType ->
-        Pair(sortType, recurrenceType)
-    }
-        .flatMapLatest { (sortType, recurrenceType) ->
-            when(sortType) {
-                SortType.ALPHABETICAL -> dao.getTasksOrderedAlphabetically()
-                SortType.ALPHABETICAL_REV -> dao.getTasksOrderedAlphabeticallyRev()
-                SortType.DUE_DATE -> dao.getTasksSortedByDueDate()
-                SortType.PRIORITY -> dao.getTasksSortedByPriority()
-            }.map { tasks ->
-                tasks.filter { task ->
-                    recurrenceType == RecurrenceType.NONE || task.recurrenceType == recurrenceType
-                }
-            }
-        }
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
+    private val _tasks = MutableStateFlow<List<Task>>(emptyList())
+
     private val _state = MutableStateFlow(TaskState())
     val state = combine(_state, _sortType, _recurrenceFilter, _tasks) { state, sortType, recurrenceType, tasks ->
         state.copy(
@@ -54,6 +40,7 @@ class TaskViewModel(
             recurrenceFilter = recurrenceType
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), TaskState())
+
     private val _deletedTasks = MutableStateFlow<List<DeletedTask>>(emptyList())
     val deletedTasks: StateFlow<List<DeletedTask>> = _deletedTasks
 
@@ -63,6 +50,7 @@ class TaskViewModel(
                 _deletedTasks.value = deletedTasks
             }
         }
+        reloadTasks()
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -86,6 +74,9 @@ class TaskViewModel(
                             deletedAt = System.currentTimeMillis()
                         )
                     )
+
+                    // Emit new value to _tasks after deletion
+//                    reloadTasks()
                 }
             }
             TaskEvent.SaveTask -> {
@@ -121,6 +112,9 @@ class TaskViewModel(
                     savedTask?.let {
                         notificationHelper.scheduleNotification(it)
                     }
+
+                    // Emit new value to _tasks after saving
+//                    reloadTasks()
                 }
                 _state.update {
                     it.copy(
@@ -264,6 +258,35 @@ class TaskViewModel(
                     dao.deleteAllDeletedTasks()
                 }
             }
+
+            is TaskEvent.RefreshTasks -> {
+                viewModelScope.launch {
+                    reloadTasks()
+                }
+            }
+        }
+    }
+
+    fun reloadTasks() {
+        viewModelScope.launch {
+            combine(_sortType, _recurrenceFilter) { sortType, recurrenceType ->
+                Pair(sortType, recurrenceType)
+            }
+                .flatMapLatest { (sortType, recurrenceType) ->
+                    when (sortType) {
+                        SortType.ALPHABETICAL -> dao.getTasksOrderedAlphabetically()
+                        SortType.ALPHABETICAL_REV -> dao.getTasksOrderedAlphabeticallyRev()
+                        SortType.DUE_DATE -> dao.getTasksSortedByDueDate()
+                        SortType.PRIORITY -> dao.getTasksSortedByPriority()
+                    }.map { tasks ->
+                        tasks.filter { task ->
+                            recurrenceType == RecurrenceType.NONE || task.recurrenceType == recurrenceType
+                        }
+                    }
+                }
+                .collect { tasks ->
+                    _tasks.value = tasks
+                }
         }
     }
 

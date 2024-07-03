@@ -33,7 +33,6 @@ import com.darkblue.minimalisttodolistv4.util.NotificationHelper
 import com.darkblue.minimalisttodolistv4.util.PermissionManager
 
 class MainActivity : ComponentActivity() {
-
     // Room Database Initialization
     private val db by lazy {
         Room.databaseBuilder(
@@ -78,7 +77,7 @@ class MainActivity : ComponentActivity() {
         // Setting Status Bar and Navigation Bar to be Transparent
         enableEdgeToEdge(
             statusBarStyle = SystemBarStyle.light(
-                        Color.TRANSPARENT , Color.TRANSPARENT
+                Color.TRANSPARENT , Color.TRANSPARENT
             ),
             navigationBarStyle = SystemBarStyle.light(
                 Color.TRANSPARENT, Color.TRANSPARENT
@@ -104,7 +103,6 @@ class MainActivity : ComponentActivity() {
         appViewModel.setPermissionManager(permissionManager)
 
         setContent {
-
             // Theme from DataStore through dataStoreViewModel
             val theme by dataStoreViewModel.theme.collectAsState()
             var darkTheme by remember { mutableStateOf(false) }
@@ -126,5 +124,11 @@ class MainActivity : ComponentActivity() {
                 )
             }
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        // Reload tasks when the activity resumes
+        taskViewModel.reloadTasks()
     }
 }

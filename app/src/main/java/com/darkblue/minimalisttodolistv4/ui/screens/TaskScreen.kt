@@ -36,6 +36,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -147,6 +148,8 @@ fun TaskScreen(
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun TaskList(onEvent: (TaskEvent) -> Unit, taskState: TaskState, viewModel: TaskViewModel, padding: PaddingValues) {
+//    val taskState by viewModel.state.collectAsState()
+
     LazyColumn(
         contentPadding = PaddingValues(16.dp),
         modifier = Modifier

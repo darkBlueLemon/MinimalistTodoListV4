@@ -39,4 +39,6 @@ sealed interface TaskEvent {
     data class DeleteForever(val deletedTask: DeletedTask) : TaskEvent
     data class UndoDeleteTask(val deletedTask: DeletedTask) : TaskEvent
     data object DeleteAllHistoryTasks : TaskEvent
+
+    data object RefreshTasks : TaskEvent
 }
