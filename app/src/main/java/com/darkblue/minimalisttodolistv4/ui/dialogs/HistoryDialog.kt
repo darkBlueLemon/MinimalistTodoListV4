@@ -2,7 +2,12 @@ package com.darkblue.minimalisttodolistv4.ui.dialogs
 
 import android.os.Build
 import androidx.annotation.RequiresApi
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -12,6 +17,7 @@ import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -21,10 +27,9 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.Undo
+import androidx.compose.material.icons.filled.DeleteForever
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.outlined.Delete
-import androidx.compose.material.icons.rounded.DeleteForever
-import androidx.compose.material.icons.rounded.Menu
 import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -35,9 +40,11 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.darkblue.minimalisttodolistv4.data.model.DeletedTask
@@ -46,6 +53,8 @@ import com.darkblue.minimalisttodolistv4.ui.components.CustomDropdownMenu
 import com.darkblue.minimalisttodolistv4.viewmodel.AppEvent
 import com.darkblue.minimalisttodolistv4.viewmodel.TaskEvent
 import com.darkblue.minimalisttodolistv4.viewmodel.TaskViewModel
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @RequiresApi(Build.VERSION_CODES.O)
@@ -68,21 +77,80 @@ fun HistoryDialog(
                     .width(350.dp)
             ) {
                 TitleAndDeleteAll(
-                    onClearHistory = { onEvent(TaskEvent.DeleteAllHistoryTasks)}
+                    onClearHistory = { onEvent(TaskEvent.DeleteAllHistoryTasks) }
                 )
-                LazyColumn(
-                    modifier = Modifier
-                        .padding(top = 8.dp)
-                        .animateContentSize()
-                ) {
-                    items(deletedTasks) { deletedTask ->
-                        HistoryItem(deletedTask, viewModel::onEvent, viewModel)
+                if (deletedTasks.isEmpty()) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = "Your task history is empty",
+                            textAlign = TextAlign.Center,
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = MaterialTheme.colorScheme.tertiary
+                        )
                     }
+                } else {
+                    HistoryList(
+                        viewModel,
+                        onEvent,
+                        deletedTasks
+                    )
                 }
             }
         }
     }
 }
+
+@RequiresApi(Build.VERSION_CODES.O)
+@Composable
+fun HistoryList(
+    viewModel: TaskViewModel,
+    onEvent: (TaskEvent) -> Unit,
+    deletedTasks: List<DeletedTask>
+) {
+    LazyColumn(
+        modifier = Modifier
+            .padding(top = 8.dp)
+            .animateContentSize()
+    ) {
+        items(deletedTasks, key = { it.id }) { deletedTask ->
+            var visible by remember { mutableStateOf(true) }
+
+            val coroutineScope = rememberCoroutineScope()
+
+            AnimatedVisibility(
+                visible = visible,
+                enter = fadeIn(animationSpec = tween(300)),
+                exit = fadeOut(animationSpec = tween(300))
+                        + shrinkVertically(animationSpec = tween(300))
+            ) {
+                HistoryItem(
+                    deletedTask = deletedTask,
+                    onEvent = onEvent,
+                    viewModel = viewModel,
+                    onItemDelete = {
+                        coroutineScope.launch {
+                            delay(300)
+                            visible = false
+                            onEvent(TaskEvent.DeleteForever(deletedTask))
+                        }
+                    },
+                    onItemRecover = {
+                        coroutineScope.launch {
+                            delay(300)
+                            visible = false
+                            onEvent(TaskEvent.UndoDeleteTask(deletedTask))
+                        }
+                    }
+                )
+            }
+        }
+    }
+}
+
 
 @Composable
 fun TitleAndDeleteAll(onClearHistory: () -> Unit) {
@@ -100,45 +168,18 @@ fun TitleAndDeleteAll(onClearHistory: () -> Unit) {
             style = MaterialTheme.typography.headlineSmall,
             modifier = Modifier.align(Alignment.Center)
         )
-        Box (
-            modifier =  Modifier
-                .fillMaxHeight()
-        ){
-            Icon(
-                imageVector = Icons.Rounded.Menu,
-                contentDescription = "Menu Toggle",
-                modifier = Modifier
-                    .align(Alignment.CenterStart)
-                    .clickable { expanded = true }
-            )
-            CustomDropdownMenu(
-                expanded = expanded,
-                onDismissRequest = {
+        Icon(
+            Icons.Default.DeleteForever,
+            contentDescription = "Clear History",
+            tint = MaterialTheme.colorScheme.primary,
+            modifier = Modifier
+                .clickable {
+                    onClearHistory()
                     expanded = false
                 }
-            ) {
-                Column(
-                    verticalArrangement = Arrangement.Center,
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    modifier = Modifier.padding(start = 10.dp, end = 10.dp)
-                ) {
-                    Icon(
-                        Icons.Rounded.DeleteForever,
-                        contentDescription = "Clear History",
-                        tint = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.clickable {
-                            onClearHistory()
-                            expanded = false
-                        }
-                    )
-                    Text(
-                        "Clear History",
-                        color = MaterialTheme.colorScheme.tertiary,
-                        style = MaterialTheme.typography.bodySmall
-                    )
-                }
-            }
-        }
+                .align(Alignment.CenterEnd)
+                .padding(end = 10.dp)
+        )
     }
 }
 
@@ -147,7 +188,9 @@ fun TitleAndDeleteAll(onClearHistory: () -> Unit) {
 fun HistoryItem(
     deletedTask: DeletedTask,
     onEvent: (TaskEvent) -> Unit,
-    viewModel: TaskViewModel
+    viewModel: TaskViewModel,
+    onItemDelete: () -> Unit,
+    onItemRecover: () -> Unit
 ) {
     var expanded by remember { mutableStateOf(false) }
 
@@ -189,13 +232,14 @@ fun HistoryItem(
             ) {
                 DropDownItem(
                     onRecoverClick = {
-                        onEvent(TaskEvent.UndoDeleteTask(deletedTask))
+                        onItemRecover()
                         expanded = false
                     },
                     onDeleteClick = {
-                        onEvent(TaskEvent.DeleteForever(deletedTask))
+                        onItemDelete()
                         expanded = false
-                    })
+                    }
+                )
             }
         }
     }

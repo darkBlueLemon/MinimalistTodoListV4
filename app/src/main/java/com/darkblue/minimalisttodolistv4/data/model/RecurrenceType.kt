@@ -10,7 +10,7 @@ enum class RecurrenceType {
 
     fun toDisplayString(): String {
         return when (this) {
-            NONE -> "None"
+            NONE -> "Show All"
             DAILY -> "Daily"
             WEEKLY -> "Weekly"
             MONTHLY -> "Monthly"

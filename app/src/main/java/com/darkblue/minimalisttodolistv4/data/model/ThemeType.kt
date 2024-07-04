@@ -1,8 +1,8 @@
 package com.darkblue.minimalisttodolistv4.data.model
 
 enum class ThemeType(val displayName: String) {
-    LIGHT("Light"),
     DARK("Dark"),
+    LIGHT("Light"),
     AUTO("Auto");
 
 

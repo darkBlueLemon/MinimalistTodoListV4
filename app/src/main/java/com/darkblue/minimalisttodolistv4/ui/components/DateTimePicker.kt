@@ -106,7 +106,7 @@ fun TimePickerFromOldApp(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center,
                     modifier = Modifier
-                        .padding(20.dp)
+                        .padding(32.dp)
                 ) {
                     TimePicker(
                         state = timePickerState,

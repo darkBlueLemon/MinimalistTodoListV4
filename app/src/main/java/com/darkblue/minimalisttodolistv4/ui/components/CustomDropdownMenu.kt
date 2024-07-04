@@ -11,6 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
 
 @Composable
 fun CustomDropdownMenu(
@@ -18,29 +19,24 @@ fun CustomDropdownMenu(
     onDismissRequest: () -> Unit,
     content: @Composable () -> Unit
 ) {
-    // Padding issues without the if statement
-    if(expanded) {
-        Box(
-            modifier = Modifier.background(Color.Green)
+    Box {
+        MaterialTheme(
+            colorScheme = MaterialTheme.colorScheme,
+            shapes = MaterialTheme.shapes.copy(extraSmall = RoundedCornerShape(16.dp))
         ) {
-            MaterialTheme(
-                colorScheme = MaterialTheme.colorScheme,
-                shapes = MaterialTheme.shapes.copy(extraSmall = RoundedCornerShape(16.dp))
+            DropdownMenu(
+                expanded = expanded,
+                onDismissRequest = onDismissRequest,
+                modifier = Modifier
+                    .clip(RoundedCornerShape(16.dp))
+                    .background(MaterialTheme.colorScheme.background)
+                    .border(
+                        width = 2.dp,
+                        color = MaterialTheme.colorScheme.onBackground,
+                        shape = RoundedCornerShape(16.dp)
+                    )
             ) {
-                DropdownMenu(
-                    expanded = expanded,
-                    onDismissRequest = onDismissRequest,
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(16.dp))
-                        .background(MaterialTheme.colorScheme.background)
-                        .border(
-                            width = 2.dp,
-                            color = MaterialTheme.colorScheme.onBackground,
-                            shape = RoundedCornerShape(16.dp)
-                        )
-                ) {
-                    content()
-                }
+                content()
             }
         }
     }

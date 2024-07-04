@@ -49,10 +49,12 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import com.darkblue.minimalisttodolistv4.data.model.RecurrenceType
 import com.darkblue.minimalisttodolistv4.data.model.Task
+import com.darkblue.minimalisttodolistv4.emptyStateMessages
 import com.darkblue.minimalisttodolistv4.viewmodel.DataStoreViewModel
 import com.darkblue.minimalisttodolistv4.viewmodel.TaskEvent
 import com.darkblue.minimalisttodolistv4.viewmodel.TaskState
@@ -87,6 +89,15 @@ fun TaskScreen(
 ) {
     // Necessary for the vibrate function
     val context = LocalContext.current
+
+    // Generate a random message when the task list becomes empty
+    val randomMessage = remember(taskState.tasks.isEmpty()) {
+        if (taskState.tasks.isEmpty()) {
+            emptyStateMessages.random()
+        } else {
+            ""
+        }
+    }
 
     Scaffold(
         floatingActionButton = {
@@ -142,7 +153,23 @@ fun TaskScreen(
                 },
             )
         }
-        TaskList(onEvent, taskState, taskViewModel, padding)
+        if (taskState.tasks.isEmpty()) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(padding),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = randomMessage,
+                    textAlign = TextAlign.Center,
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.tertiary
+                )
+            }
+        } else {
+            TaskList(onEvent, taskState, taskViewModel, padding)
+        }
     }
 }
 

@@ -216,11 +216,13 @@ class TaskViewModel(
             // Deletion Events
             is TaskEvent.DeleteForever -> {
                 viewModelScope.launch {
+                    delay(500)
                     dao.deleteDeletedTask(event.deletedTask)
                 }
             }
             is TaskEvent.UndoDeleteTask -> {
                 viewModelScope.launch {
+                    delay(500)
                     val deletedTask = event.deletedTask
                     val restoredTask = Task(
                         title = deletedTask.title,

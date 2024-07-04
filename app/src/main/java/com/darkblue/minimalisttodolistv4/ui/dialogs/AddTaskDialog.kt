@@ -3,6 +3,9 @@ package com.darkblue.minimalisttodolistv4.ui.dialogs
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -148,7 +151,11 @@ fun PrioritySelector(
     var selectedPriority by remember { mutableStateOf(priorityFromEdit) }
     var isPrioritySelected by remember { mutableStateOf(false) }
 
-    if (isPrioritySelected || selectedPriority != 0) {
+    AnimatedVisibility(
+        visible = isPrioritySelected || selectedPriority != 0,
+        enter = fadeIn(),
+        exit = fadeOut()
+    ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceEvenly,
@@ -167,7 +174,9 @@ fun PrioritySelector(
                 onPriorityChange(TaskEvent.SetPriority(priority))
             }
         }
-    } else {
+    }
+
+    if (!isPrioritySelected && selectedPriority == 0) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -202,7 +211,7 @@ fun PriorityStar(index: Int, selectedPriority: Int, color: Color, onClick: (Int)
     val starColor = if (index == selectedPriority) color else Color.Gray
 
     Icon(
-        painter = rememberVectorPainter(image = starIcon),
+        imageVector = starIcon,
         contentDescription = "Priority $index",
         tint = starColor,
         modifier = Modifier
@@ -334,18 +343,22 @@ fun RecurrenceSelector(
     modifier: Modifier = Modifier,
     recurrenceFromEdit: RecurrenceType,
     onRecurrenceTypeSelected: (RecurrenceType) -> Unit
-    ) {
+) {
     var selectedRecurrenceType by remember { mutableStateOf(recurrenceFromEdit) }
     var isRecurrenceSelected by remember { mutableStateOf(false) }
 
-    if (isRecurrenceSelected || selectedRecurrenceType != RecurrenceType.NONE) {
+    AnimatedVisibility(
+        visible = isRecurrenceSelected || selectedRecurrenceType != RecurrenceType.NONE,
+        enter = fadeIn(),
+        exit = fadeOut()
+    ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(top = 11.dp, bottom = 11.dp),
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
-            RecurrenceType.Companion.entriesWithoutNONE.forEach { recurrenceType ->
+            RecurrenceType.entriesWithoutNONE.forEach { recurrenceType ->
                 Text(
                     text = recurrenceType.toDisplayString(),
                     modifier = Modifier
@@ -363,14 +376,15 @@ fun RecurrenceSelector(
                             shape = RoundedCornerShape(8.dp)
                         )
                         .padding(horizontal = 16.dp, vertical = 8.dp),
-//                        .padding(horizontal = 4.dp, vertical = 8.dp),
                     color = if (recurrenceType == selectedRecurrenceType) MaterialTheme.colorScheme.onPrimary
                     else MaterialTheme.colorScheme.primary,
                     style = MaterialTheme.typography.bodySmall
                 )
             }
         }
-    } else {
+    }
+
+    if (!isRecurrenceSelected && selectedRecurrenceType == RecurrenceType.NONE) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()

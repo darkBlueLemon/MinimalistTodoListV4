@@ -1,6 +1,7 @@
 package com.darkblue.minimalisttodolistv4.ui.dialogs
 
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -8,8 +9,10 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.CheckCircle
@@ -27,6 +30,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.dp
 import com.darkblue.minimalisttodolistv4.data.model.ClockType
@@ -39,6 +43,7 @@ import com.darkblue.minimalisttodolistv4.viewmodel.AppEvent
 import com.darkblue.minimalisttodolistv4.viewmodel.DataStoreViewModel
 import com.darkblue.minimalisttodolistv4.viewmodel.TaskEvent
 import com.darkblue.minimalisttodolistv4.viewmodel.TaskState
+import kotlinx.coroutines.handleCoroutineException
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -56,24 +61,34 @@ fun MenuDialog(
         },
         modifier = modifier
             .width(350.dp)
-
-        // to stop it from expanding on box drop down menu click
-//            .height(350.dp)
     ) {
         CustomBox {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(30.dp),
-                verticalArrangement = Arrangement.spacedBy(24.dp)
+                    .padding(20.dp),
             ) {
                 Text(
                     text = "Menu",
                     style = MaterialTheme.typography.headlineSmall,
-                    modifier = Modifier.align(Alignment.CenterHorizontally)
+                    modifier = Modifier
+                        .align(Alignment.CenterHorizontally)
+                        .padding(bottom = 24.dp)
                 )
-                Text(text = "History", modifier = Modifier.clickable { onAppEvent(AppEvent.ShowHistoryDialog) })
-                Text(text = "Notification")
+                Text(
+                    text = "History",
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable {
+                            onAppEvent(AppEvent.ShowHistoryDialog)
+                        }
+                        .padding(bottom = 24.dp)
+                )
+//                Text(
+//                    text = "Notification",
+//                    modifier = Modifier
+//                        .padding(bottom = 24.dp)
+//                )
                 RecurrenceSelector(
                     currentRecurrenceFilter = taskState.recurrenceFilter,
                     onRecurrenceFilterChange = { onEvent(TaskEvent.SetRecurrenceFilter(it)) }
@@ -82,12 +97,145 @@ fun MenuDialog(
                     currentSortType = taskState.sortType,
                     onSortChange = { onEvent(TaskEvent.SortTasks(it) ) }
                 )
-                ThemeSelector(dataStoreViewModel)
-                Text(text = "Tutorial")
-                ClockTypeSelector(dataStoreViewModel = dataStoreViewModel)
+                ThemeSelector(
+                    dataStoreViewModel
+                )
+//                Text(
+//                    text = "Tutorial",
+//                    modifier = Modifier
+//                        .padding(bottom = 24.dp)
+//                )
+                ClockTypeSelector(
+                    dataStoreViewModel = dataStoreViewModel
+                )
             }
         }
     }
+}
+
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+fun RecurrenceSelector(
+    currentRecurrenceFilter: RecurrenceType,
+    onRecurrenceFilterChange: (RecurrenceType) -> Unit
+) {
+    var expanded by remember { mutableStateOf(false) }
+
+    Text(text = "View Recurring Tasks", modifier = Modifier
+        .fillMaxWidth()
+        .clickable { expanded = true }
+//        .padding(bottom = 24.dp)
+    )
+    CustomDropdownMenu(
+        expanded = expanded,
+        onDismissRequest = {
+            expanded = false
+        },
+    ) {
+        RecurrenceType.entriesWithNONE.forEach { recurrenceType ->
+            Row(
+                horizontalArrangement = Arrangement.Start,
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .padding(start = 12.dp, end = 25.dp)
+                    .combinedClickable(
+                        indication = null,
+                        interactionSource = remember { MutableInteractionSource() },
+                        onClick = {
+                            onRecurrenceFilterChange(recurrenceType)
+                        }
+                    )
+            ) {
+                CompleteIconWithoutDelay(isChecked = currentRecurrenceFilter == recurrenceType)
+                Text(recurrenceType.toDisplayString())
+            }
+        }
+    }
+    Spacer(modifier = Modifier.size(width = 0.dp, height = 24.dp))
+}
+
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+fun PrioritySelector(
+    currentSortType: SortType,
+    onSortChange: (SortType) -> Unit
+) {
+    var expanded by remember { mutableStateOf(false) }
+
+    Text(text = "Sorting Option", modifier = Modifier
+        .fillMaxWidth()
+        .clickable { expanded = true }
+//        .padding(bottom = 24.dp)
+    )
+    CustomDropdownMenu(
+        expanded = expanded,
+        onDismissRequest = {
+            expanded = false
+        },
+    ) {
+        SortType.entries.forEach { sortType ->
+            Row(
+                horizontalArrangement = Arrangement.Start,
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .padding(start = 12.dp, end = 25.dp)
+                    .combinedClickable(
+                        indication = null,
+                        interactionSource = remember { MutableInteractionSource() },
+                        onClick = { onSortChange(sortType) }
+                    )
+            ) {
+                CompleteIconWithoutDelay(isChecked = currentSortType == sortType)
+                Text(sortType.toDisplayString())
+            }
+        }
+    }
+    Spacer(modifier = Modifier.size(width = 0.dp, height = 24.dp))
+}
+
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+fun ThemeSelector(
+    dataStoreViewModel: DataStoreViewModel
+) {
+    val theme by dataStoreViewModel.theme.collectAsState()
+    var expanded by remember { mutableStateOf(false) }
+
+    Text(
+//        text = "Current Theme: ${theme.toDisplayString()}",
+        text = "Theme",
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { expanded = true }
+//            .padding(bottom = 24.dp)
+    )
+    CustomDropdownMenu(
+        expanded = expanded,
+        onDismissRequest = {
+            expanded = false
+        },
+    ) {
+        ThemeType.entries.forEach { themeType ->
+            Row(
+                horizontalArrangement = Arrangement.Start,
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .padding(start = 12.dp, end = 25.dp)
+                    .combinedClickable(
+                        indication = null,
+                        interactionSource = remember { MutableInteractionSource() },
+                        onClick = {
+                            dataStoreViewModel.saveTheme(themeType)
+                        }
+                    )
+            ) {
+                CompleteIconWithoutDelay(isChecked = theme == themeType)
+                Text(themeType.toDisplayString())
+            }
+        }
+    }
+
+    Spacer(modifier = Modifier.size(width = 0.dp, height = 24.dp))
 }
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -99,10 +247,12 @@ fun ClockTypeSelector(
     var expanded by remember { mutableStateOf(false) }
 
     Text(
-        text = "Current Clock Type: ${clock.toDisplayString()}",
+//        text = "Current Clock Type: ${clock.toDisplayString()}",
+        text = "Clock Type",
         modifier = Modifier
             .fillMaxWidth()
             .clickable { expanded = true }
+//            .padding(bottom = 24.dp)
     )
     CustomDropdownMenu(
         expanded = expanded,
@@ -131,123 +281,6 @@ fun ClockTypeSelector(
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
-@Composable
-fun RecurrenceSelector(
-    currentRecurrenceFilter: RecurrenceType,
-    onRecurrenceFilterChange: (RecurrenceType) -> Unit
-) {
-    var expanded by remember { mutableStateOf(false) }
-
-    Text(text = "Recurrence Filter", modifier = Modifier
-        .fillMaxWidth()
-        .clickable { expanded = true }
-    )
-    CustomDropdownMenu(
-        expanded = expanded,
-        onDismissRequest = {
-            expanded = false
-        },
-    ) {
-        RecurrenceType.entriesWithNONE.forEach { recurrenceType ->
-            Row(
-                horizontalArrangement = Arrangement.Start,
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier
-                    .padding(start = 12.dp, end = 25.dp)
-                    .combinedClickable(
-                        indication = null,
-                        interactionSource = remember { MutableInteractionSource() },
-                        onClick = {
-                            onRecurrenceFilterChange(recurrenceType)
-                        }
-                    )
-            ) {
-                CompleteIconWithoutDelay(isChecked = currentRecurrenceFilter == recurrenceType)
-                Text(recurrenceType.toDisplayString())
-            }
-        }
-    }
-}
-
-@OptIn(ExperimentalFoundationApi::class)
-@Composable
-fun PrioritySelector(
-    currentSortType: SortType,
-    onSortChange: (SortType) -> Unit
-) {
-    var expanded by remember { mutableStateOf(false) }
-
-    Text(text = "Sorting Option", modifier = Modifier
-        .fillMaxWidth()
-        .clickable { expanded = true }
-    )
-    CustomDropdownMenu(
-        expanded = expanded,
-        onDismissRequest = {
-            expanded = false
-        },
-    ) {
-        SortType.entries.forEach { sortType ->
-            Row(
-                horizontalArrangement = Arrangement.Start,
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier
-                    .padding(start = 12.dp, end = 25.dp)
-                    .combinedClickable(
-                        indication = null,
-                        interactionSource = remember { MutableInteractionSource() },
-                        onClick = { onSortChange(sortType) }
-                    )
-            ) {
-                CompleteIconWithoutDelay(isChecked = currentSortType == sortType)
-                Text(sortType.toDisplayString())
-            }
-        }
-    }
-}
-
-@OptIn(ExperimentalFoundationApi::class)
-@Composable
-fun ThemeSelector(
-    dataStoreViewModel: DataStoreViewModel
-) {
-    val theme by dataStoreViewModel.theme.collectAsState()
-    var expanded by remember { mutableStateOf(false) }
-
-    Text(
-        text = "Current Theme: ${theme.toDisplayString()}",
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable { expanded = true }
-    )
-    CustomDropdownMenu(
-        expanded = expanded,
-        onDismissRequest = {
-            expanded = false
-        },
-    ) {
-        ThemeType.entries.forEach { themeType ->
-            Row(
-                horizontalArrangement = Arrangement.Start,
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier
-                    .padding(start = 12.dp, end = 25.dp)
-                    .combinedClickable(
-                        indication = null,
-                        interactionSource = remember { MutableInteractionSource() },
-                        onClick = {
-                            dataStoreViewModel.saveTheme(themeType)
-                        }
-                    )
-            ) {
-                CompleteIconWithoutDelay(isChecked = theme == themeType)
-                Text(themeType.toDisplayString())
-            }
-        }
-    }
-}
-
 @Composable
 fun CompleteIconWithoutDelay(isChecked: Boolean) {
     Box(
@@ -269,4 +302,3 @@ fun CompleteIconWithoutDelay(isChecked: Boolean) {
         }
     }
 }
-
