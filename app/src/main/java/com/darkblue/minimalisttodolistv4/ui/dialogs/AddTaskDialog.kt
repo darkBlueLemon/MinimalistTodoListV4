@@ -89,7 +89,6 @@ fun AddTaskDialog(
                         recurrenceFromEdit = taskState.recurrenceType,
                         onRecurrenceTypeSelected = { recurrenceType ->
                             onEvent(TaskEvent.SetRecurrenceType(recurrenceType))
-                            onAppEvent(AppEvent.CheckNotificationPermissions)
                         }
                     )
                 }

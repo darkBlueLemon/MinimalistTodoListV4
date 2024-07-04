@@ -134,6 +134,7 @@ fun TaskScreen(
             ScheduleExactAlarmPermissionDialog(
                 onDismissOrDisallow = {
                     onAppEvent(AppEvent.HideScheduleExactAlarmPermissionDialog)
+                    onAppEvent(AppEvent.IncrementPostNotificationDenialCount)
                 },
                 onAllow = {
                     onAppEvent(AppEvent.ShowScheduleExactAlarmPermissionIntent)

@@ -9,15 +9,28 @@ import android.os.Build
 import android.provider.Settings
 import androidx.activity.result.ActivityResultLauncher
 import androidx.core.content.ContextCompat
+import com.darkblue.minimalisttodolistv4.data.preferences.AppPreferences
 import com.darkblue.minimalisttodolistv4.viewmodel.AppEvent
+import kotlinx.coroutines.flow.first
 
 class PermissionManager(
     private val context: Context,
     private val activity: Activity,
     private val postNotificationPermissionLauncher: ActivityResultLauncher<String>,
-    private val onTaskEvent: (AppEvent) -> Unit
+    private val onTaskEvent: (AppEvent) -> Unit,
+    private val appPreferences: AppPreferences
 ) {
-    fun requestPermissions() {
+    companion object {
+        private const val MAX_DENIAL_COUNT = 2
+    }
+
+    suspend fun requestPermissions() {
+        val denialCount = appPreferences.postNotificationDenialCount.first()
+        if (denialCount >= MAX_DENIAL_COUNT) {
+            // Do not request permission again
+            return
+        }
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             if (!hasPostNotificationPermission()) {
                 postNotificationPermissionLauncher.launch(android.Manifest.permission.POST_NOTIFICATIONS)
@@ -27,9 +40,14 @@ class PermissionManager(
         }
     }
 
-    fun handlePostNotificationPermissionResult(isGranted: Boolean) {
-        if (isGranted && !hasScheduleExactAlarmPermission()) {
-            onTaskEvent(AppEvent.ShowScheduleExactAlarmPermissionDialog)
+    suspend fun handlePostNotificationPermissionResult(isGranted: Boolean) {
+        if (isGranted) {
+            appPreferences.resetPostNotificationDenialCount()
+            if (!hasScheduleExactAlarmPermission()) {
+                onTaskEvent(AppEvent.ShowScheduleExactAlarmPermissionDialog)
+            }
+        } else {
+            appPreferences.incrementPostNotificationDenialCount()
         }
     }
 

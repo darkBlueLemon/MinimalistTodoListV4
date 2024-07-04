@@ -19,6 +19,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.room.Room
 import com.darkblue.minimalisttodolistv4.data.preferences.AppPreferences
 import com.darkblue.minimalisttodolistv4.data.database.ContactDatabase
@@ -31,6 +32,8 @@ import com.darkblue.minimalisttodolistv4.viewmodel.TaskViewModel
 import com.darkblue.minimalisttodolistv4.ui.theme.MinimalistTodoListV4Theme
 import com.darkblue.minimalisttodolistv4.util.NotificationHelper
 import com.darkblue.minimalisttodolistv4.util.PermissionManager
+import com.darkblue.minimalisttodolistv4.viewmodel.AppViewModelFactory
+import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
     // Room Database Initialization
@@ -62,8 +65,10 @@ class MainActivity : ComponentActivity() {
     private lateinit var postNotificationPermissionLauncher: ActivityResultLauncher<String>
     private lateinit var appPreferences: AppPreferences
 
-    // AppViewModel Initialization
-    private val appViewModel = AppViewModel()
+    // AppViewModel Initialization with AppPreferences Instance (DataStore)
+    private val appViewModel by viewModels<AppViewModel> {
+        AppViewModelFactory(appPreferences)
+    }
 
     // DataStoreViewModel Initialization with AppPreferences Instance (DataStore)
     private val dataStoreViewModel by viewModels<DataStoreViewModel> {
@@ -91,13 +96,16 @@ class MainActivity : ComponentActivity() {
         postNotificationPermissionLauncher = registerForActivityResult(
             ActivityResultContracts.RequestPermission()
         ) { isGranted: Boolean ->
-            permissionManager.handlePostNotificationPermissionResult(isGranted)
+            lifecycleScope.launch {
+                permissionManager.handlePostNotificationPermissionResult(isGranted)
+            }
         }
         permissionManager = PermissionManager(
             context = this,
             activity = this,
             postNotificationPermissionLauncher = postNotificationPermissionLauncher,
-            onTaskEvent = appViewModel::onEvent
+            onTaskEvent = appViewModel::onEvent,
+            appPreferences = appPreferences
         )
         // Attaching permission Manager to AppViewModel
         appViewModel.setPermissionManager(permissionManager)

@@ -12,4 +12,5 @@ sealed interface AppEvent {
 
     data object ShowScheduleExactAlarmPermissionIntent: AppEvent
     data object CheckNotificationPermissions: AppEvent
+    data object IncrementPostNotificationDenialCount: AppEvent
 }
