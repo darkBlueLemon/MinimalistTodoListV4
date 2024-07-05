@@ -104,6 +104,37 @@ fun HistoryDialog(
     }
 }
 
+@Composable
+fun TitleAndDeleteAll(onClearHistory: () -> Unit) {
+    var expanded by remember { mutableStateOf(false) }
+
+    Box (
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(IntrinsicSize.Max)
+            .padding(8.dp)
+    ){
+        Text(
+            text = "History",
+            color = MaterialTheme.colorScheme.primary,
+            style = MaterialTheme.typography.headlineSmall,
+            modifier = Modifier.align(Alignment.Center)
+        )
+        Icon(
+            Icons.Default.DeleteForever,
+            contentDescription = "Clear History",
+            tint = MaterialTheme.colorScheme.primary,
+            modifier = Modifier
+                .clickable {
+                    onClearHistory()
+                    expanded = false
+                }
+                .align(Alignment.CenterEnd)
+                .padding(end = 10.dp)
+        )
+    }
+}
+
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun HistoryList(
@@ -151,38 +182,6 @@ fun HistoryList(
     }
 }
 
-
-@Composable
-fun TitleAndDeleteAll(onClearHistory: () -> Unit) {
-    var expanded by remember { mutableStateOf(false) }
-
-    Box (
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(IntrinsicSize.Max)
-            .padding(8.dp)
-    ){
-        Text(
-            text = "History",
-            color = MaterialTheme.colorScheme.primary,
-            style = MaterialTheme.typography.headlineSmall,
-            modifier = Modifier.align(Alignment.Center)
-        )
-        Icon(
-            Icons.Default.DeleteForever,
-            contentDescription = "Clear History",
-            tint = MaterialTheme.colorScheme.primary,
-            modifier = Modifier
-                .clickable {
-                    onClearHistory()
-                    expanded = false
-                }
-                .align(Alignment.CenterEnd)
-                .padding(end = 10.dp)
-        )
-    }
-}
-
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun HistoryItem(
@@ -208,10 +207,12 @@ fun HistoryItem(
             Text(
                 text = deletedTask.title,
                 maxLines = 1,
-                overflow = TextOverflow.Ellipsis
+                overflow = TextOverflow.Ellipsis,
+                style = MaterialTheme.typography.bodyLarge,
             )
             Text(
-                text = viewModel.formatDueDateWithDateTime(deletedTask.deletedAt)
+                text = viewModel.formatDueDateWithDateTime(deletedTask.deletedAt),
+                style = MaterialTheme.typography.bodyLarge,
             )
         }
         Box {

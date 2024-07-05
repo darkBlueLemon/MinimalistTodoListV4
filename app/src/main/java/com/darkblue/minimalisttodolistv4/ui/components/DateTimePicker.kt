@@ -28,6 +28,7 @@ import androidx.compose.ui.Alignment
 
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import com.darkblue.minimalisttodolistv4.data.model.ClockType
 import com.darkblue.minimalisttodolistv4.viewmodel.DataStoreViewModel
@@ -137,7 +138,11 @@ fun TimePickerFromOldApp(
                                 closeSelection()
                             }
                         ) {
-                            Text(text = "Cancel", color = MaterialTheme.colorScheme.primary)
+                            Text(
+                                text = "Cancel",
+                                color = MaterialTheme.colorScheme.primary,
+                                style = MaterialTheme.typography.bodyMedium,
+                            )
                         }
                         TextButton(
                             onClick = {
@@ -146,7 +151,11 @@ fun TimePickerFromOldApp(
                                 closeSelection()
                             }
                         ) {
-                            Text(text = "OK", color = MaterialTheme.colorScheme.primary)
+                            Text(
+                                text = "OK",
+                                color = MaterialTheme.colorScheme.primary,
+                                style = MaterialTheme.typography.bodyMedium,
+                            )
                         }
                     }
                 }

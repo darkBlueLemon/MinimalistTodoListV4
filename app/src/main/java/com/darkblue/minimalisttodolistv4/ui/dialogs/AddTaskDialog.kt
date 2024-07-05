@@ -198,7 +198,7 @@ fun PrioritySelector(
                 text = "Add priority",
                 color = MaterialTheme.colorScheme.tertiary,
                 fontWeight = FontWeight.Light,
-                style = MaterialTheme.typography.bodySmall,
+                style = MaterialTheme.typography.bodyMedium,
                 modifier = Modifier.padding(15.dp)
             )
         }
@@ -240,7 +240,7 @@ fun Note(modifier: Modifier = Modifier, taskState: TaskState, onEvent: (TaskEven
                     text = "Add note",
                     color = MaterialTheme.colorScheme.tertiary,
                     fontWeight = FontWeight.Light,
-                    style = MaterialTheme.typography.bodySmall,
+                    style = MaterialTheme.typography.bodyMedium,
                 )
             },
             colors = TextFieldDefaults.colors(
@@ -282,7 +282,7 @@ fun DateSelector(modifier: Modifier = Modifier, taskState: TaskState, onEvent: (
                 .padding(15.dp),
             color = if (text == "Add date") MaterialTheme.colorScheme.tertiary else MaterialTheme.colorScheme.primary,
             fontWeight = FontWeight.Light,
-            style = MaterialTheme.typography.bodySmall,
+            style = MaterialTheme.typography.bodyMedium,
         )
     }
 
@@ -324,7 +324,7 @@ fun TimeSelector(modifier: Modifier = Modifier, taskState: TaskState, onEvent: (
                 .clickable { onEvent(TaskEvent.ShowTimePicker) },
             color = if (text == "Add Time") MaterialTheme.colorScheme.tertiary else MaterialTheme.colorScheme.primary,
             fontWeight = FontWeight.Light,
-            style = MaterialTheme.typography.bodySmall,
+            style = MaterialTheme.typography.bodyMedium,
         )
     }
 
@@ -361,6 +361,7 @@ fun RecurrenceSelector(
             RecurrenceType.entriesWithoutNONE.forEach { recurrenceType ->
                 Text(
                     text = recurrenceType.toDisplayString(),
+                    style = MaterialTheme.typography.bodySmall,
                     modifier = Modifier
                         .clickable {
                             if (selectedRecurrenceType == recurrenceType) {
@@ -378,7 +379,6 @@ fun RecurrenceSelector(
                         .padding(horizontal = 16.dp, vertical = 8.dp),
                     color = if (recurrenceType == selectedRecurrenceType) MaterialTheme.colorScheme.onPrimary
                     else MaterialTheme.colorScheme.primary,
-                    style = MaterialTheme.typography.bodySmall
                 )
             }
         }
@@ -404,7 +404,7 @@ fun RecurrenceSelector(
                 text = "Add recurrence",
                 color = MaterialTheme.colorScheme.tertiary,
                 fontWeight = FontWeight.Light,
-                style = MaterialTheme.typography.bodySmall,
+                style = MaterialTheme.typography.bodyMedium,
                 modifier = Modifier.padding(15.dp)
             )
         }
@@ -430,6 +430,7 @@ fun SaveButton(
             color = MaterialTheme.colorScheme.primary,
             fontSize = 15.sp,
             fontWeight = FontWeight.SemiBold,
+            style = MaterialTheme.typography.bodyMedium,
             modifier = Modifier.padding(horizontal = 25.dp, vertical = 10.dp)
         )
     }

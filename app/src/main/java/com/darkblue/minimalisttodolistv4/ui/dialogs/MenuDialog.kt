@@ -77,6 +77,7 @@ fun MenuDialog(
                 )
                 Text(
                     text = "History",
+                    style = MaterialTheme.typography.bodyLarge,
                     modifier = Modifier
                         .fillMaxWidth()
                         .clickable {
@@ -121,9 +122,12 @@ fun RecurrenceSelector(
 ) {
     var expanded by remember { mutableStateOf(false) }
 
-    Text(text = "View Recurring Tasks", modifier = Modifier
-        .fillMaxWidth()
-        .clickable { expanded = true }
+    Text(
+        text = "View Recurring Tasks",
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { expanded = true },
+        style = MaterialTheme.typography.bodyLarge
 //        .padding(bottom = 24.dp)
     )
     CustomDropdownMenu(
@@ -147,7 +151,10 @@ fun RecurrenceSelector(
                     )
             ) {
                 CompleteIconWithoutDelay(isChecked = currentRecurrenceFilter == recurrenceType)
-                Text(recurrenceType.toDisplayString())
+                Text(
+                    recurrenceType.toDisplayString(),
+                    style = MaterialTheme.typography.bodyLarge
+                )
             }
         }
     }
@@ -164,7 +171,8 @@ fun PrioritySelector(
 
     Text(text = "Sorting Option", modifier = Modifier
         .fillMaxWidth()
-        .clickable { expanded = true }
+        .clickable { expanded = true },
+        style = MaterialTheme.typography.bodyLarge
 //        .padding(bottom = 24.dp)
     )
     CustomDropdownMenu(
@@ -186,7 +194,10 @@ fun PrioritySelector(
                     )
             ) {
                 CompleteIconWithoutDelay(isChecked = currentSortType == sortType)
-                Text(sortType.toDisplayString())
+                Text(
+                    sortType.toDisplayString(),
+                    style = MaterialTheme.typography.bodyLarge
+                )
             }
         }
     }
@@ -206,7 +217,8 @@ fun ThemeSelector(
         text = "Theme",
         modifier = Modifier
             .fillMaxWidth()
-            .clickable { expanded = true }
+            .clickable { expanded = true },
+        style = MaterialTheme.typography.bodyLarge
 //            .padding(bottom = 24.dp)
     )
     CustomDropdownMenu(
@@ -230,7 +242,10 @@ fun ThemeSelector(
                     )
             ) {
                 CompleteIconWithoutDelay(isChecked = theme == themeType)
-                Text(themeType.toDisplayString())
+                Text(
+                    themeType.toDisplayString(),
+                    style = MaterialTheme.typography.bodyLarge
+                )
             }
         }
     }
@@ -251,7 +266,8 @@ fun ClockTypeSelector(
         text = "Clock Type",
         modifier = Modifier
             .fillMaxWidth()
-            .clickable { expanded = true }
+            .clickable { expanded = true },
+        style = MaterialTheme.typography.bodyLarge
 //            .padding(bottom = 24.dp)
     )
     CustomDropdownMenu(
@@ -275,7 +291,10 @@ fun ClockTypeSelector(
                     )
             ) {
                 CompleteIconWithoutDelay(isChecked = clock == clockType)
-                Text(clockType.toDisplayString())
+                Text(
+                    clockType.toDisplayString(),
+                    style = MaterialTheme.typography.bodyLarge
+                )
             }
         }
     }

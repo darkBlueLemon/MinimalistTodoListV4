@@ -23,6 +23,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.room.Room
 import com.darkblue.minimalisttodolistv4.data.preferences.AppPreferences
 import com.darkblue.minimalisttodolistv4.data.database.ContactDatabase
+import com.darkblue.minimalisttodolistv4.data.model.FontFamilyType
 import com.darkblue.minimalisttodolistv4.data.model.ThemeType
 import com.darkblue.minimalisttodolistv4.ui.navigation.NavGraph
 import com.darkblue.minimalisttodolistv4.viewmodel.AppViewModel
@@ -124,7 +125,10 @@ class MainActivity : ComponentActivity() {
                 }
             }
 
-            MinimalistTodoListV4Theme(darkTheme = darkTheme) {
+            MinimalistTodoListV4Theme(
+                darkTheme = darkTheme,
+                fontFamilyType = FontFamilyType.DEFAULT
+            ) {
                 NavGraph(
                     taskViewModel = taskViewModel,
                     dataStoreViewModel = dataStoreViewModel,
