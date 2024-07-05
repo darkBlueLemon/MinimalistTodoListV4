@@ -27,6 +27,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -34,6 +35,7 @@ import com.darkblue.minimalisttodolistv4.data.model.FontFamilyType
 import com.darkblue.minimalisttodolistv4.data.model.ThemeType
 import com.darkblue.minimalisttodolistv4.ui.components.CustomBox
 import com.darkblue.minimalisttodolistv4.ui.components.CustomDropdownMenu
+import com.darkblue.minimalisttodolistv4.viewmodel.AppEvent
 import com.darkblue.minimalisttodolistv4.viewmodel.DataStoreViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -47,13 +49,14 @@ fun FontSettingsDialog(
         onDismissRequest = {
             onDismiss()
         },
+        modifier = modifier
+            .width(350.dp)
     ) {
         CustomBox {
             Column(
-                // Best thing everrrrr -> IntrinsicSize
                 modifier = Modifier
-                    .padding(15.dp)
-                    .width(IntrinsicSize.Max),
+                    .fillMaxWidth()
+                    .padding(20.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 Text(
@@ -80,13 +83,24 @@ fun FontFamilySelector(
     val fontFamily by dataStoreViewModel.fontFamily.collectAsState()
     var expanded by remember { mutableStateOf(false) }
 
-    Text(
-        text = "Font Family",
+    Row (
         modifier = Modifier
             .fillMaxWidth()
             .clickable { expanded = true },
-        style = MaterialTheme.typography.bodyLarge
-    )
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Text(
+            text = "Font Family",
+            style = MaterialTheme.typography.bodyLarge
+        )
+        Text(
+            text = fontFamily.toDisplayString(),
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.tertiary,
+            fontStyle = FontStyle.Italic
+        )
+    }
+
     CustomDropdownMenu(
         expanded = expanded,
         onDismissRequest = {
@@ -132,13 +146,24 @@ fun FontWeightSelector(
     )
     var expanded by remember { mutableStateOf(false) }
 
-    Text(
-        text = "Font Weight",
+    Row (
         modifier = Modifier
             .fillMaxWidth()
             .clickable { expanded = true },
-        style = MaterialTheme.typography.bodyLarge
-    )
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Text(
+            text = "Font Weight",
+            style = MaterialTheme.typography.bodyLarge
+        )
+        Text(
+            text = fontWeight.toDisplayString(),
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.tertiary,
+            fontStyle = FontStyle.Italic
+        )
+    }
+
     CustomDropdownMenu(
         expanded = expanded,
         onDismissRequest = {
@@ -187,7 +212,7 @@ fun FontSizeSelector(
         onValueChange = { newSize ->
             dataStoreViewModel.saveFontSize(newSize.toInt())
         },
-        valueRange = 10f..30f,
+        valueRange = 10f..22f,
         steps = 20
     )
 }

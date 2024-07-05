@@ -32,6 +32,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.darkblue.minimalisttodolistv4.data.model.ClockType
@@ -86,6 +87,16 @@ fun MenuDialog(
                         }
                         .padding(bottom = 24.dp)
                 )
+                Text(
+                    text = "Font Options",
+                    style = MaterialTheme.typography.bodyLarge,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable {
+                            onAppEvent(AppEvent.ShowFontSettingsDialog)
+                        }
+                        .padding(bottom = 24.dp)
+                )
 //                Text(
 //                    text = "Notification",
 //                    modifier = Modifier
@@ -110,16 +121,6 @@ fun MenuDialog(
                 ClockTypeSelector(
                     dataStoreViewModel = dataStoreViewModel
                 )
-                Text(
-                    text = "Font",
-                    style = MaterialTheme.typography.bodyLarge,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable {
-                            onAppEvent(AppEvent.ShowFontSettingsDialog)
-                        }
-//                        .padding(bottom = 24.dp)
-                )
             }
         }
     }
@@ -133,14 +134,24 @@ fun RecurrenceSelector(
 ) {
     var expanded by remember { mutableStateOf(false) }
 
-    Text(
-        text = "View Recurring Tasks",
+    Row (
         modifier = Modifier
             .fillMaxWidth()
             .clickable { expanded = true },
-        style = MaterialTheme.typography.bodyLarge
-//        .padding(bottom = 24.dp)
-    )
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Text(
+            text = "View Recurring Tasks",
+            style = MaterialTheme.typography.bodyLarge
+        )
+        Text(
+            text = currentRecurrenceFilter.toDisplayString(),
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.tertiary,
+            fontStyle = FontStyle.Italic
+        )
+    }
+
     CustomDropdownMenu(
         expanded = expanded,
         onDismissRequest = {
@@ -180,12 +191,24 @@ fun PrioritySelector(
 ) {
     var expanded by remember { mutableStateOf(false) }
 
-    Text(text = "Sorting Option", modifier = Modifier
-        .fillMaxWidth()
-        .clickable { expanded = true },
-        style = MaterialTheme.typography.bodyLarge
-//        .padding(bottom = 24.dp)
-    )
+    Row (
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { expanded = true },
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Text(
+            text = "Sorting Option",
+            style = MaterialTheme.typography.bodyLarge
+        )
+        Text(
+            text = currentSortType.toDisplayString(),
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.tertiary,
+            fontStyle = FontStyle.Italic
+        )
+    }
+
     CustomDropdownMenu(
         expanded = expanded,
         onDismissRequest = {
@@ -223,16 +246,24 @@ fun ThemeSelector(
     val theme by dataStoreViewModel.theme.collectAsState()
     var expanded by remember { mutableStateOf(false) }
 
-    Text(
-//        text = "Current Theme: ${theme.toDisplayString()}",
-        text = "Theme",
+    Row (
         modifier = Modifier
             .fillMaxWidth()
             .clickable { expanded = true },
-        style = MaterialTheme.typography.bodyLarge,
-//        fontWeight = FontWeight.Light
-//            .padding(bottom = 24.dp)
-    )
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Text(
+            text = "Theme",
+            style = MaterialTheme.typography.bodyLarge,
+        )
+        Text(
+            text = theme.toDisplayString(),
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.tertiary,
+            fontStyle = FontStyle.Italic
+        )
+    }
+
     CustomDropdownMenu(
         expanded = expanded,
         onDismissRequest = {
@@ -273,15 +304,24 @@ fun ClockTypeSelector(
     val clock by dataStoreViewModel.clockType.collectAsState()
     var expanded by remember { mutableStateOf(false) }
 
-    Text(
-//        text = "Current Clock Type: ${clock.toDisplayString()}",
-        text = "Clock Type",
+    Row (
         modifier = Modifier
             .fillMaxWidth()
             .clickable { expanded = true },
-        style = MaterialTheme.typography.bodyLarge
-//            .padding(bottom = 24.dp)
-    )
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Text(
+            text = "Clock Type",
+            style = MaterialTheme.typography.bodyLarge
+        )
+        Text(
+            text = clock.toDisplayString(),
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.tertiary,
+            fontStyle = FontStyle.Italic
+        )
+    }
+
     CustomDropdownMenu(
         expanded = expanded,
         onDismissRequest = {

@@ -7,7 +7,7 @@ enum class ClockType {
     companion object {
         fun fromDisplayName(displayName: String): ClockType {
             return when (displayName) {
-                "Military (24-Hour)" -> TWENTY_FOUR_HOUR
+                "24-Hour" -> TWENTY_FOUR_HOUR
                 else -> TWELVE_HOUR
             }
         }
@@ -15,8 +15,8 @@ enum class ClockType {
 
     fun toDisplayString(): String {
         return when (this) {
-            TWELVE_HOUR -> "Standard (12-Hour)"
-            TWENTY_FOUR_HOUR -> "Military (24-Hour)"
+            TWELVE_HOUR -> "12-Hour"
+            TWENTY_FOUR_HOUR -> "24-Hour"
         }
     }
 }
