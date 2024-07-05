@@ -122,7 +122,7 @@ fun Title(modifier: Modifier = Modifier, taskState: TaskState, onEvent: (TaskEve
             Text(
                 text = "I want to ...",
                 color = MaterialTheme.colorScheme.tertiary,
-                fontWeight = FontWeight.Light,
+//                fontWeight = FontWeight.Light,
                 style = MaterialTheme.typography.titleLarge,
             )
         },
@@ -136,7 +136,7 @@ fun Title(modifier: Modifier = Modifier, taskState: TaskState, onEvent: (TaskEve
             focusedTextColor = MaterialTheme.colorScheme.primary
         ),
         textStyle = LocalTextStyle.current.copy(
-            fontWeight = FontWeight.Light,
+//            fontWeight = FontWeight.Light,
             fontSize = MaterialTheme.typography.titleLarge.fontSize
         ),
         modifier = Modifier.fillMaxWidth()
@@ -197,7 +197,7 @@ fun PrioritySelector(
             Text(
                 text = "Add priority",
                 color = MaterialTheme.colorScheme.tertiary,
-                fontWeight = FontWeight.Light,
+//                fontWeight = FontWeight.Light,
                 style = MaterialTheme.typography.bodyMedium,
                 modifier = Modifier.padding(15.dp)
             )
@@ -239,7 +239,7 @@ fun Note(modifier: Modifier = Modifier, taskState: TaskState, onEvent: (TaskEven
                 Text(
                     text = "Add note",
                     color = MaterialTheme.colorScheme.tertiary,
-                    fontWeight = FontWeight.Light,
+//                    fontWeight = FontWeight.Light,
                     style = MaterialTheme.typography.bodyMedium,
                 )
             },
@@ -253,7 +253,7 @@ fun Note(modifier: Modifier = Modifier, taskState: TaskState, onEvent: (TaskEven
                 focusedTextColor = MaterialTheme.colorScheme.primary,
             ),
             textStyle = LocalTextStyle.current.copy(
-                fontWeight = FontWeight.Light,
+//                fontWeight = FontWeight.Light,
             ),
             singleLine = true,
         )
@@ -281,7 +281,7 @@ fun DateSelector(modifier: Modifier = Modifier, taskState: TaskState, onEvent: (
             modifier = Modifier
                 .padding(15.dp),
             color = if (text == "Add date") MaterialTheme.colorScheme.tertiary else MaterialTheme.colorScheme.primary,
-            fontWeight = FontWeight.Light,
+//            fontWeight = FontWeight.Light,
             style = MaterialTheme.typography.bodyMedium,
         )
     }
@@ -323,7 +323,7 @@ fun TimeSelector(modifier: Modifier = Modifier, taskState: TaskState, onEvent: (
                 .padding(15.dp)
                 .clickable { onEvent(TaskEvent.ShowTimePicker) },
             color = if (text == "Add Time") MaterialTheme.colorScheme.tertiary else MaterialTheme.colorScheme.primary,
-            fontWeight = FontWeight.Light,
+//            fontWeight = FontWeight.Light,
             style = MaterialTheme.typography.bodyMedium,
         )
     }
@@ -403,7 +403,7 @@ fun RecurrenceSelector(
             Text(
                 text = "Add recurrence",
                 color = MaterialTheme.colorScheme.tertiary,
-                fontWeight = FontWeight.Light,
+//                fontWeight = FontWeight.Light,
                 style = MaterialTheme.typography.bodyMedium,
                 modifier = Modifier.padding(15.dp)
             )

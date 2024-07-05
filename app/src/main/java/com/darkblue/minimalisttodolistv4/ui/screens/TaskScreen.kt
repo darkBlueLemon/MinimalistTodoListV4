@@ -62,6 +62,7 @@ import com.darkblue.minimalisttodolistv4.viewmodel.TaskEvent
 import com.darkblue.minimalisttodolistv4.viewmodel.TaskState
 import com.darkblue.minimalisttodolistv4.viewmodel.TaskViewModel
 import com.darkblue.minimalisttodolistv4.ui.dialogs.AddTaskDialog
+import com.darkblue.minimalisttodolistv4.ui.dialogs.FontSettingsDialog
 import com.darkblue.minimalisttodolistv4.ui.dialogs.HistoryDialog
 import com.darkblue.minimalisttodolistv4.ui.dialogs.MenuDialog
 import com.darkblue.minimalisttodolistv4.ui.dialogs.ScheduleExactAlarmPermissionDialog
@@ -155,6 +156,13 @@ fun TaskScreen(
                 },
             )
         }
+        if (appState.isFontSettingsDialogVisible) {
+            FontSettingsDialog(
+                dataStoreViewModel = dataStoreViewModel,
+                onDismiss = { onAppEvent(AppEvent.HideFontSettingsDialog) }
+            )
+        }
+
         if (taskState.tasks.isEmpty()) {
             Box(
                 modifier = Modifier

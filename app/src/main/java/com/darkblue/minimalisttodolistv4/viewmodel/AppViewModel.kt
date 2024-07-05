@@ -52,6 +52,15 @@ class AppViewModel(private val appPreferences: AppPreferences): ViewModel() {
                     appPreferences.incrementPostNotificationDenialCount()
                 }
             }
+            AppEvent.ShowFontSettingsDialog -> {
+                _state.update { it.copy(
+                    isFontSettingsDialogVisible = true,
+                    isMenuDialogVisible = false
+                ) }
+            }
+            AppEvent.HideFontSettingsDialog -> {
+                _state.update { it.copy(isFontSettingsDialogVisible = false) }
+            }
         }
     }
 }

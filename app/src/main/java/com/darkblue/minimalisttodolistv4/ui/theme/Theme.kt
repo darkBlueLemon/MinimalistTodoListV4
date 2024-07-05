@@ -13,7 +13,10 @@ import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.sp
 import com.darkblue.minimalisttodolistv4.data.model.FontFamilyType
 
 private val DarkColorScheme = darkColorScheme(
@@ -73,48 +76,35 @@ private val DarkColorScheme2 = lightColorScheme(
 fun MinimalistTodoListV4Theme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     fontFamilyType: FontFamilyType = FontFamilyType.DEFAULT,
+    baseFontSize: Int = 16,
+    fontWeight: FontWeight = FontWeight.Normal,
     content: @Composable () -> Unit
 ) {
-    val colorScheme = when {
-        darkTheme -> DarkColorScheme2
-        else -> LightColorScheme2
-    }
+    val colorScheme = if (darkTheme) DarkColorScheme2 else LightColorScheme2
 
-//    val customTypography = Typography.copy(
-//        bodySmall = Typography.bodySmall.copy(fontFamily = fontFamilyType.getFontFamily()),
-//        bodyMedium = Typography.bodyMedium.copy(fontFamily = fontFamilyType.getFontFamily()),
-//        bodyLarge = Typography.bodyLarge.copy(fontFamily = fontFamilyType.getFontFamily()),
-//        titleLarge = Typography.titleLarge.copy(fontFamily = fontFamilyType.getFontFamily()),
-//        headlineSmall = Typography.headlineSmall.copy(fontFamily = fontFamilyType.getFontFamily()),
-//    )
-
-    val typography = getCustomTypography(fontFamilyType)
+    val customTypography = Typography(
+        displayLarge = TextStyle(fontFamily = fontFamilyType.getFontFamily(), fontWeight = fontWeight, fontSize = (baseFontSize * 2.125).sp),
+        displayMedium = TextStyle(fontFamily = fontFamilyType.getFontFamily(), fontWeight = fontWeight, fontSize = (baseFontSize * 1.5).sp),
+        displaySmall = TextStyle(fontFamily = fontFamilyType.getFontFamily(), fontWeight = fontWeight, fontSize = (baseFontSize * 1.25).sp),
+        headlineLarge = TextStyle(fontFamily = fontFamilyType.getFontFamily(), fontWeight = fontWeight, fontSize = (baseFontSize * 2.0).sp),
+        headlineMedium = TextStyle(fontFamily = fontFamilyType.getFontFamily(), fontWeight = fontWeight, fontSize = (baseFontSize * 1.75).sp),
+        headlineSmall = TextStyle(fontFamily = fontFamilyType.getFontFamily(), fontWeight = fontWeight, fontSize = (baseFontSize * 1.5).sp),
+        titleLarge = TextStyle(fontFamily = fontFamilyType.getFontFamily(), fontWeight = fontWeight, fontSize = (baseFontSize * 1.25).sp),
+        titleMedium = TextStyle(fontFamily = fontFamilyType.getFontFamily(), fontWeight = fontWeight, fontSize = (baseFontSize * 1.0).sp),
+        titleSmall = TextStyle(fontFamily = fontFamilyType.getFontFamily(), fontWeight = fontWeight, fontSize = (baseFontSize * 0.875).sp),
+        bodyLarge = TextStyle(fontFamily = fontFamilyType.getFontFamily(), fontWeight = fontWeight, fontSize = (baseFontSize * 1.0).sp),
+        bodyMedium = TextStyle(fontFamily = fontFamilyType.getFontFamily(), fontWeight = fontWeight, fontSize = (baseFontSize * 0.875).sp),
+        bodySmall = TextStyle(fontFamily = fontFamilyType.getFontFamily(), fontWeight = fontWeight, fontSize = (baseFontSize * 0.75).sp),
+        labelLarge = TextStyle(fontFamily = fontFamilyType.getFontFamily(), fontWeight = fontWeight, fontSize = (baseFontSize * 0.875).sp),
+        labelMedium = TextStyle(fontFamily = fontFamilyType.getFontFamily(), fontWeight = fontWeight, fontSize = (baseFontSize * 0.75).sp),
+        labelSmall = TextStyle(fontFamily = fontFamilyType.getFontFamily(), fontWeight = fontWeight, fontSize = (baseFontSize * 0.625).sp)
+    )
 
     MaterialTheme(
         colorScheme = colorScheme,
-        typography = typography,
+        typography = customTypography,
         content = content
     )
 }
 
-fun getCustomTypography(fontFamilyType: FontFamilyType): Typography {
-    val fontFamily = fontFamilyType.getFontFamily()
 
-    return Typography(
-        displayLarge = Typography.displayLarge.copy(fontFamily = fontFamily),
-        displayMedium = Typography.displayMedium.copy(fontFamily = fontFamily),
-        displaySmall = Typography.displaySmall.copy(fontFamily = fontFamily),
-        headlineLarge = Typography.headlineLarge.copy(fontFamily = fontFamily),
-        headlineMedium = Typography.headlineMedium.copy(fontFamily = fontFamily),
-        headlineSmall = Typography.headlineSmall.copy(fontFamily = fontFamily),
-        titleLarge = Typography.titleLarge.copy(fontFamily = fontFamily),
-        titleMedium = Typography.titleMedium.copy(fontFamily = fontFamily),
-        titleSmall = Typography.titleSmall.copy(fontFamily = fontFamily),
-        bodyLarge = Typography.bodyLarge.copy(fontFamily = fontFamily),
-        bodyMedium = Typography.bodyMedium.copy(fontFamily = fontFamily),
-        bodySmall = Typography.bodySmall.copy(fontFamily = fontFamily),
-        labelLarge = Typography.labelLarge.copy(fontFamily = fontFamily),
-        labelMedium = Typography.labelMedium.copy(fontFamily = fontFamily),
-        labelSmall = Typography.labelSmall.copy(fontFamily = fontFamily)
-    )
-}

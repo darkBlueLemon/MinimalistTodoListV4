@@ -7,6 +7,9 @@ sealed interface AppEvent {
     data object ShowHistoryDialog : AppEvent
     data object HideHistoryDialog : AppEvent
 
+    data object ShowFontSettingsDialog : AppEvent
+    data object HideFontSettingsDialog : AppEvent
+
     data object ShowScheduleExactAlarmPermissionDialog: AppEvent
     data object HideScheduleExactAlarmPermissionDialog : AppEvent
 

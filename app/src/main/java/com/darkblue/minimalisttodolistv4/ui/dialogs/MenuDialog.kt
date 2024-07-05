@@ -32,6 +32,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.darkblue.minimalisttodolistv4.data.model.ClockType
 import com.darkblue.minimalisttodolistv4.data.model.RecurrenceType
@@ -108,6 +109,16 @@ fun MenuDialog(
 //                )
                 ClockTypeSelector(
                     dataStoreViewModel = dataStoreViewModel
+                )
+                Text(
+                    text = "Font",
+                    style = MaterialTheme.typography.bodyLarge,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable {
+                            onAppEvent(AppEvent.ShowFontSettingsDialog)
+                        }
+//                        .padding(bottom = 24.dp)
                 )
             }
         }
@@ -218,7 +229,8 @@ fun ThemeSelector(
         modifier = Modifier
             .fillMaxWidth()
             .clickable { expanded = true },
-        style = MaterialTheme.typography.bodyLarge
+        style = MaterialTheme.typography.bodyLarge,
+//        fontWeight = FontWeight.Light
 //            .padding(bottom = 24.dp)
     )
     CustomDropdownMenu(
@@ -298,6 +310,8 @@ fun ClockTypeSelector(
             }
         }
     }
+
+    Spacer(modifier = Modifier.size(width = 0.dp, height = 24.dp))
 }
 
 @Composable
