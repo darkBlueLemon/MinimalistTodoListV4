@@ -97,4 +97,7 @@ dependencies {
 
     // Splash APi
     implementation(libs.androidx.core.splashscreen)
+
+    // Flow Row
+    implementation (libs.androidx.foundation)
 }

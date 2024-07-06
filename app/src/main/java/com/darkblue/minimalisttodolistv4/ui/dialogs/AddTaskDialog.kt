@@ -12,6 +12,8 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -75,7 +77,9 @@ fun AddTaskDialog(
         CustomBox {
             Column(
                 // Best thing everrrrr -> IntrinsicSize
-                modifier = Modifier.padding(15.dp).width(IntrinsicSize.Max),
+                modifier = Modifier
+                    .padding(15.dp)
+                    .width(IntrinsicSize.Max),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 Title(taskState = taskState, onEvent = onEvent)
@@ -159,7 +163,9 @@ fun PrioritySelector(
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceEvenly,
-            modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 8.dp)
         ) {
             PriorityStar(index = 1, selectedPriority, Priority1) { priority ->
                 selectedPriority = priority
@@ -223,7 +229,9 @@ fun PriorityStar(index: Int, selectedPriority: Int, color: Color, onClick: (Int)
 @Composable
 fun Note(modifier: Modifier = Modifier, taskState: TaskState, onEvent: (TaskEvent) -> Unit) {
     Row(
-        modifier = Modifier.fillMaxWidth().padding(start = 15.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(start = 15.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Icon(
@@ -266,7 +274,9 @@ fun DateSelector(modifier: Modifier = Modifier, taskState: TaskState, onEvent: (
     val text = viewModel.formatDueDateWithDateOnly(taskState.dueDate).ifEmpty { "Add date" }
 
     Row(
-        modifier = Modifier.fillMaxWidth().padding(start = 15.dp, top = 4.dp, bottom = 4.dp)
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(start = 15.dp, top = 4.dp, bottom = 4.dp)
             .clickable { onEvent(TaskEvent.ShowDatePicker) },
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -308,7 +318,9 @@ fun TimeSelector(modifier: Modifier = Modifier, taskState: TaskState, onEvent: (
     val text = viewModel.formatDueDateWithTimeOnly(taskState.dueDate).ifEmpty { "Add Time" }
 
     Row(
-        modifier = Modifier.fillMaxWidth().padding(start = 15.dp, top = 4.dp, bottom = 4.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(start = 15.dp, top = 4.dp, bottom = 4.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Icon(
@@ -338,6 +350,7 @@ fun TimeSelector(modifier: Modifier = Modifier, taskState: TaskState, onEvent: (
     }
 }
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun RecurrenceSelector(
     modifier: Modifier = Modifier,
@@ -352,11 +365,13 @@ fun RecurrenceSelector(
         enter = fadeIn(),
         exit = fadeOut()
     ) {
-        Row(
+        FlowRow(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(top = 11.dp, bottom = 11.dp),
-            horizontalArrangement = Arrangement.SpaceEvenly
+            horizontalArrangement = Arrangement.Center,
+            verticalArrangement = Arrangement.Top,
+            maxItemsInEachRow = Int.MAX_VALUE // This is optional as it's the default value
         ) {
             RecurrenceType.entriesWithoutNONE.forEach { recurrenceType ->
                 Text(
@@ -403,7 +418,6 @@ fun RecurrenceSelector(
             Text(
                 text = "Add recurrence",
                 color = MaterialTheme.colorScheme.tertiary,
-//                fontWeight = FontWeight.Light,
                 style = MaterialTheme.typography.bodyMedium,
                 modifier = Modifier.padding(15.dp)
             )

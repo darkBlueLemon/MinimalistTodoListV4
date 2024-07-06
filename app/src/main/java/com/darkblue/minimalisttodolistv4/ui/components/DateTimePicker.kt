@@ -7,8 +7,10 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -90,6 +92,7 @@ fun TimePickerFromOldApp(
         initialMinute = initialTime.minute,
         is24Hour = is24Hour
     )
+    val padding = if(is24Hour) 32.dp else 18.dp
 
     BasicAlertDialog(
         onDismissRequest = {
@@ -102,12 +105,12 @@ fun TimePickerFromOldApp(
                     .clip(RoundedCornerShape(7))
                     .background(MaterialTheme.colorScheme.background)
                     .border(2.dp, MaterialTheme.colorScheme.primary, RoundedCornerShape(7))
+                    .padding(padding)
             ) {
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center,
                     modifier = Modifier
-                        .padding(32.dp)
                 ) {
                     TimePicker(
                         state = timePickerState,
