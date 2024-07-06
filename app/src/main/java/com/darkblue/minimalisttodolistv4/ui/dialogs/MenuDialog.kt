@@ -1,7 +1,13 @@
 package com.darkblue.minimalisttodolistv4.ui.dialogs
 
+import android.app.Activity
+import android.content.Context
+import android.util.Log
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -11,9 +17,11 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import com.darkblue.minimalisttodolistv4.util.changeEnabledComponent
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.CheckCircle
 import androidx.compose.material.icons.outlined.RadioButtonUnchecked
@@ -23,6 +31,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -30,17 +39,26 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.darkblue.minimalisttodolistv4.R
 import com.darkblue.minimalisttodolistv4.data.model.ClockType
 import com.darkblue.minimalisttodolistv4.data.model.RecurrenceType
 import com.darkblue.minimalisttodolistv4.data.model.SortType
 import com.darkblue.minimalisttodolistv4.data.model.ThemeType
 import com.darkblue.minimalisttodolistv4.ui.components.CustomBox
 import com.darkblue.minimalisttodolistv4.ui.components.CustomDropdownMenu
+import com.darkblue.minimalisttodolistv4.util.darkIcon
+import com.darkblue.minimalisttodolistv4.util.enableDarkIcon
+import com.darkblue.minimalisttodolistv4.util.enableLightIcon
+import com.darkblue.minimalisttodolistv4.util.getActivity
+import com.darkblue.minimalisttodolistv4.util.lightIcon
 import com.darkblue.minimalisttodolistv4.viewmodel.AppEvent
 import com.darkblue.minimalisttodolistv4.viewmodel.DataStoreViewModel
 import com.darkblue.minimalisttodolistv4.viewmodel.TaskEvent
@@ -57,6 +75,7 @@ fun MenuDialog(
     onAppEvent: (AppEvent) -> Unit
 ) {
     LocalConfiguration.current.screenWidthDp
+    val context = LocalContext.current
     BasicAlertDialog(
         onDismissRequest = {
             onAppEvent(AppEvent.HideMenuDialog)
@@ -97,6 +116,7 @@ fun MenuDialog(
                         }
                         .padding(bottom = 24.dp)
                 )
+                AppIconSelector(context = context)
 //                Text(
 //                    text = "Notification",
 //                    modifier = Modifier
@@ -123,6 +143,68 @@ fun MenuDialog(
                 )
             }
         }
+    }
+}
+
+@Composable
+fun AppIconSelector(modifier: Modifier = Modifier, context: Context) {
+    var expanded by remember { mutableStateOf(false) }
+
+    Text(
+        text = "App Icon",
+        style = MaterialTheme.typography.bodyLarge,
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { expanded = true },
+    )
+
+    CustomDropdownMenu(
+        expanded = expanded,
+        onDismissRequest = {
+            expanded = false
+        },
+    ) {
+        Row(
+            modifier = Modifier
+                .padding(start = 12.dp, end = 12.dp, top = 4.dp, bottom = 4.dp),
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            IconPreview(isLightIcon = true, onClick = { lightIcon(context) })
+            IconPreview(isLightIcon = false, onClick = { darkIcon(context) })
+        }
+    }
+
+    Spacer(modifier = Modifier.size(width = 0.dp, height = 24.dp))
+}
+@Composable
+fun IconPreview(isLightIcon: Boolean, onClick: () -> Unit) {
+    val iconResId = if (isLightIcon) {
+        R.drawable.logo_light
+    } else {
+        R.drawable.logo_dark
+    }
+
+    val backgroundColor = if (isLightIcon) {
+        Color.White
+    } else {
+        Color.Black
+    }
+
+    Box(
+        modifier = Modifier
+            .shadow(8.dp, RoundedCornerShape(16.dp))
+            .background(backgroundColor, RoundedCornerShape(16.dp))
+            .border(BorderStroke(2.dp, Color.Gray), RoundedCornerShape(16.dp))
+            .clickable {
+                onClick()
+            },
+        contentAlignment = Alignment.Center
+    ) {
+        Image(
+            painter = painterResource(id = iconResId),
+            contentDescription = null, // Provide a content description if necessary
+            modifier = Modifier.size(80.dp)
+        )
     }
 }
 

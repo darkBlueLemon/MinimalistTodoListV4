@@ -53,6 +53,8 @@ import com.darkblue.minimalisttodolistv4.ui.theme.MinimalistTodoListV4Theme
 import com.darkblue.minimalisttodolistv4.util.NotificationHelper
 import com.darkblue.minimalisttodolistv4.util.PermissionManager
 import com.darkblue.minimalisttodolistv4.util.changeEnabledComponent
+import com.darkblue.minimalisttodolistv4.util.enableDarkIcon
+import com.darkblue.minimalisttodolistv4.util.enableLightIcon
 import com.darkblue.minimalisttodolistv4.viewmodel.AppViewModelFactory
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -152,11 +154,6 @@ class MainActivity : ComponentActivity() {
                 }
             }
 
-//            changeEnabledComponent(
-//                disabled = "$packageName.MainActivityAlias",
-//                enabled = "$packageName.MainActivity"
-//            )
-
             MinimalistTodoListV4Theme(
                 darkTheme = darkTheme,
                 fontFamilyType = fontFamilyType,
@@ -168,24 +165,6 @@ class MainActivity : ComponentActivity() {
                     dataStoreViewModel = dataStoreViewModel,
                     appViewModel = appViewModel
                 )
-//                Row {
-//                    Button(onClick = {
-//                        changeEnabledComponent(
-//                            enabled = "$packageName.MainActivityAlias",
-//                            disabled = "$packageName.MainActivity"
-//                        )
-//                    }) {
-//                        Text(text = "light icon")
-//                    }
-//                    Button(onClick = {
-//                        changeEnabledComponent(
-//                            disabled = "$packageName.MainActivityAlias",
-//                            enabled = "$packageName.MainActivity"
-//                        )
-//                    }) {
-//                        Text(text = "dark icon")
-//                    }
-//                }
             }
         }
     }
