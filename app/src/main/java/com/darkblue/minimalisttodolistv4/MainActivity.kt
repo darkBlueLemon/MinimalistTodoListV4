@@ -31,6 +31,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -48,6 +49,7 @@ import com.darkblue.minimalisttodolistv4.ui.theme.MinimalistTodoListV4Theme
 import com.darkblue.minimalisttodolistv4.util.NotificationHelper
 import com.darkblue.minimalisttodolistv4.util.PermissionManager
 import com.darkblue.minimalisttodolistv4.viewmodel.AppViewModelFactory
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
@@ -93,6 +95,8 @@ class MainActivity : ComponentActivity() {
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        installSplashScreen()
 
         // Setting Status Bar and Navigation Bar to be Transparent
         enableEdgeToEdge(
