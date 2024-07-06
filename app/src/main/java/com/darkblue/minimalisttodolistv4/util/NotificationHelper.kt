@@ -88,13 +88,12 @@ class NotificationHelper(private val context: Context) {
         )
 
         val notification = NotificationCompat.Builder(context, channelId)
-            // Set a different icon
-            .setSmallIcon(R.drawable.ic_launcher_foreground)
+            .setSmallIcon(R.drawable.logo_dark)
             .setContentTitle(taskTitle)
             .setContentText("Your task is due now")
             .setPriority(NotificationCompat.PRIORITY_HIGH)
-            .addAction(R.drawable.ic_launcher_foreground, "Complete", completePendingIntent)
-            .addAction(R.drawable.ic_launcher_foreground, "Snooze", snoozePendingIntent)
+            .addAction(R.drawable.logo_dark, "Complete", completePendingIntent)
+            .addAction(R.drawable.logo_dark, "Snooze", snoozePendingIntent)
             .setAutoCancel(true)
             .build()
 
