@@ -1,6 +1,7 @@
 package com.darkblue.minimalisttodolistv4.viewmodel
 
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -70,32 +71,41 @@ class TaskViewModel(
     @RequiresApi(Build.VERSION_CODES.O)
     fun onEvent(event: TaskEvent) {
         when (event) {
-            is TaskEvent.SaveTask -> saveTask()
-            is TaskEvent.SetTitle -> updateState { it.copy(title = event.title) }
-            is TaskEvent.SetPriority -> updateState { it.copy(priority = event.priority) }
-            is TaskEvent.SetNote -> updateState { it.copy(note = event.note) }
+            is TaskEvent.DeleteTask -> handleDeleteTask(event.task)
+            TaskEvent.SaveTask -> handleSaveTask()
+            is TaskEvent.SetTitle -> _state.update { it.copy(title = event.title) }
+            is TaskEvent.SetPriority -> _state.update { it.copy(priority = event.priority) }
+            is TaskEvent.SetNote -> _state.update { it.copy(note = event.note) }
             is TaskEvent.SortTasks -> _sortType.value = event.sortType
-            is TaskEvent.SetRecurrenceType -> updateState { it.copy(recurrenceType = event.recurrenceType) }
-            is TaskEvent.EditTask -> editTask(event.task)
+            is TaskEvent.SetRecurrenceType -> _state.update { it.copy(recurrenceType = event.recurrenceType) }
+            is TaskEvent.EditTask -> handleEditTask(event.task)
             is TaskEvent.SetRecurrenceFilter -> _recurrenceFilter.value = event.recurrenceType
-            is TaskEvent.ShowDatePicker -> updateState { it.copy(isDatePickerVisible = true) }
-            is TaskEvent.HideDatePicker -> updateState { it.copy(isDatePickerVisible = false) }
-            is TaskEvent.SetDueDate -> updateState { it.copy(dueDateOnly = event.dueDate).also(::combineDateAndTime) }
-            is TaskEvent.ShowTimePicker -> updateState { it.copy(isTimePickerVisible = true) }
-            is TaskEvent.HideTimePicker -> updateState { it.copy(isTimePickerVisible = false) }
-            is TaskEvent.SetDueTime -> updateState { it.copy(dueTimeOnly = event.dueTime).also(::combineDateAndTime) }
-            is TaskEvent.DeleteTask -> deleteTask(event.task)
-            is TaskEvent.DeleteForever -> deleteForever(event.deletedTask)
-            is TaskEvent.UndoDeleteTask -> undoDeleteTask(event.deletedTask)
-            is TaskEvent.ShowAddTaskDialog -> showAddTaskDialog()
-            is TaskEvent.HideAddTaskDialog -> hideAddTaskDialog()
-            is TaskEvent.DeleteAllHistoryTasks -> deleteAllHistoryTasks()
-            is TaskEvent.RefreshTasks -> reloadTasks()
+            TaskEvent.ShowDatePicker -> _state.update { it.copy(isDatePickerVisible = true) }
+            TaskEvent.HideDatePicker -> _state.update { it.copy(isDatePickerVisible = false) }
+            is TaskEvent.SetDueDate -> handleSetDueDate(event.dueDate)
+            TaskEvent.ShowTimePicker -> _state.update { it.copy(isTimePickerVisible = true) }
+            TaskEvent.HideTimePicker -> _state.update { it.copy(isTimePickerVisible = false) }
+            is TaskEvent.SetDueTime -> handleSetDueTime(event.dueTime)
+            is TaskEvent.DeleteForever -> handleDeleteForever(event.deletedTask)
+            is TaskEvent.UndoDeleteTask -> handleUndoDeleteTask(event.deletedTask)
+            TaskEvent.ShowAddTaskDialog -> _state.update { it.copy(isAddTaskDialogVisible = true) }
+            TaskEvent.HideAddTaskDialog -> resetAddTaskDialog()
+            TaskEvent.DeleteAllHistoryTasks -> viewModelScope.launch { dao.deleteAllDeletedTasks() }
+            TaskEvent.RefreshTasks -> reloadTasks()
+        }
+    }
+
+    private fun handleDeleteTask(task: Task) {
+        viewModelScope.launch {
+            delay(500)
+            notificationHelper.cancelNotification(task.id.toInt())
+            dao.deleteTask(task)
+            dao.insertDeletedTask(task.toDeletedTask())
         }
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    private fun saveTask() {
+    private fun handleSaveTask() {
         val currentState = state.value
         if (currentState.title.isBlank()) return
 
@@ -114,11 +124,11 @@ class TaskViewModel(
             savedTask?.let { notificationHelper.scheduleNotification(it) }
         }
 
-        resetAddTaskDialogState()
+        resetAddTaskDialog()
     }
 
-    private fun editTask(task: Task) {
-        updateState {
+    private fun handleEditTask(task: Task) {
+        _state.update {
             it.copy(
                 title = task.title,
                 priority = task.priority,
@@ -131,23 +141,32 @@ class TaskViewModel(
         }
     }
 
-    private fun deleteTask(task: Task) {
-        viewModelScope.launch {
-            delay(500)
-            notificationHelper.cancelNotification(task.id.toInt())
-            dao.deleteTask(task)
-            dao.insertDeletedTask(task.toDeletedTask())
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun handleSetDueDate(dueDate: LocalDate) {
+        _state.update {
+            it.copy(dueDateOnly = dueDate).also { updatedState ->
+                combineDateAndTime(updatedState)
+            }
         }
     }
 
-    private fun deleteForever(deletedTask: DeletedTask) {
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun handleSetDueTime(dueTime: LocalTime) {
+        _state.update {
+            it.copy(dueTimeOnly = dueTime).also { updatedState ->
+                combineDateAndTime(updatedState)
+            }
+        }
+    }
+
+    private fun handleDeleteForever(deletedTask: DeletedTask) {
         viewModelScope.launch {
             delay(500)
             dao.deleteDeletedTask(deletedTask)
         }
     }
 
-    private fun undoDeleteTask(deletedTask: DeletedTask) {
+    private fun handleUndoDeleteTask(deletedTask: DeletedTask) {
         viewModelScope.launch {
             delay(500)
             val restoredTask = deletedTask.toTask()
@@ -156,12 +175,8 @@ class TaskViewModel(
         }
     }
 
-    private fun showAddTaskDialog() {
-        updateState { it.copy(isAddTaskDialogVisible = true) }
-    }
-
-    private fun hideAddTaskDialog() {
-        updateState {
+    private fun resetAddTaskDialog() {
+        _state.update {
             it.copy(
                 isAddTaskDialogVisible = false,
                 title = "",
@@ -173,12 +188,6 @@ class TaskViewModel(
                 nextDueDate = null,
                 editingTaskId = null
             )
-        }
-    }
-
-    private fun deleteAllHistoryTasks() {
-        viewModelScope.launch {
-            dao.deleteAllDeletedTasks()
         }
     }
 
@@ -193,30 +202,27 @@ class TaskViewModel(
                         SortType.ALPHABETICAL_REV -> dao.getTasksOrderedAlphabeticallyRev()
                         SortType.DUE_DATE -> dao.getTasksSortedByDueDate()
                         SortType.PRIORITY -> dao.getTasksSortedByPriority()
-                    }.map { tasks -> tasks.filter { it.recurrenceType == recurrenceType || recurrenceType == RecurrenceType.NONE } }
-                }.collect { tasks ->
+                    }.map { tasks ->
+                        tasks.filter { task ->
+                            recurrenceType == RecurrenceType.NONE || task.recurrenceType == recurrenceType
+                        }
+                    }
+                }
+                .collect { tasks ->
                     _tasks.value = tasks
                 }
         }
     }
 
-    private fun updateState(update: (TaskState) -> TaskState) {
-        _state.value = update(_state.value)
-    }
-
-    private fun resetAddTaskDialogState() {
-        updateState {
-            it.copy(
-                isAddTaskDialogVisible = false,
-                title = "",
-                priority = 0,
-                note = "",
-                dueDate = null,
-                dueTimeOnly = null,
-                recurrenceType = RecurrenceType.NONE,
-                nextDueDate = null,
-                editingTaskId = null
-            )
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun combineDateAndTime(state: TaskState) {
+        val date = state.dueDateOnly
+        val time = state.dueTimeOnly
+        if (date != null) {
+            val combinedDateTime = if (time != null) date.atTime(time) else date.atStartOfDay()
+            _state.update {
+                it.copy(dueDate = combinedDateTime.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli())
+            }
         }
     }
 
@@ -241,28 +247,6 @@ class TaskViewModel(
             dueDate = this.dueDate,
             recurrenceType = this.recurrenceType,
         )
-    }
-
-    @RequiresApi(Build.VERSION_CODES.O)
-    private fun combineDateAndTime(state: TaskState) {
-        val date = state.dueDateOnly
-        val time = state.dueTimeOnly
-        if (date != null && time != null) {
-            val dueDateTime = ZonedDateTime.of(date, time, ZoneId.systemDefault())
-            val nextDueDate = calculateNextDueDate(dueDateTime, state.recurrenceType)
-            updateState { it.copy(dueDate = dueDateTime.toInstant().toEpochMilli(), nextDueDate = nextDueDate) }
-        }
-    }
-
-    @RequiresApi(Build.VERSION_CODES.O)
-    private fun calculateNextDueDate(dueDateTime: ZonedDateTime, recurrenceType: RecurrenceType): Long? {
-        return when (recurrenceType) {
-            RecurrenceType.DAILY -> dueDateTime.plusDays(1).toInstant().toEpochMilli()
-            RecurrenceType.WEEKLY -> dueDateTime.plusWeeks(1).toInstant().toEpochMilli()
-            RecurrenceType.MONTHLY -> dueDateTime.plusMonths(1).toInstant().toEpochMilli()
-            RecurrenceType.YEARLY -> dueDateTime.plusYears(1).toInstant().toEpochMilli()
-            else -> null
-        }
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
