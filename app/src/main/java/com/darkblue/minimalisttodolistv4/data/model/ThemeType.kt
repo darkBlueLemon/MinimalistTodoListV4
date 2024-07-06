@@ -5,14 +5,11 @@ enum class ThemeType(val displayName: String) {
     LIGHT("Light"),
     AUTO("Auto");
 
-
     companion object {
         fun fromDisplayName(displayName: String): ThemeType {
             return entries.firstOrNull { it.displayName == displayName } ?: LIGHT
         }
     }
 
-    fun toDisplayString(): String {
-        return displayName
-    }
+    fun toDisplayString(): String = displayName
 }

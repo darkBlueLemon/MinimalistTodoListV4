@@ -17,24 +17,42 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 class DataStoreViewModel(private val appPreferences: AppPreferences) : ViewModel() {
-    val theme: StateFlow<ThemeType> = appPreferences.theme.map { ThemeType.fromDisplayName(it) }.stateIn(viewModelScope, SharingStarted.Eagerly, ThemeType.DARK)
-    val clockType: StateFlow<ClockType> = appPreferences.clockType.map { ClockType.fromDisplayName(it) }.stateIn(viewModelScope, SharingStarted.Eagerly, ClockType.TWENTY_FOUR_HOUR)
-    val fontFamily: StateFlow<FontFamilyType> = appPreferences.fontFamily.map { FontFamilyType.fromDisplayName(it) }.stateIn(viewModelScope, SharingStarted.Eagerly, FontFamilyType.DEFAULT)
-    val fontSize: StateFlow<Int> = appPreferences.fontSize.stateIn(viewModelScope, SharingStarted.Eagerly, 16)
-    val fontWeight: StateFlow<FontWeight> = appPreferences.fontWeight.map { fontWeightFromDisplayName(it) }.stateIn(viewModelScope, SharingStarted.Eagerly, FontWeight.Normal)
-    val priorityOption: StateFlow<SortType> = appPreferences.priorityOption.map { SortType.fromDisplayName(it) }.stateIn(viewModelScope, SharingStarted.Eagerly, SortType.PRIORITY)
-    val recurrenceFilter: StateFlow<RecurrenceType> = appPreferences.recurrenceFilter.map { RecurrenceType.fromDisplayName(it) }.stateIn(viewModelScope, SharingStarted.Eagerly, RecurrenceType.NONE)
+    val theme: StateFlow<ThemeType> = appPreferences.theme
+        .map { it }
+        .stateIn(viewModelScope, SharingStarted.Eagerly, ThemeType.DARK)
 
+    val clockType: StateFlow<ClockType> = appPreferences.clockType
+        .map { it }
+        .stateIn(viewModelScope, SharingStarted.Eagerly, ClockType.TWENTY_FOUR_HOUR)
+
+    val fontFamily: StateFlow<FontFamilyType> = appPreferences.fontFamily
+        .map { it }
+        .stateIn(viewModelScope, SharingStarted.Eagerly, FontFamilyType.DEFAULT)
+
+    val fontSize: StateFlow<Int> = appPreferences.fontSize
+        .stateIn(viewModelScope, SharingStarted.Eagerly, 16)
+
+    val fontWeight: StateFlow<FontWeight> = appPreferences.fontWeight
+        .map { fontWeightFromDisplayName(it) }
+        .stateIn(viewModelScope, SharingStarted.Eagerly, FontWeight.Normal)
+
+    val priorityOption: StateFlow<SortType> = appPreferences.priorityOption
+        .map { it }
+        .stateIn(viewModelScope, SharingStarted.Eagerly, SortType.PRIORITY)
+
+    val recurrenceFilter: StateFlow<RecurrenceType> = appPreferences.recurrenceFilter
+        .map { it }
+        .stateIn(viewModelScope, SharingStarted.Eagerly, RecurrenceType.NONE)
     fun saveTheme(themeType: ThemeType) {
-        viewModelScope.launch { appPreferences.saveTheme(themeType.toDisplayString()) }
+        viewModelScope.launch { appPreferences.saveTheme(themeType) }
     }
 
     fun saveClockType(clockType: ClockType) {
-        viewModelScope.launch { appPreferences.saveClockType(clockType.toDisplayString()) }
+        viewModelScope.launch { appPreferences.saveClockType(clockType) }
     }
 
     fun saveFontFamily(fontFamilyType: FontFamilyType) {
-        viewModelScope.launch { appPreferences.saveFontFamily(fontFamilyType.toDisplayString()) }
+        viewModelScope.launch { appPreferences.saveFontFamily(fontFamilyType) }
     }
 
     fun saveFontSize(fontSize: Int) {
@@ -46,11 +64,11 @@ class DataStoreViewModel(private val appPreferences: AppPreferences) : ViewModel
     }
 
     fun savePriorityOption(priority: SortType) {
-        viewModelScope.launch { appPreferences.savePriority(priority.toDisplayString()) }
+        viewModelScope.launch { appPreferences.savePriority(priority)}
     }
 
     fun saveRecurrenceFilter(recurrenceFilter: RecurrenceType) {
-        viewModelScope.launch { appPreferences.saveRecurrence(recurrenceFilter.toDisplayString()) }
+        viewModelScope.launch { appPreferences.saveRecurrence(recurrenceFilter) }
     }
 
     private fun fontWeightFromDisplayName(displayName: String): FontWeight {

@@ -7,10 +7,15 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
+import com.darkblue.minimalisttodolistv4.data.model.ClockType
+import com.darkblue.minimalisttodolistv4.data.model.FontFamilyType
+import com.darkblue.minimalisttodolistv4.data.model.RecurrenceType
+import com.darkblue.minimalisttodolistv4.data.model.SortType
+import com.darkblue.minimalisttodolistv4.data.model.ThemeType
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
-const val PREFERENCES_NAME = "settings"
+private const val PREFERENCES_NAME = "settings"
 
 class AppPreferences private constructor(context: Context) {
     private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = PREFERENCES_NAME)
@@ -19,7 +24,6 @@ class AppPreferences private constructor(context: Context) {
     companion object {
         @Volatile
         private var INSTANCE: AppPreferences? = null
-
         fun getInstance(context: Context): AppPreferences {
             return INSTANCE ?: synchronized(this) {
                 INSTANCE ?: AppPreferences(context).also { INSTANCE = it }
@@ -27,52 +31,85 @@ class AppPreferences private constructor(context: Context) {
         }
     }
 
-    private val THEME_KEY = stringPreferencesKey("theme")
-    private val CLOCK_TYPE_KEY = stringPreferencesKey("clockType")
-    private val POST_NOTIFICATION_DENIAL_COUNT = intPreferencesKey("post_notification_denial_count")
-    private val FONT_FAMILY_KEY = stringPreferencesKey("fontFamily")
-    private val FONT_SIZE_KEY = intPreferencesKey("fontSize")
-    private val FONT_WEIGHT_KEY = stringPreferencesKey("fontWeight")
-    private val SORTING_OPTION_KEY = stringPreferencesKey("sorting_option")
-    private val RECCURENCE_FILTER_KEY = stringPreferencesKey("recurrence_option")
-
-    val theme: Flow<String> = dataStore.data.map { preferences -> preferences[THEME_KEY] ?: "Dark" }
-    val clockType: Flow<String> = dataStore.data.map { preferences -> preferences[CLOCK_TYPE_KEY] ?: "12" }
-    val postNotificationDenialCount: Flow<Int> = dataStore.data.map { preferences -> preferences[POST_NOTIFICATION_DENIAL_COUNT] ?: 0 }
-    val fontFamily: Flow<String> = dataStore.data.map { preferences -> preferences[FONT_FAMILY_KEY] ?: "Default" }
-    val fontSize: Flow<Int> = dataStore.data.map { preferences -> preferences[FONT_SIZE_KEY] ?: 16 }
-    val fontWeight: Flow<String> = dataStore.data.map { preferences -> preferences[FONT_WEIGHT_KEY] ?: "Normal" }
-    val priorityOption: Flow<String> = dataStore.data.map { preferences ->  preferences[SORTING_OPTION_KEY] ?: "Priority" }
-    val recurrenceFilter: Flow<String> = dataStore.data.map { preferences ->  preferences[RECCURENCE_FILTER_KEY] ?: "Show All" }
-
-    suspend fun saveTheme(theme: String) {
-        dataStore.edit { preferences -> preferences[THEME_KEY] = theme }
+    private object PreferencesKeys {
+        val THEME = stringPreferencesKey("theme")
+        val CLOCK_TYPE = stringPreferencesKey("clockType")
+        val POST_NOTIFICATION_DENIAL_COUNT = intPreferencesKey("post_notification_denial_count")
+        val FONT_FAMILY = stringPreferencesKey("fontFamily")
+        val FONT_SIZE = intPreferencesKey("fontSize")
+        val FONT_WEIGHT = stringPreferencesKey("fontWeight")
+        val SORTING_OPTION = stringPreferencesKey("sorting_option")
+        val RECURRENCE_FILTER = stringPreferencesKey("recurrence_option")
     }
-    suspend fun saveClockType(clockType: String) {
-        dataStore.edit { preferences -> preferences[CLOCK_TYPE_KEY] = clockType }
+
+    val theme: Flow<ThemeType> = dataStore.data.map { preferences ->
+        ThemeType.fromDisplayName(preferences[PreferencesKeys.THEME] ?: ThemeType.DARK.displayName)
     }
+
+    val clockType: Flow<ClockType> = dataStore.data.map { preferences ->
+        ClockType.fromDisplayName(preferences[PreferencesKeys.CLOCK_TYPE] ?: ClockType.TWELVE_HOUR.displayName)
+    }
+
+    val postNotificationDenialCount: Flow<Int> = dataStore.data.map { preferences ->
+        preferences[PreferencesKeys.POST_NOTIFICATION_DENIAL_COUNT] ?: 0
+    }
+
+    val fontFamily: Flow<FontFamilyType> = dataStore.data.map { preferences ->
+        FontFamilyType.fromDisplayName(preferences[PreferencesKeys.FONT_FAMILY] ?: FontFamilyType.DEFAULT.displayName)
+    }
+
+    val fontSize: Flow<Int> = dataStore.data.map { preferences ->
+        preferences[PreferencesKeys.FONT_SIZE] ?: 16
+    }
+
+    val fontWeight: Flow<String> = dataStore.data.map { preferences ->
+        preferences[PreferencesKeys.FONT_WEIGHT] ?: "Normal"
+    }
+
+    val priorityOption: Flow<SortType> = dataStore.data.map { preferences ->
+        SortType.fromDisplayName(preferences[PreferencesKeys.SORTING_OPTION] ?: SortType.PRIORITY.displayName)
+    }
+
+    val recurrenceFilter: Flow<RecurrenceType> = dataStore.data.map { preferences ->
+        RecurrenceType.fromDisplayName(preferences[PreferencesKeys.RECURRENCE_FILTER] ?: RecurrenceType.NONE.displayName)
+    }
+
+    suspend fun saveTheme(theme: ThemeType) {
+        dataStore.edit { preferences -> preferences[PreferencesKeys.THEME] = theme.displayName }
+    }
+
+    suspend fun saveClockType(clockType: ClockType) {
+        dataStore.edit { preferences -> preferences[PreferencesKeys.CLOCK_TYPE] = clockType.displayName }
+    }
+
     suspend fun incrementPostNotificationDenialCount() {
         dataStore.edit { preferences ->
-            val currentCount = preferences[POST_NOTIFICATION_DENIAL_COUNT] ?: 0
-            preferences[POST_NOTIFICATION_DENIAL_COUNT] = currentCount + 1
+            val currentCount = preferences[PreferencesKeys.POST_NOTIFICATION_DENIAL_COUNT] ?: 0
+            preferences[PreferencesKeys.POST_NOTIFICATION_DENIAL_COUNT] = currentCount + 1
         }
     }
+
     suspend fun resetPostNotificationDenialCount() {
-        dataStore.edit { preferences -> preferences[POST_NOTIFICATION_DENIAL_COUNT] = 0 }
+        dataStore.edit { preferences -> preferences[PreferencesKeys.POST_NOTIFICATION_DENIAL_COUNT] = 0 }
     }
-    suspend fun saveFontFamily(fontFamily: String) {
-        dataStore.edit { preferences -> preferences[FONT_FAMILY_KEY] = fontFamily }
+
+    suspend fun saveFontFamily(fontFamily: FontFamilyType) {
+        dataStore.edit { preferences -> preferences[PreferencesKeys.FONT_FAMILY] = fontFamily.displayName }
     }
+
     suspend fun saveFontSize(fontSize: Int) {
-        dataStore.edit { preferences -> preferences[FONT_SIZE_KEY] = fontSize }
+        dataStore.edit { preferences -> preferences[PreferencesKeys.FONT_SIZE] = fontSize }
     }
+
     suspend fun saveFontWeight(fontWeight: String) {
-        dataStore.edit { preferences -> preferences[FONT_WEIGHT_KEY] = fontWeight }
+        dataStore.edit { preferences -> preferences[PreferencesKeys.FONT_WEIGHT] = fontWeight }
     }
-    suspend fun savePriority(priority: String) {
-        dataStore.edit { preferences -> preferences[SORTING_OPTION_KEY] = priority }
+
+    suspend fun savePriority(priority: SortType) {
+        dataStore.edit { preferences -> preferences[PreferencesKeys.SORTING_OPTION] = priority.displayName }
     }
-    suspend fun saveRecurrence(recurrenceFilter: String) {
-        dataStore.edit { preferences -> preferences[RECCURENCE_FILTER_KEY] = recurrenceFilter }
+
+    suspend fun saveRecurrence(recurrenceFilter: RecurrenceType) {
+        dataStore.edit { preferences -> preferences[PreferencesKeys.RECURRENCE_FILTER] = recurrenceFilter.displayName }
     }
 }

@@ -1,9 +1,9 @@
 package com.darkblue.minimalisttodolistv4.viewmodel
 
 import android.os.Build
-import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.darkblue.minimalisttodolistv4.util.NotificationHelper
 import com.darkblue.minimalisttodolistv4.data.model.DeletedTask
@@ -20,6 +20,7 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.ZoneId
+import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -27,13 +28,13 @@ class TaskViewModel(
     private val dao: TaskDao,
     private val notificationHelper: NotificationHelper,
     private val dataStoreViewModel: DataStoreViewModel
-): ViewModel() {
+) : ViewModel() {
 
     private val _sortType = MutableStateFlow(SortType.PRIORITY)
     private val _recurrenceFilter = MutableStateFlow(RecurrenceType.NONE)
     private val _tasks = MutableStateFlow<List<Task>>(emptyList())
-
     private val _state = MutableStateFlow(TaskState())
+
     val state = combine(_state, _sortType, _recurrenceFilter, _tasks) { state, sortType, recurrenceType, tasks ->
         state.copy(
             tasks = tasks,
@@ -45,240 +46,139 @@ class TaskViewModel(
     private val _deletedTasks = MutableStateFlow<List<DeletedTask>>(emptyList())
     val deletedTasks: StateFlow<List<DeletedTask>> = _deletedTasks
 
-    init {
-        // Initialize _sortType and _recurrenceFilter from dataStoreViewModel
-        viewModelScope.launch {
-            dataStoreViewModel.priorityOption.collect { priorityOption ->
-                _sortType.value = priorityOption
-            }
-        }
-        viewModelScope.launch {
-            dataStoreViewModel.recurrenceFilter.collect { recurrenceFilter ->
-                _recurrenceFilter.value = recurrenceFilter
-            }
-        }
+   init {
+       initializeDataStore()
+       observeDeletedTasks()
+       reloadTasks()
+   }
 
+    private fun initializeDataStore() {
         viewModelScope.launch {
-            dao.getDeletedTasks().collect { deletedTasks ->
-                _deletedTasks.value = deletedTasks
-            }
+            dataStoreViewModel.priorityOption.collect { _sortType.value = it }
         }
-        reloadTasks()
+        viewModelScope.launch {
+            dataStoreViewModel.recurrenceFilter.collect { _recurrenceFilter.value = it }
+        }
+    }
+
+    private fun observeDeletedTasks() {
+        viewModelScope.launch {
+            dao.getDeletedTasks().collect { _deletedTasks.value = it }
+        }
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
     fun onEvent(event: TaskEvent) {
-        when(event) {
-            is TaskEvent.DeleteTask -> {
-                viewModelScope.launch {
-                    val task = event.task
-                    delay(500)
-                    notificationHelper.cancelNotification(event.task.id.toInt())
-                    dao.deleteTask(task)
-                    Log.d("TAG", task.id.toString())
-                    dao.insertDeletedTask(
-                        DeletedTask(
-                            title = task.title,
-                            priority = task.priority,
-                            note = task.note,
-                            dueDate = task.dueDate,
-                            recurrenceType = task.recurrenceType,
-//                            nextDueDate = task.notificationTime,
-                            deletedAt = System.currentTimeMillis()
-                        )
-                    )
+        when (event) {
+            is TaskEvent.SaveTask -> saveTask()
+            is TaskEvent.SetTitle -> updateState { it.copy(title = event.title) }
+            is TaskEvent.SetPriority -> updateState { it.copy(priority = event.priority) }
+            is TaskEvent.SetNote -> updateState { it.copy(note = event.note) }
+            is TaskEvent.SortTasks -> _sortType.value = event.sortType
+            is TaskEvent.SetRecurrenceType -> updateState { it.copy(recurrenceType = event.recurrenceType) }
+            is TaskEvent.EditTask -> editTask(event.task)
+            is TaskEvent.SetRecurrenceFilter -> _recurrenceFilter.value = event.recurrenceType
+            is TaskEvent.ShowDatePicker -> updateState { it.copy(isDatePickerVisible = true) }
+            is TaskEvent.HideDatePicker -> updateState { it.copy(isDatePickerVisible = false) }
+            is TaskEvent.SetDueDate -> updateState { it.copy(dueDateOnly = event.dueDate).also(::combineDateAndTime) }
+            is TaskEvent.ShowTimePicker -> updateState { it.copy(isTimePickerVisible = true) }
+            is TaskEvent.HideTimePicker -> updateState { it.copy(isTimePickerVisible = false) }
+            is TaskEvent.SetDueTime -> updateState { it.copy(dueTimeOnly = event.dueTime).also(::combineDateAndTime) }
+            is TaskEvent.DeleteTask -> deleteTask(event.task)
+            is TaskEvent.DeleteForever -> deleteForever(event.deletedTask)
+            is TaskEvent.UndoDeleteTask -> undoDeleteTask(event.deletedTask)
+            is TaskEvent.ShowAddTaskDialog -> showAddTaskDialog()
+            is TaskEvent.HideAddTaskDialog -> hideAddTaskDialog()
+            is TaskEvent.DeleteAllHistoryTasks -> deleteAllHistoryTasks()
+            is TaskEvent.RefreshTasks -> reloadTasks()
+        }
+    }
 
-                    // Emit new value to _tasks after deletion
-//                    reloadTasks()
-                }
-            }
-            TaskEvent.SaveTask -> {
-                val title = state.value.title
-                val priority = state.value.priority
-                val note = state.value.note
-                val dueDate = state.value.dueDate
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun saveTask() {
+        val currentState = state.value
+        if (currentState.title.isBlank()) return
 
-                val recurrenceType = state.value.recurrenceType
-//                val nextDueDate = calculateNextDueDate(dueDate, recurrenceType)
+        val task = Task(
+            id = currentState.editingTaskId ?: 0,
+            title = currentState.title,
+            priority = currentState.priority,
+            note = currentState.note,
+            dueDate = currentState.dueDate,
+            recurrenceType = currentState.recurrenceType
+        )
 
-                val id = state.value.editingTaskId
+        viewModelScope.launch {
+            val taskId = dao.upsertTask(task)
+            val savedTask = dao.getTaskById(if (taskId.toInt() == -1) currentState.editingTaskId!! else taskId.toInt())
+            savedTask?.let { notificationHelper.scheduleNotification(it) }
+        }
 
-                if(title.isBlank()) {
-                    return
-                }
+        resetAddTaskDialogState()
+    }
 
-                val task = Task(
-                    id = id ?: 0,
-                    title = title,
-                    priority = priority,
-                    note = note,
-                    dueDate = dueDate,
-                    recurrenceType = recurrenceType,
-//                    notificationTime = nextDueDate
-                )
+    private fun editTask(task: Task) {
+        updateState {
+            it.copy(
+                title = task.title,
+                priority = task.priority,
+                note = task.note,
+                dueDate = task.dueDate,
+                recurrenceType = task.recurrenceType,
+                isAddTaskDialogVisible = true,
+                editingTaskId = task.id
+            )
+        }
+    }
 
-                viewModelScope.launch {
-                    val taskId = dao.upsertTask(task)
-                    val savedTask = if (taskId.toInt() == -1) dao.getTaskById(id!!) else dao.getTaskById(taskId.toInt())
-//                    Log.d("TAG", savedTask!!.title)
-                    Log.d("TAG", id.toString())
-                    savedTask?.let {
-                        notificationHelper.scheduleNotification(it)
-                    }
+    private fun deleteTask(task: Task) {
+        viewModelScope.launch {
+            delay(500)
+            notificationHelper.cancelNotification(task.id.toInt())
+            dao.deleteTask(task)
+            dao.insertDeletedTask(task.toDeletedTask())
+        }
+    }
 
-                    // Emit new value to _tasks after saving
-//                    reloadTasks()
-                }
-                _state.update {
-                    it.copy(
-                        isAddTaskDialogVisible = false,
-                        title = "",
-                        priority = 0,
-                        note = "",
-                        dueDate = null,
-                        dueTimeOnly = null,
-                        recurrenceType = RecurrenceType.NONE,
-                        nextDueDate = null,
-                        editingTaskId = null
-                    )
-                }
-            }
-            is TaskEvent.SetTitle -> {
-                _state.update { it.copy(
-                    title = event.title
-                ) }
-            }
-            is TaskEvent.SetPriority -> {
-                _state.update { it.copy(
-                    priority = event.priority
-                ) }
-            }
-            is TaskEvent.SetNote -> {
-                _state.update { it.copy(
-                    note = event.note
-                ) }
-            }
-            is TaskEvent.SortTasks -> {
-                _sortType.value = event.sortType
-            }
+    private fun deleteForever(deletedTask: DeletedTask) {
+        viewModelScope.launch {
+            delay(500)
+            dao.deleteDeletedTask(deletedTask)
+        }
+    }
 
-            // Recurrence
-            is TaskEvent.SetRecurrenceType -> {
-                _state.update { it.copy(recurrenceType = event.recurrenceType) }
-            }
+    private fun undoDeleteTask(deletedTask: DeletedTask) {
+        viewModelScope.launch {
+            delay(500)
+            val restoredTask = deletedTask.toTask()
+            dao.upsertTask(restoredTask)
+            dao.deleteDeletedTask(deletedTask)
+        }
+    }
 
-            // Editing
-            is TaskEvent.EditTask -> {
-                _state.update {
-                    it.copy(
-                        title = event.task.title,
-                        priority = event.task.priority,
-                        note = event.task.note,
-                        dueDate = event.task.dueDate,
-                        recurrenceType = event.task.recurrenceType,
-//                        nextDueDate = event.task.notificationTime,
-                        isAddTaskDialogVisible = true,
-                        editingTaskId = event.task.id
-                    )
-                }
-            }
+    private fun showAddTaskDialog() {
+        updateState { it.copy(isAddTaskDialogVisible = true) }
+    }
 
-            // Recurrence Filter
-            is TaskEvent.SetRecurrenceFilter -> {
-                _recurrenceFilter.value = event.recurrenceType
-            }
+    private fun hideAddTaskDialog() {
+        updateState {
+            it.copy(
+                isAddTaskDialogVisible = false,
+                title = "",
+                priority = 0,
+                note = "",
+                dueDate = null,
+                dueTimeOnly = null,
+                recurrenceType = RecurrenceType.NONE,
+                nextDueDate = null,
+                editingTaskId = null
+            )
+        }
+    }
 
-            // Date Picker
-            TaskEvent.ShowDatePicker -> {
-                _state.update { it.copy(
-                    isDatePickerVisible = true
-                ) }
-            }
-            TaskEvent.HideDatePicker -> {
-                _state.update { it.copy(
-                    isDatePickerVisible = false
-                ) }
-            }
-            is TaskEvent.SetDueDate -> {
-                _state.update { it.copy(
-                    dueDateOnly = event.dueDate
-                ).also {
-                    combineDateAndTime(it)
-                } }
-            }
-
-            // Time Picker
-            TaskEvent.ShowTimePicker -> {
-                _state.update { it.copy(
-                    isTimePickerVisible = true
-                ) }
-            }
-            TaskEvent.HideTimePicker -> {
-                _state.update { it.copy(
-                    isTimePickerVisible = false
-                ) }
-            }
-            is TaskEvent.SetDueTime -> {
-                _state.update { it.copy(
-                    dueTimeOnly = event.dueTime
-                ).also {
-                    combineDateAndTime(it)
-                } }
-            }
-
-            // Deletion Events
-            is TaskEvent.DeleteForever -> {
-                viewModelScope.launch {
-                    delay(500)
-                    dao.deleteDeletedTask(event.deletedTask)
-                }
-            }
-            is TaskEvent.UndoDeleteTask -> {
-                viewModelScope.launch {
-                    delay(500)
-                    val deletedTask = event.deletedTask
-                    val restoredTask = Task(
-                        title = deletedTask.title,
-                        priority = deletedTask.priority,
-                        note = deletedTask.note,
-                        dueDate = deletedTask.dueDate,
-                        recurrenceType = deletedTask.recurrenceType,
-//                        notificationTime = deletedTask.nextDueDate
-                    )
-                    dao.upsertTask(restoredTask)
-                    dao.deleteDeletedTask(deletedTask)
-                }
-            }
-
-            TaskEvent.ShowAddTaskDialog -> {
-                _state.update { it.copy(
-                    isAddTaskDialogVisible = true
-                ) }
-            }
-            TaskEvent.HideAddTaskDialog -> {
-                _state.update { it.copy(
-                    isAddTaskDialogVisible = false,
-                    title = "",
-                    priority = 0,
-                    note = "",
-                    dueDate = null,
-                    dueTimeOnly = null,
-                    recurrenceType = RecurrenceType.NONE,
-                    nextDueDate = null,
-                    editingTaskId = null
-                ) }
-            }
-            is TaskEvent.DeleteAllHistoryTasks -> {
-                viewModelScope.launch {
-                    dao.deleteAllDeletedTasks()
-                }
-            }
-
-            is TaskEvent.RefreshTasks -> {
-                viewModelScope.launch {
-                    reloadTasks()
-                }
-            }
+    private fun deleteAllHistoryTasks() {
+        viewModelScope.launch {
+            dao.deleteAllDeletedTasks()
         }
     }
 
@@ -293,41 +193,75 @@ class TaskViewModel(
                         SortType.ALPHABETICAL_REV -> dao.getTasksOrderedAlphabeticallyRev()
                         SortType.DUE_DATE -> dao.getTasksSortedByDueDate()
                         SortType.PRIORITY -> dao.getTasksSortedByPriority()
-                    }.map { tasks ->
-                        tasks.filter { task ->
-                            recurrenceType == RecurrenceType.NONE || task.recurrenceType == recurrenceType
-                        }
-                    }
-                }
-                .collect { tasks ->
+                    }.map { tasks -> tasks.filter { it.recurrenceType == recurrenceType || recurrenceType == RecurrenceType.NONE } }
+                }.collect { tasks ->
                     _tasks.value = tasks
                 }
         }
     }
 
-//    @RequiresApi(Build.VERSION_CODES.O)
-//    private fun calculateNextDueDate(dueDate: Long?, recurrenceType: RecurrenceType): Long? {
-//        if (dueDate == null) return null
-//        val date = Instant.ofEpochMilli(dueDate).atZone(ZoneId.systemDefault()).toLocalDate()
-//        val nextDate = when (recurrenceType) {
-//            RecurrenceType.DAILY -> date.plusDays(1)
-//            RecurrenceType.WEEKLY -> date.plusWeeks(1)
-//            RecurrenceType.MONTHLY -> date.plusMonths(1)
-//            RecurrenceType.YEARLY -> date.plusYears(1)
-//            else -> return null
-//        }
-//        return nextDate.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
-//    }
+    private fun updateState(update: (TaskState) -> TaskState) {
+        _state.value = update(_state.value)
+    }
+
+    private fun resetAddTaskDialogState() {
+        updateState {
+            it.copy(
+                isAddTaskDialogVisible = false,
+                title = "",
+                priority = 0,
+                note = "",
+                dueDate = null,
+                dueTimeOnly = null,
+                recurrenceType = RecurrenceType.NONE,
+                nextDueDate = null,
+                editingTaskId = null
+            )
+        }
+    }
+
+    private fun Task.toDeletedTask(): DeletedTask {
+        return DeletedTask(
+            id = this.id,
+            title = this.title,
+            priority = this.priority,
+            note = this.note,
+            dueDate = this.dueDate,
+            recurrenceType = this.recurrenceType,
+            deletedAt = System.currentTimeMillis()
+        )
+    }
+
+    private fun DeletedTask.toTask(): Task {
+        return Task(
+            id = this.id,
+            title = this.title,
+            priority = this.priority,
+            note = this.note,
+            dueDate = this.dueDate,
+            recurrenceType = this.recurrenceType,
+        )
+    }
 
     @RequiresApi(Build.VERSION_CODES.O)
     private fun combineDateAndTime(state: TaskState) {
         val date = state.dueDateOnly
         val time = state.dueTimeOnly
-        if (date != null) {
-            val combinedDateTime = if(time != null) date.atTime(time) else date.atStartOfDay()
-            _state.update { it.copy(
-                dueDate = combinedDateTime.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
-            ) }
+        if (date != null && time != null) {
+            val dueDateTime = ZonedDateTime.of(date, time, ZoneId.systemDefault())
+            val nextDueDate = calculateNextDueDate(dueDateTime, state.recurrenceType)
+            updateState { it.copy(dueDate = dueDateTime.toInstant().toEpochMilli(), nextDueDate = nextDueDate) }
+        }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun calculateNextDueDate(dueDateTime: ZonedDateTime, recurrenceType: RecurrenceType): Long? {
+        return when (recurrenceType) {
+            RecurrenceType.DAILY -> dueDateTime.plusDays(1).toInstant().toEpochMilli()
+            RecurrenceType.WEEKLY -> dueDateTime.plusWeeks(1).toInstant().toEpochMilli()
+            RecurrenceType.MONTHLY -> dueDateTime.plusMonths(1).toInstant().toEpochMilli()
+            RecurrenceType.YEARLY -> dueDateTime.plusYears(1).toInstant().toEpochMilli()
+            else -> null
         }
     }
 
@@ -405,5 +339,19 @@ class TaskViewModel(
     fun getLocalTimeFromEpochMilli(epochMilli: Long?): LocalTime {
         epochMilli ?: return LocalTime.now()
         return Instant.ofEpochMilli(epochMilli).atZone(ZoneId.systemDefault()).toLocalTime()
+    }
+}
+
+class TaskViewModelFactory(
+    private val dao: TaskDao,
+    private val notificationHelper: NotificationHelper,
+    private val dataStoreViewModel: DataStoreViewModel
+) : ViewModelProvider.Factory {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        if (modelClass.isAssignableFrom(TaskViewModel::class.java)) {
+            @Suppress("UNCHECKED_CAST")
+            return TaskViewModel(dao, notificationHelper, dataStoreViewModel) as T
+        }
+        throw IllegalArgumentException("Unknown ViewModel class")
     }
 }

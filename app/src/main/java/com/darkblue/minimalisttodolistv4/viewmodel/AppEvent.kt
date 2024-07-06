@@ -10,10 +10,10 @@ sealed interface AppEvent {
     data object ShowFontSettingsDialog : AppEvent
     data object HideFontSettingsDialog : AppEvent
 
-    data object ShowScheduleExactAlarmPermissionDialog: AppEvent
+    data object ShowScheduleExactAlarmPermissionDialog : AppEvent
     data object HideScheduleExactAlarmPermissionDialog : AppEvent
 
-    data object ShowScheduleExactAlarmPermissionIntent: AppEvent
-    data object CheckNotificationPermissions: AppEvent
-    data object IncrementPostNotificationDenialCount: AppEvent
+    data object ShowScheduleExactAlarmPermissionIntent : AppEvent
+    data object CheckNotificationPermissions : AppEvent
+    data object IncrementPostNotificationDenialCount : AppEvent
 }

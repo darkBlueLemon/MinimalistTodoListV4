@@ -13,9 +13,10 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-class AppViewModel(private val appPreferences: AppPreferences): ViewModel() {
+class AppViewModel(private val appPreferences: AppPreferences) : ViewModel() {
     private val _state = MutableStateFlow(AppState())
     val state: StateFlow<AppState> = _state
+
     private lateinit var permissionManager: PermissionManager
 
     fun setPermissionManager(permissionManager: PermissionManager) {
@@ -24,47 +25,40 @@ class AppViewModel(private val appPreferences: AppPreferences): ViewModel() {
 
     fun onEvent(event: AppEvent) {
         when (event) {
-            AppEvent.ShowMenuDialog -> {
-                _state.update { it.copy(isMenuDialogVisible = true) }
+            AppEvent.ShowMenuDialog -> updateState { copy(isMenuDialogVisible = true) }
+            AppEvent.HideMenuDialog -> updateState { copy(isMenuDialogVisible = false) }
+
+            AppEvent.ShowHistoryDialog -> updateState {
+                copy(isHistoryDialogVisible = true, isMenuDialogVisible = false)
             }
-            AppEvent.HideMenuDialog -> {
-                _state.update { it.copy(isMenuDialogVisible = false) }
+            AppEvent.HideHistoryDialog -> updateState { copy(isHistoryDialogVisible = false) }
+
+            AppEvent.ShowFontSettingsDialog -> updateState {
+                copy(isFontSettingsDialogVisible = true, isMenuDialogVisible = false)
             }
-            AppEvent.ShowHistoryDialog -> {
-                _state.update { it.copy(isHistoryDialogVisible = true, isMenuDialogVisible = false) }
+            AppEvent.HideFontSettingsDialog -> updateState { copy(isFontSettingsDialogVisible = false) }
+
+            AppEvent.ShowScheduleExactAlarmPermissionDialog -> updateState {
+                copy(isScheduleExactAlarmPermissionDialogVisible = true)
             }
-            AppEvent.HideHistoryDialog -> {
-                _state.update { it.copy(isHistoryDialogVisible = false) }
+            AppEvent.HideScheduleExactAlarmPermissionDialog -> updateState {
+                copy(isScheduleExactAlarmPermissionDialogVisible = false)
             }
-            AppEvent.ShowScheduleExactAlarmPermissionDialog -> {
-                _state.update { it.copy(isScheduleExactAlarmPermissionDialogVisible = true) }
-            }
-            AppEvent.HideScheduleExactAlarmPermissionDialog -> {
-                _state.update { it.copy(isScheduleExactAlarmPermissionDialogVisible = false) }
-            }
+
             AppEvent.ShowScheduleExactAlarmPermissionIntent -> {
                 permissionManager.requestScheduleExactAlarmPermission()
             }
             AppEvent.CheckNotificationPermissions -> {
-                viewModelScope.launch {
-                    permissionManager.requestPermissions()
-                }
+                viewModelScope.launch { permissionManager.requestPermissions() }
             }
             AppEvent.IncrementPostNotificationDenialCount -> {
-                viewModelScope.launch {
-                    appPreferences.incrementPostNotificationDenialCount()
-                }
-            }
-            AppEvent.ShowFontSettingsDialog -> {
-                _state.update { it.copy(
-                    isFontSettingsDialogVisible = true,
-                    isMenuDialogVisible = false
-                ) }
-            }
-            AppEvent.HideFontSettingsDialog -> {
-                _state.update { it.copy(isFontSettingsDialogVisible = false) }
+                viewModelScope.launch { appPreferences.incrementPostNotificationDenialCount() }
             }
         }
+    }
+
+    private inline fun updateState(update: AppState.() -> AppState) {
+        _state.update { it.update() }
     }
 }
 

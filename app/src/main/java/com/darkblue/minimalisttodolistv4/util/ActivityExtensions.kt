@@ -1,7 +1,5 @@
 package com.darkblue.minimalisttodolistv4.util
 
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.platform.LocalContext
 import android.app.Activity
 import android.content.ComponentName
 import android.content.Context
@@ -10,8 +8,6 @@ import android.content.pm.PackageManager
 import android.util.Log
 
 // Change App Icon
-
-// Usage
 fun lightIcon(context: Context) = setAppIcon(context, true)
 fun darkIcon(context: Context) = setAppIcon(context, false)
 

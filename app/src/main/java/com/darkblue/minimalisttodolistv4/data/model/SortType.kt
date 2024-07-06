@@ -1,29 +1,16 @@
 package com.darkblue.minimalisttodolistv4.data.model
 
-enum class SortType {
-    PRIORITY,
-    DUE_DATE,
-    ALPHABETICAL,
-    ALPHABETICAL_REV;
+enum class SortType(val displayName: String) {
+    PRIORITY("Priority"),
+    DUE_DATE("Time Remaining"),
+    ALPHABETICAL("Alphabetical"),
+    ALPHABETICAL_REV("Alphabetical z-a");
 
     companion object {
         fun fromDisplayName(displayName: String): SortType {
-            return when(displayName) {
-                "Alphabetical" -> ALPHABETICAL
-                "Alphabetical z-a" -> ALPHABETICAL_REV
-                "Time Remaining" -> DUE_DATE
-                "Priority" -> PRIORITY
-                else -> PRIORITY
-            }
+            return entries.firstOrNull { it.displayName == displayName } ?: PRIORITY
         }
     }
 
-    fun toDisplayString(): String {
-        return when (this) {
-            ALPHABETICAL -> "Alphabetical"
-            ALPHABETICAL_REV -> "Alphabetical z-a"
-            DUE_DATE -> "Time Remaining"
-            PRIORITY -> "Priority"
-        }
-    }
+    fun toDisplayString(): String = displayName
 }

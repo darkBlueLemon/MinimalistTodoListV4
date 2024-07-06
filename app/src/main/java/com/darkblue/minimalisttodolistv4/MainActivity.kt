@@ -15,6 +15,7 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -53,6 +54,7 @@ import com.darkblue.minimalisttodolistv4.ui.theme.MinimalistTodoListV4Theme
 import com.darkblue.minimalisttodolistv4.util.NotificationHelper
 import com.darkblue.minimalisttodolistv4.util.PermissionManager
 import com.darkblue.minimalisttodolistv4.viewmodel.AppViewModelFactory
+import com.darkblue.minimalisttodolistv4.viewmodel.TaskViewModelFactory
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -61,17 +63,14 @@ class MainActivity : ComponentActivity() {
     private lateinit var postNotificationPermissionLauncher: ActivityResultLauncher<String>
     private lateinit var appPreferences: AppPreferences
 
-    // AppViewModel Initialization with AppPreferences Instance (DataStore)
     private val appViewModel by viewModels<AppViewModel> {
         AppViewModelFactory(appPreferences)
     }
 
-    // DataStoreViewModel Initialization with AppPreferences Instance (DataStore)
     private val dataStoreViewModel by viewModels<DataStoreViewModel> {
         PreferencesViewModelFactory(appPreferences)
     }
 
-    // Room Database Initialization
     private val db by lazy {
         Room.databaseBuilder(
             applicationContext,
@@ -80,42 +79,40 @@ class MainActivity : ComponentActivity() {
         ).build()
     }
 
-    // Notification Helper Initialization
     private val notificationHelper by lazy {
         NotificationHelper(applicationContext)
     }
 
-    // TaskViewModel Initialization with Database and Notification Instance
-    private val taskViewModel by viewModels<TaskViewModel>(
-        factoryProducer = {
-            object : ViewModelProvider.Factory {
-                override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                    return TaskViewModel(db.dao, notificationHelper, dataStoreViewModel) as T
-                }
-            }
-        }
-    )
+    private val taskViewModel by viewModels<TaskViewModel> {
+        TaskViewModelFactory(db.dao, notificationHelper, dataStoreViewModel)
+    }
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        setupUI()
+        initializeComponents()
+        setContent {
+            setupTheme()
+        }
+    }
+
+    private fun setupUI() {
         installSplashScreen()
-
-        // Setting Status Bar and Navigation Bar to be Transparent
         enableEdgeToEdge(
-            statusBarStyle = SystemBarStyle.light(
-                Color.TRANSPARENT, Color.TRANSPARENT
-            ),
-            navigationBarStyle = SystemBarStyle.light(
-                Color.TRANSPARENT, Color.TRANSPARENT
-            )
+            statusBarStyle = SystemBarStyle.light(Color.TRANSPARENT, Color.TRANSPARENT),
+            navigationBarStyle = SystemBarStyle.light(Color.TRANSPARENT, Color.TRANSPARENT)
         )
+    }
 
-        // Initializing appPreferences as a singleton
+    private fun initializeComponents() {
         appPreferences = AppPreferences.getInstance(this)
+        initializeNotificationPermission()
+        appViewModel.setPermissionManager(permissionManager)
+    }
 
-        // Initializing Notification Launcher / Permission Manager
+    private fun initializeNotificationPermission() {
         postNotificationPermissionLauncher = registerForActivityResult(
             ActivityResultContracts.RequestPermission()
         ) { isGranted: Boolean ->
@@ -130,45 +127,38 @@ class MainActivity : ComponentActivity() {
             onTaskEvent = appViewModel::onEvent,
             appPreferences = appPreferences
         )
-        // Attaching permission Manager to AppViewModel
-        appViewModel.setPermissionManager(permissionManager)
+    }
 
-        setContent {
-            // Theme from DataStore through dataStoreViewModel
-            val theme by dataStoreViewModel.theme.collectAsState()
-            val fontFamilyType by dataStoreViewModel.fontFamily.collectAsState()
-            val fontSize by dataStoreViewModel.fontSize.collectAsState()
-            val fontWeight by dataStoreViewModel.fontWeight.collectAsState()
+    @RequiresApi(Build.VERSION_CODES.O)
+    @Composable
+    private fun setupTheme() {
+        val theme by dataStoreViewModel.theme.collectAsState()
+        val fontFamilyType by dataStoreViewModel.fontFamily.collectAsState()
+        val fontSize by dataStoreViewModel.fontSize.collectAsState()
+        val fontWeight by dataStoreViewModel.fontWeight.collectAsState()
 
-            var darkTheme by remember { mutableStateOf(false) }
-            darkTheme = when (theme) {
-                ThemeType.DARK -> true
-                ThemeType.LIGHT -> false
-                ThemeType.AUTO -> {
-                    val nightModeFlags = resources.configuration.uiMode and
-                            Configuration.UI_MODE_NIGHT_MASK
-                    nightModeFlags == Configuration.UI_MODE_NIGHT_YES
-                }
-            }
+        val darkTheme = when (theme) {
+            ThemeType.DARK -> true
+            ThemeType.LIGHT -> false
+            ThemeType.AUTO -> isSystemInDarkTheme()
+        }
 
-            MinimalistTodoListV4Theme(
-                darkTheme = darkTheme,
-                fontFamilyType = fontFamilyType,
-                baseFontSize = fontSize,
-                fontWeight = fontWeight
-            ) {
-                NavGraph(
-                    taskViewModel = taskViewModel,
-                    dataStoreViewModel = dataStoreViewModel,
-                    appViewModel = appViewModel
-                )
-            }
+        MinimalistTodoListV4Theme(
+            darkTheme = darkTheme,
+            fontFamilyType = fontFamilyType,
+            baseFontSize = fontSize,
+            fontWeight = fontWeight
+        ) {
+            NavGraph(
+                taskViewModel = taskViewModel,
+                dataStoreViewModel = dataStoreViewModel,
+                appViewModel = appViewModel
+            )
         }
     }
 
     override fun onResume() {
         super.onResume()
-        // Reload tasks when the activity resumes
         taskViewModel.reloadTasks()
     }
 }

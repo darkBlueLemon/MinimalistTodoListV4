@@ -12,18 +12,14 @@ data class TaskState(
     val priority: Int = 0,
     val note: String = "",
     val sortType: SortType = SortType.PRIORITY,
-
     val isDatePickerVisible: Boolean = false,
     val isTimePickerVisible: Boolean = false,
     val isAddTaskDialogVisible: Boolean = false,
-
     val recurrenceType: RecurrenceType = RecurrenceType.NONE,
     val recurrenceFilter: RecurrenceType = RecurrenceType.NONE,
     val nextDueDate: Long? = null,
-
     val dueDate: Long? = null,
     val dueDateOnly: LocalDate? = null,
     val dueTimeOnly: LocalTime? = null,
-
     val editingTaskId: Int? = null,
 )
