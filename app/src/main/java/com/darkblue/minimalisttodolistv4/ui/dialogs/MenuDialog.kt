@@ -1,8 +1,10 @@
 package com.darkblue.minimalisttodolistv4.ui.dialogs
 
-import android.app.Activity
 import android.content.Context
-import android.util.Log
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
@@ -17,7 +19,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import com.darkblue.minimalisttodolistv4.util.changeEnabledComponent
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -39,13 +40,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.darkblue.minimalisttodolistv4.R
 import com.darkblue.minimalisttodolistv4.data.model.ClockType
@@ -55,15 +55,12 @@ import com.darkblue.minimalisttodolistv4.data.model.ThemeType
 import com.darkblue.minimalisttodolistv4.ui.components.CustomBox
 import com.darkblue.minimalisttodolistv4.ui.components.CustomDropdownMenu
 import com.darkblue.minimalisttodolistv4.util.darkIcon
-import com.darkblue.minimalisttodolistv4.util.enableDarkIcon
-import com.darkblue.minimalisttodolistv4.util.enableLightIcon
-import com.darkblue.minimalisttodolistv4.util.getActivity
 import com.darkblue.minimalisttodolistv4.util.lightIcon
 import com.darkblue.minimalisttodolistv4.viewmodel.AppEvent
 import com.darkblue.minimalisttodolistv4.viewmodel.DataStoreViewModel
 import com.darkblue.minimalisttodolistv4.viewmodel.TaskEvent
 import com.darkblue.minimalisttodolistv4.viewmodel.TaskState
-import kotlinx.coroutines.handleCoroutineException
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -169,13 +166,18 @@ fun AppIconSelector(modifier: Modifier = Modifier, context: Context) {
                 .padding(start = 12.dp, end = 12.dp, top = 4.dp, bottom = 4.dp),
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            IconPreview(isLightIcon = true, onClick = { lightIcon(context) })
-            IconPreview(isLightIcon = false, onClick = { darkIcon(context) })
+            IconPreview(isLightIcon = true, onClick = {
+                lightIcon(context)
+            })
+            IconPreview(isLightIcon = false, onClick = {
+                darkIcon(context)
+            })
         }
     }
 
     Spacer(modifier = Modifier.size(width = 0.dp, height = 24.dp))
 }
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun IconPreview(isLightIcon: Boolean, onClick: () -> Unit) {
     val iconResId = if (isLightIcon) {
@@ -183,26 +185,58 @@ fun IconPreview(isLightIcon: Boolean, onClick: () -> Unit) {
     } else {
         R.drawable.logo_dark
     }
-
     val backgroundColor = if (isLightIcon) {
         Color.White
     } else {
         Color.Black
     }
+    val borderColor = if (isLightIcon) {
+        Color.Black
+    } else {
+        Color.White
+    }
+    val scale = remember { Animatable(initialValue = 1f) }
+    var selected by remember { mutableStateOf(false) }
+
+    LaunchedEffect(key1 = selected) {
+        if(selected) {
+            launch {
+                scale.animateTo(
+                    targetValue = 0.9f,
+                    animationSpec = tween(
+                        durationMillis = 50
+                    )
+                )
+                scale.animateTo(
+                    targetValue = 1f,
+                    animationSpec = spring(
+                        dampingRatio = Spring.DampingRatioLowBouncy,
+                        stiffness = Spring.StiffnessLow
+                    )
+                )
+                selected = false
+            }
+        }
+    }
 
     Box(
         modifier = Modifier
-            .shadow(8.dp, RoundedCornerShape(16.dp))
+            .scale(scale.value)
             .background(backgroundColor, RoundedCornerShape(16.dp))
-            .border(BorderStroke(2.dp, Color.Gray), RoundedCornerShape(16.dp))
-            .clickable {
-                onClick()
-            },
+            .border(BorderStroke(2.dp, borderColor), RoundedCornerShape(16.dp))
+            .combinedClickable(
+                indication = null,
+                interactionSource = remember { MutableInteractionSource() },
+                onClick = {
+                    selected = !selected
+                    onClick()
+                }
+            ),
         contentAlignment = Alignment.Center
     ) {
         Image(
             painter = painterResource(id = iconResId),
-            contentDescription = null, // Provide a content description if necessary
+            contentDescription = null,
             modifier = Modifier.size(80.dp)
         )
     }
