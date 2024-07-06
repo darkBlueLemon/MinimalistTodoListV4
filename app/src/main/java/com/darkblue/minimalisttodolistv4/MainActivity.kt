@@ -57,6 +57,20 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
+    private lateinit var permissionManager: PermissionManager
+    private lateinit var postNotificationPermissionLauncher: ActivityResultLauncher<String>
+    private lateinit var appPreferences: AppPreferences
+
+    // AppViewModel Initialization with AppPreferences Instance (DataStore)
+    private val appViewModel by viewModels<AppViewModel> {
+        AppViewModelFactory(appPreferences)
+    }
+
+    // DataStoreViewModel Initialization with AppPreferences Instance (DataStore)
+    private val dataStoreViewModel by viewModels<DataStoreViewModel> {
+        PreferencesViewModelFactory(appPreferences)
+    }
+
     // Room Database Initialization
     private val db by lazy {
         Room.databaseBuilder(
@@ -76,25 +90,11 @@ class MainActivity : ComponentActivity() {
         factoryProducer = {
             object : ViewModelProvider.Factory {
                 override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                    return TaskViewModel(db.dao, notificationHelper) as T
+                    return TaskViewModel(db.dao, notificationHelper, dataStoreViewModel) as T
                 }
             }
         }
     )
-
-    private lateinit var permissionManager: PermissionManager
-    private lateinit var postNotificationPermissionLauncher: ActivityResultLauncher<String>
-    private lateinit var appPreferences: AppPreferences
-
-    // AppViewModel Initialization with AppPreferences Instance (DataStore)
-    private val appViewModel by viewModels<AppViewModel> {
-        AppViewModelFactory(appPreferences)
-    }
-
-    // DataStoreViewModel Initialization with AppPreferences Instance (DataStore)
-    private val dataStoreViewModel by viewModels<DataStoreViewModel> {
-        PreferencesViewModelFactory(appPreferences)
-    }
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {

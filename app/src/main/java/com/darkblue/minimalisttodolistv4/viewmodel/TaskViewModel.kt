@@ -25,7 +25,8 @@ import java.time.format.DateTimeFormatter
 @OptIn(ExperimentalCoroutinesApi::class)
 class TaskViewModel(
     private val dao: TaskDao,
-    private val notificationHelper: NotificationHelper
+    private val notificationHelper: NotificationHelper,
+    private val dataStoreViewModel: DataStoreViewModel
 ): ViewModel() {
 
     private val _sortType = MutableStateFlow(SortType.PRIORITY)
@@ -45,6 +46,18 @@ class TaskViewModel(
     val deletedTasks: StateFlow<List<DeletedTask>> = _deletedTasks
 
     init {
+        // Initialize _sortType and _recurrenceFilter from dataStoreViewModel
+        viewModelScope.launch {
+            dataStoreViewModel.priorityOption.collect { priorityOption ->
+                _sortType.value = priorityOption
+            }
+        }
+        viewModelScope.launch {
+            dataStoreViewModel.recurrenceFilter.collect { recurrenceFilter ->
+                _recurrenceFilter.value = recurrenceFilter
+            }
+        }
+
         viewModelScope.launch {
             dao.getDeletedTasks().collect { deletedTasks ->
                 _deletedTasks.value = deletedTasks

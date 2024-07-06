@@ -6,6 +6,18 @@ enum class SortType {
     ALPHABETICAL,
     ALPHABETICAL_REV;
 
+    companion object {
+        fun fromDisplayName(displayName: String): SortType {
+            return when(displayName) {
+                "Alphabetical" -> ALPHABETICAL
+                "Alphabetical z-a" -> ALPHABETICAL_REV
+                "Time Remaining" -> DUE_DATE
+                "Priority" -> PRIORITY
+                else -> PRIORITY
+            }
+        }
+    }
+
     fun toDisplayString(): String {
         return when (this) {
             ALPHABETICAL -> "Alphabetical"

@@ -6,6 +6,8 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.darkblue.minimalisttodolistv4.data.model.ClockType
 import com.darkblue.minimalisttodolistv4.data.model.FontFamilyType
+import com.darkblue.minimalisttodolistv4.data.model.RecurrenceType
+import com.darkblue.minimalisttodolistv4.data.model.SortType
 import com.darkblue.minimalisttodolistv4.data.preferences.AppPreferences
 import com.darkblue.minimalisttodolistv4.data.model.ThemeType
 import kotlinx.coroutines.flow.SharingStarted
@@ -20,6 +22,8 @@ class DataStoreViewModel(private val appPreferences: AppPreferences) : ViewModel
     val fontFamily: StateFlow<FontFamilyType> = appPreferences.fontFamily.map { FontFamilyType.fromDisplayName(it) }.stateIn(viewModelScope, SharingStarted.Eagerly, FontFamilyType.DEFAULT)
     val fontSize: StateFlow<Int> = appPreferences.fontSize.stateIn(viewModelScope, SharingStarted.Eagerly, 16)
     val fontWeight: StateFlow<FontWeight> = appPreferences.fontWeight.map { fontWeightFromDisplayName(it) }.stateIn(viewModelScope, SharingStarted.Eagerly, FontWeight.Normal)
+    val priorityOption: StateFlow<SortType> = appPreferences.priorityOption.map { SortType.fromDisplayName(it) }.stateIn(viewModelScope, SharingStarted.Eagerly, SortType.PRIORITY)
+    val recurrenceFilter: StateFlow<RecurrenceType> = appPreferences.recurrenceFilter.map { RecurrenceType.fromDisplayName(it) }.stateIn(viewModelScope, SharingStarted.Eagerly, RecurrenceType.NONE)
 
     fun saveTheme(themeType: ThemeType) {
         viewModelScope.launch { appPreferences.saveTheme(themeType.toDisplayString()) }
@@ -39,6 +43,14 @@ class DataStoreViewModel(private val appPreferences: AppPreferences) : ViewModel
 
     fun saveFontWeight(fontWeight: FontWeight) {
         viewModelScope.launch { appPreferences.saveFontWeight(fontWeight.toDisplayString()) }
+    }
+
+    fun savePriorityOption(priority: SortType) {
+        viewModelScope.launch { appPreferences.savePriority(priority.toDisplayString()) }
+    }
+
+    fun saveRecurrenceFilter(recurrenceFilter: RecurrenceType) {
+        viewModelScope.launch { appPreferences.saveRecurrence(recurrenceFilter.toDisplayString()) }
     }
 
     private fun fontWeightFromDisplayName(displayName: String): FontWeight {

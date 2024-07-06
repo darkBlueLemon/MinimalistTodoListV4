@@ -47,6 +47,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.unit.dp
+import androidx.datastore.dataStore
 import com.darkblue.minimalisttodolistv4.R
 import com.darkblue.minimalisttodolistv4.data.model.ClockType
 import com.darkblue.minimalisttodolistv4.data.model.RecurrenceType
@@ -121,11 +122,13 @@ fun MenuDialog(
 //                )
                 RecurrenceSelector(
                     currentRecurrenceFilter = taskState.recurrenceFilter,
-                    onRecurrenceFilterChange = { onEvent(TaskEvent.SetRecurrenceFilter(it)) }
+                    onRecurrenceFilterChange = { onEvent(TaskEvent.SetRecurrenceFilter(it)) },
+                    dataStoreViewModel = dataStoreViewModel
                 )
                 PrioritySelector(
                     currentSortType = taskState.sortType,
-                    onSortChange = { onEvent(TaskEvent.SortTasks(it) ) }
+                    onSortChange = { onEvent(TaskEvent.SortTasks(it) ) },
+                    dataStoreViewModel = dataStoreViewModel
                 )
                 ThemeSelector(
                     dataStoreViewModel
@@ -246,8 +249,10 @@ fun IconPreview(isLightIcon: Boolean, onClick: () -> Unit) {
 @Composable
 fun RecurrenceSelector(
     currentRecurrenceFilter: RecurrenceType,
-    onRecurrenceFilterChange: (RecurrenceType) -> Unit
+    onRecurrenceFilterChange: (RecurrenceType) -> Unit,
+    dataStoreViewModel: DataStoreViewModel
 ) {
+    val recurrenceFilter by dataStoreViewModel.recurrenceFilter.collectAsState()
     var expanded by remember { mutableStateOf(false) }
 
     Row (
@@ -261,7 +266,7 @@ fun RecurrenceSelector(
             style = MaterialTheme.typography.bodyLarge
         )
         Text(
-            text = currentRecurrenceFilter.toDisplayString(),
+            text = recurrenceFilter.toDisplayString(),
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.tertiary,
             fontStyle = FontStyle.Italic
@@ -284,6 +289,7 @@ fun RecurrenceSelector(
                         indication = null,
                         interactionSource = remember { MutableInteractionSource() },
                         onClick = {
+                            dataStoreViewModel.saveRecurrenceFilter(recurrenceType)
                             onRecurrenceFilterChange(recurrenceType)
                         }
                     )
@@ -303,8 +309,10 @@ fun RecurrenceSelector(
 @Composable
 fun PrioritySelector(
     currentSortType: SortType,
-    onSortChange: (SortType) -> Unit
+    onSortChange: (SortType) -> Unit,
+    dataStoreViewModel: DataStoreViewModel
 ) {
+    val sortingOption by dataStoreViewModel.priorityOption.collectAsState()
     var expanded by remember { mutableStateOf(false) }
 
     Row (
@@ -318,7 +326,7 @@ fun PrioritySelector(
             style = MaterialTheme.typography.bodyLarge
         )
         Text(
-            text = currentSortType.toDisplayString(),
+            text = sortingOption.toDisplayString(),
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.tertiary,
             fontStyle = FontStyle.Italic
@@ -340,7 +348,10 @@ fun PrioritySelector(
                     .combinedClickable(
                         indication = null,
                         interactionSource = remember { MutableInteractionSource() },
-                        onClick = { onSortChange(sortType) }
+                        onClick = {
+                            onSortChange(sortType)
+                            dataStoreViewModel.savePriorityOption(sortType)
+                        }
                     )
             ) {
                 CompleteIconWithoutDelay(isChecked = currentSortType == sortType)
