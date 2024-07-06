@@ -1,5 +1,8 @@
 package com.darkblue.minimalisttodolistv4
 
+import android.app.Activity
+import android.content.ComponentName
+import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.graphics.Color
 import android.os.Build
@@ -17,6 +20,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Slider
@@ -48,6 +52,7 @@ import com.darkblue.minimalisttodolistv4.viewmodel.TaskViewModel
 import com.darkblue.minimalisttodolistv4.ui.theme.MinimalistTodoListV4Theme
 import com.darkblue.minimalisttodolistv4.util.NotificationHelper
 import com.darkblue.minimalisttodolistv4.util.PermissionManager
+import com.darkblue.minimalisttodolistv4.util.changeEnabledComponent
 import com.darkblue.minimalisttodolistv4.viewmodel.AppViewModelFactory
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -101,15 +106,15 @@ class MainActivity : ComponentActivity() {
         // Setting Status Bar and Navigation Bar to be Transparent
         enableEdgeToEdge(
             statusBarStyle = SystemBarStyle.light(
-                Color.TRANSPARENT , Color.TRANSPARENT
+                Color.TRANSPARENT, Color.TRANSPARENT
             ),
             navigationBarStyle = SystemBarStyle.light(
                 Color.TRANSPARENT, Color.TRANSPARENT
             )
         )
 
-        // Initializing appPreferences
-        appPreferences = AppPreferences(this)
+        // Initializing appPreferences as a singleton
+        appPreferences = AppPreferences.getInstance(this)
 
         // Initializing Notification Launcher / Permission Manager
         postNotificationPermissionLauncher = registerForActivityResult(
@@ -147,6 +152,11 @@ class MainActivity : ComponentActivity() {
                 }
             }
 
+//            changeEnabledComponent(
+//                disabled = "$packageName.MainActivityAlias",
+//                enabled = "$packageName.MainActivity"
+//            )
+
             MinimalistTodoListV4Theme(
                 darkTheme = darkTheme,
                 fontFamilyType = fontFamilyType,
@@ -158,6 +168,24 @@ class MainActivity : ComponentActivity() {
                     dataStoreViewModel = dataStoreViewModel,
                     appViewModel = appViewModel
                 )
+//                Row {
+//                    Button(onClick = {
+//                        changeEnabledComponent(
+//                            enabled = "$packageName.MainActivityAlias",
+//                            disabled = "$packageName.MainActivity"
+//                        )
+//                    }) {
+//                        Text(text = "light icon")
+//                    }
+//                    Button(onClick = {
+//                        changeEnabledComponent(
+//                            disabled = "$packageName.MainActivityAlias",
+//                            enabled = "$packageName.MainActivity"
+//                        )
+//                    }) {
+//                        Text(text = "dark icon")
+//                    }
+//                }
             }
         }
     }

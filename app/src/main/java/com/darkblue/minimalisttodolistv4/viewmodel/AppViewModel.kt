@@ -1,5 +1,8 @@
 package com.darkblue.minimalisttodolistv4.viewmodel
 
+import android.app.Activity
+import android.content.ComponentName
+import android.content.pm.PackageManager
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope

@@ -12,9 +12,20 @@ import kotlinx.coroutines.flow.map
 
 const val PREFERENCES_NAME = "settings"
 
-class AppPreferences(context: Context) {
-    val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = PREFERENCES_NAME)
+class AppPreferences private constructor(context: Context) {
+    private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = PREFERENCES_NAME)
     private val dataStore = context.dataStore
+
+    companion object {
+        @Volatile
+        private var INSTANCE: AppPreferences? = null
+
+        fun getInstance(context: Context): AppPreferences {
+            return INSTANCE ?: synchronized(this) {
+                INSTANCE ?: AppPreferences(context).also { INSTANCE = it }
+            }
+        }
+    }
 
     private val THEME_KEY = stringPreferencesKey("theme")
     private val CLOCK_TYPE_KEY = stringPreferencesKey("clockType")

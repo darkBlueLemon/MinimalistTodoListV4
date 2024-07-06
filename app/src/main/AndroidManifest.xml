@@ -25,6 +25,18 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity-alias
+            android:name=".MainActivityAlias"
+            android:exported="true"
+            android:theme="@style/Theme.MinimalistTodoListV4.MySplash"
+            android:icon="@mipmap/ic_light"
+            android:roundIcon="@mipmap/ic_light_round"
+            android:targetActivity=".MainActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity-alias>
         <receiver android:name=".util.NotificationReceiver" />
         <receiver android:name=".util.NotificationActionReceiver" />
     </application>
