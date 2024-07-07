@@ -1,5 +1,6 @@
 package com.darkblue.minimalisttodolistv4.ui.dialogs
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -7,15 +8,21 @@ import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.BasicAlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.darkblue.minimalisttodolistv4.ui.components.CustomBox
 
@@ -28,57 +35,52 @@ fun ScheduleExactAlarmPermissionDialog(
 ) {
     BasicAlertDialog(
         onDismissRequest = { onDismissOrDisallow() },
-        modifier = Modifier.padding(20.dp)
+        modifier = Modifier.padding(24.dp)
     ) {
         CustomBox {
             Column(
                 modifier = Modifier
-                    .padding(15.dp)
+                    .padding(20.dp)
                     .width(IntrinsicSize.Max),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
+                verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 Text(
-                    text = "Alarms & Reminders permission",
+                    text = "Enable Alarm & Reminder Permissions",
                     style = MaterialTheme.typography.titleLarge,
-                    color = MaterialTheme.colorScheme.primary
+                    color = MaterialTheme.colorScheme.primary,
+                    fontWeight = FontWeight.Bold
                 )
                 Text(
-                    text = "Grant access to set alarms for scheduled notifications",
+                    text = "To set scheduled notifications, this app requires permission to create alarms. Would you like to enable this access?",
                     style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.primary
+                    color = MaterialTheme.colorScheme.primary,
                 )
-                Spacer(modifier = Modifier.size(width = 0.dp, height = 12.dp))
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.End
                 ) {
-                    Text(
-                        text = "Cancel",
-                        modifier.clickable {
-                            onDismissOrDisallow()
-                        },
-                        color = MaterialTheme.colorScheme.primary,
-                        style = MaterialTheme.typography.bodyMedium,
-                    )
-                    Spacer(modifier = Modifier.size(width = 24.dp, height = 0.dp))
-                    Text(
-                        text = "Allow",
-                        modifier.clickable {
-                            onAllow()
-                        },
-                        color = MaterialTheme.colorScheme.primary,
-                        style = MaterialTheme.typography.bodyMedium,
-                    )
-//                    Button(onClick = {
-//                        onAllow()
-//                    }) {
-//                        Text("Allow")
-//                    }
-//                    Button(onClick = {
-//                        onDisallow()
-//                    }) {
-//                        Text("Don't Allow")
-//                    }
+                    TextButton(
+                        onClick = { onDismissOrDisallow() }
+                    ) {
+                        Text(
+                            text = "Not Now",
+                            color = MaterialTheme.colorScheme.primary,
+                            style = MaterialTheme.typography.labelLarge
+                        )
+                    }
+                    Spacer(modifier = Modifier.width(16.dp))
+                    Button(
+                        onClick = { onAllow() },
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.primary
+                        )
+                    ) {
+                        Text(
+                            text = "Allow",
+                            color = MaterialTheme.colorScheme.onPrimary,
+                            style = MaterialTheme.typography.labelLarge
+                        )
+                    }
                 }
             }
         }

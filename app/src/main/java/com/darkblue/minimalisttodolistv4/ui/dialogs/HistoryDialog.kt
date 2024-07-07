@@ -1,5 +1,6 @@
 package com.darkblue.minimalisttodolistv4.ui.dialogs
 
+import android.content.Context
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.animation.AnimatedVisibility
@@ -44,12 +45,14 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.darkblue.minimalisttodolistv4.data.model.DeletedTask
 import com.darkblue.minimalisttodolistv4.ui.components.CustomBox
 import com.darkblue.minimalisttodolistv4.ui.components.CustomDropdownMenu
+import com.darkblue.minimalisttodolistv4.util.vibrate
 import com.darkblue.minimalisttodolistv4.viewmodel.AppEvent
 import com.darkblue.minimalisttodolistv4.viewmodel.TaskEvent
 import com.darkblue.minimalisttodolistv4.viewmodel.TaskViewModel
@@ -65,6 +68,7 @@ fun HistoryDialog(
     onAppEvent: (AppEvent) -> Unit
 ) {
     val deletedTasks by viewModel.deletedTasks.collectAsState()
+    val context = LocalContext.current
 
     BasicAlertDialog(onDismissRequest = {
         onAppEvent(AppEvent.HideHistoryDialog)
@@ -77,7 +81,8 @@ fun HistoryDialog(
                     .width(350.dp)
             ) {
                 TitleAndDeleteAll(
-                    onClearHistory = { onEvent(TaskEvent.DeleteAllHistoryTasks) }
+                    onClearHistory = { onEvent(TaskEvent.DeleteAllHistoryTasks) },
+                    context = context
                 )
                 if (deletedTasks.isEmpty()) {
                     Box(
@@ -105,7 +110,7 @@ fun HistoryDialog(
 }
 
 @Composable
-fun TitleAndDeleteAll(onClearHistory: () -> Unit) {
+fun TitleAndDeleteAll(onClearHistory: () -> Unit, context: Context) {
     var expanded by remember { mutableStateOf(false) }
 
     Box (
@@ -128,6 +133,7 @@ fun TitleAndDeleteAll(onClearHistory: () -> Unit) {
                 .clickable {
                     onClearHistory()
                     expanded = false
+                    vibrate(context = context, strength = 1)
                 }
                 .align(Alignment.CenterEnd)
                 .padding(end = 10.dp)

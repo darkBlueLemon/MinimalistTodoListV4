@@ -1,9 +1,6 @@
 package com.darkblue.minimalisttodolistv4.ui.screens
 
-import android.content.Context
 import android.os.Build
-import android.os.VibrationEffect
-import android.os.Vibrator
 import androidx.annotation.RequiresApi
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
@@ -36,7 +33,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -49,14 +45,12 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import com.darkblue.minimalisttodolistv4.data.model.RecurrenceType
 import com.darkblue.minimalisttodolistv4.data.model.Task
-import com.darkblue.minimalisttodolistv4.emptyStateMessages
+import com.darkblue.minimalisttodolistv4.ui.components.emptyStateMessages
 import com.darkblue.minimalisttodolistv4.viewmodel.DataStoreViewModel
 import com.darkblue.minimalisttodolistv4.viewmodel.TaskEvent
 import com.darkblue.minimalisttodolistv4.viewmodel.TaskState
@@ -73,6 +67,7 @@ import com.darkblue.minimalisttodolistv4.ui.theme.Priority1
 import com.darkblue.minimalisttodolistv4.ui.theme.Priority2
 import com.darkblue.minimalisttodolistv4.ui.theme.Priority3
 import com.darkblue.minimalisttodolistv4.ui.theme.dateRed
+import com.darkblue.minimalisttodolistv4.util.vibrate
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.time.Instant
@@ -123,7 +118,7 @@ fun TaskScreen(
                     modifier = Modifier
                         .combinedClickable(
                             onLongClick = {
-                                vibrate(context = context, strength = 2)
+                                vibrate(context = context, strength = 1)
                                 onAppEvent(AppEvent.ShowMenuDialog)
                             },
                             onClick = {
@@ -378,27 +373,3 @@ fun CompleteIcon(modifier: Modifier = Modifier, onDelete: (Task) -> Unit, task: 
         }
     }
 }
-
-fun vibrate(context: Context, strength: Int) {
-    val vibrator = context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-        val effect = when (strength) {
-            1 -> VibrationEffect.createPredefined(VibrationEffect.EFFECT_CLICK)
-            2 -> VibrationEffect.createPredefined(VibrationEffect.EFFECT_TICK)
-            3 -> VibrationEffect.createPredefined(VibrationEffect.EFFECT_HEAVY_CLICK)
-            4 -> VibrationEffect.createPredefined(VibrationEffect.EFFECT_DOUBLE_CLICK)
-            else -> VibrationEffect.createPredefined(VibrationEffect.EFFECT_CLICK)
-        }
-        vibrator.vibrate(effect)
-    } else {
-        val duration = when (strength) {
-            1 -> 50L
-            2 -> 100L
-            3 -> 150L
-            4 -> 200L
-            else -> 100L
-        }
-        vibrator.vibrate(duration)
-    }
-}
-
