@@ -200,7 +200,7 @@ fun TaskScreen(
                 dataStoreViewModel = dataStoreViewModel,
                 onDismiss = { onAppEvent(AppEvent.HideFontSettingsDialog) }
             )
-        }ddk
+        }
         if (appState.isTutorialDialogVisible) {
             Tutorial(
                 onDismiss = {
