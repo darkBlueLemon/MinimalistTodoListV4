@@ -6,6 +6,8 @@ import androidx.compose.material3.Typography
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
@@ -79,11 +81,13 @@ fun MinimalistTodoListV4Theme(
         labelSmall = TextStyle(fontFamily = fontFamilyType.getFontFamily(), fontWeight = fontWeight, fontSize = (baseFontSize * 0.625).sp)
     )
 
-    MaterialTheme(
-        colorScheme = colorScheme,
-        typography = customTypography,
-        content = content
-    )
+    CompositionLocalProvider(LocalDarkTheme provides darkTheme) {
+        MaterialTheme(
+            colorScheme = colorScheme,
+            typography = customTypography,
+            content = content
+        )
+    }
 }
 
-
+val LocalDarkTheme = staticCompositionLocalOf { false }

@@ -58,6 +58,7 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
+import com.darkblue.minimalisttodolistv4.data.model.PriorityColor
 import com.darkblue.minimalisttodolistv4.data.model.RecurrenceType
 import com.darkblue.minimalisttodolistv4.data.model.Task
 import com.darkblue.minimalisttodolistv4.ui.components.CustomBox
@@ -74,11 +75,8 @@ import com.darkblue.minimalisttodolistv4.ui.dialogs.ScheduleExactAlarmPermission
 import com.darkblue.minimalisttodolistv4.ui.dialogs.Tutorial
 import com.darkblue.minimalisttodolistv4.viewmodel.AppEvent
 import com.darkblue.minimalisttodolistv4.viewmodel.AppState
-import com.darkblue.minimalisttodolistv4.ui.theme.Priority0
-import com.darkblue.minimalisttodolistv4.ui.theme.Priority1
-import com.darkblue.minimalisttodolistv4.ui.theme.Priority2
-import com.darkblue.minimalisttodolistv4.ui.theme.Priority3
 import com.darkblue.minimalisttodolistv4.ui.theme.DateRed
+import com.darkblue.minimalisttodolistv4.ui.theme.LocalDarkTheme
 import com.darkblue.minimalisttodolistv4.util.vibrate
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -97,51 +95,28 @@ fun TaskScreen(
     taskViewModel: TaskViewModel,
     dataStoreViewModel: DataStoreViewModel,
 ) {
+    val darkTheme = LocalDarkTheme.current
+
+    val tutorialVisibility = dataStoreViewModel.tutorialVisibility.collectAsState()
+
     // Necessary for the vibrate function
     val context = LocalContext.current
 
     // Generate a random message when the task list becomes empty
     val randomMessage = remember(taskState.tasks.isEmpty()) {
         if (taskState.tasks.isEmpty()) {
-            emptyStateMessages.random()
+            if(tutorialVisibility.value) {
+                emptyStateMessages.first()
+            } else {
+                emptyStateMessages.random()
+            }
         } else {
             ""
         }
     }
 
-    val tutorialVisibility = dataStoreViewModel.tutorialVisibility.collectAsState()
-
     Scaffold(
         floatingActionButton = {
-//            FloatingActionButton(
-//                onClick = {},
-//                elevation = FloatingActionButtonDefaults.elevation(0.dp, 0.dp, 0.dp, 0.dp),
-//                modifier = Modifier
-//                    .clip(shape = RoundedCornerShape(percent = 7))
-//                    .border(
-//                        width = 2.dp,
-//                        color = MaterialTheme.colorScheme.onBackground,
-//                        shape = RoundedCornerShape(percent = 25)
-//                    ),
-//                containerColor = MaterialTheme.colorScheme.background,
-//                contentColor = MaterialTheme.colorScheme.onBackground
-//            ) {
-//                Icon(
-//                    imageVector = Icons.Outlined.Add,
-//                    contentDescription = "Add task",
-//                    modifier = Modifier
-//                        .combinedClickable(
-//                            onLongClick = {
-//                                vibrate(context = context, strength = 2)
-//                                onAppEvent(AppEvent.ShowMenuDialog)
-//                            },
-//                            onClick = {
-////                                vibrate(context = context, strength = 1)
-//                                onEvent(TaskEvent.ShowAddTaskDialog)
-//                            },
-//                        )
-//                )
-//            }
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -160,8 +135,7 @@ fun TaskScreen(
                                 color = MaterialTheme.colorScheme.onBackground,
                                 shape = RoundedCornerShape(percent = 50)
                             )
-                            .size(36.dp)
-                            ,
+                            .size(36.dp),
                         containerColor = MaterialTheme.colorScheme.background,
                         contentColor = MaterialTheme.colorScheme.onBackground
                     ) {
@@ -173,7 +147,7 @@ fun TaskScreen(
                                     onAppEvent(AppEvent.ShowTutorialDialog)
                                 }
                                 .padding(8.dp),
-                            tint = Priority1
+                            tint = PriorityColor.PRIORITY1.getColor(darkTheme)
                         )
                     }
                 } else {
@@ -320,13 +294,14 @@ fun TaskList(onEvent: (TaskEvent) -> Unit, taskState: TaskState, viewModel: Task
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun TaskItem(task: Task, onEdit: (Task) -> Unit, onDelete: (Task) -> Unit, viewModel: TaskViewModel) {
+    val darkTheme = LocalDarkTheme.current
 
-    // Colors for the Priority Icon
     val priorityColor = when (task.priority) {
-        3 -> Priority3
-        2 -> Priority2
-        1 -> Priority1
-        else -> Priority0
+        0 -> PriorityColor.PRIORITY0.getColor(darkTheme)
+        1 -> PriorityColor.PRIORITY1.getColor(darkTheme)
+        2 -> PriorityColor.PRIORITY2.getColor(darkTheme)
+        3 -> PriorityColor.PRIORITY3.getColor(darkTheme)
+        else -> Color.Gray
     }
 
     Row(

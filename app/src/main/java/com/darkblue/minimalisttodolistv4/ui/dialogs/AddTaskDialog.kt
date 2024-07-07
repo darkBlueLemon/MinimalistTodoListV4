@@ -48,6 +48,7 @@ import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.darkblue.minimalisttodolistv4.data.model.PriorityColor
 import com.darkblue.minimalisttodolistv4.data.model.RecurrenceType
 import com.darkblue.minimalisttodolistv4.ui.components.CustomBox
 import com.darkblue.minimalisttodolistv4.ui.components.DatePicker
@@ -55,11 +56,9 @@ import com.darkblue.minimalisttodolistv4.viewmodel.TaskEvent
 import com.darkblue.minimalisttodolistv4.viewmodel.TaskState
 import com.darkblue.minimalisttodolistv4.viewmodel.TaskViewModel
 import com.darkblue.minimalisttodolistv4.ui.components.TimePickerFromOldApp
+import com.darkblue.minimalisttodolistv4.ui.theme.LocalDarkTheme
 import com.darkblue.minimalisttodolistv4.viewmodel.AppEvent
 import com.darkblue.minimalisttodolistv4.viewmodel.DataStoreViewModel
-import com.darkblue.minimalisttodolistv4.ui.theme.Priority1
-import com.darkblue.minimalisttodolistv4.ui.theme.Priority2
-import com.darkblue.minimalisttodolistv4.ui.theme.Priority3
 
 @RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
@@ -167,15 +166,15 @@ fun PrioritySelector(
                 .fillMaxWidth()
                 .padding(vertical = 8.dp)
         ) {
-            PriorityStar(index = 1, selectedPriority, Priority1) { priority ->
+            PriorityStar(index = 1, selectedPriority) { priority ->
                 selectedPriority = priority
                 onPriorityChange(TaskEvent.SetPriority(priority))
             }
-            PriorityStar(index = 2, selectedPriority, Priority2) { priority ->
+            PriorityStar(index = 2, selectedPriority) { priority ->
                 selectedPriority = priority
                 onPriorityChange(TaskEvent.SetPriority(priority))
             }
-            PriorityStar(index = 3, selectedPriority, Priority3) { priority ->
+            PriorityStar(index = 3, selectedPriority) { priority ->
                 selectedPriority = priority
                 onPriorityChange(TaskEvent.SetPriority(priority))
             }
@@ -203,7 +202,6 @@ fun PrioritySelector(
             Text(
                 text = "Add priority",
                 color = MaterialTheme.colorScheme.tertiary,
-//                fontWeight = FontWeight.Light,
                 style = MaterialTheme.typography.bodyMedium,
                 modifier = Modifier.padding(15.dp)
             )
@@ -212,7 +210,33 @@ fun PrioritySelector(
 }
 
 @Composable
+fun PriorityStar(index: Int, selectedPriority: Int, onPriorityChange: (Int) -> Unit) {
+    val darkTheme = LocalDarkTheme.current
+
+    val starColor = when (index) {
+        0 -> PriorityColor.PRIORITY0.getColor(darkTheme)
+        1 -> PriorityColor.PRIORITY1.getColor(darkTheme)
+        2 -> PriorityColor.PRIORITY2.getColor(darkTheme)
+        3 -> PriorityColor.PRIORITY3.getColor(darkTheme)
+        else -> Color.Gray
+    }
+
+    val starIcon = if (index == selectedPriority) Icons.Rounded.Star else Icons.Rounded.StarOutline
+
+    Icon(
+        imageVector = starIcon,
+        contentDescription = "Priority $index",
+        tint = starColor,
+        modifier = Modifier
+            .size(30.dp)
+            .clickable { onPriorityChange(index) }
+    )
+}
+
+
+@Composable
 fun PriorityStar(index: Int, selectedPriority: Int, color: Color, onClick: (Int) -> Unit) {
+
     val starIcon = if (index == selectedPriority) Icons.Rounded.Star else Icons.Rounded.StarOutline
     val starColor = if (index == selectedPriority) color else Color.Gray
 
