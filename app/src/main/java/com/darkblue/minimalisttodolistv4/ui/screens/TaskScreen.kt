@@ -113,11 +113,41 @@ fun TaskScreen(
 
     Scaffold(
         floatingActionButton = {
+//            FloatingActionButton(
+//                onClick = {},
+//                elevation = FloatingActionButtonDefaults.elevation(0.dp, 0.dp, 0.dp, 0.dp),
+//                modifier = Modifier
+//                    .clip(shape = RoundedCornerShape(percent = 7))
+//                    .border(
+//                        width = 2.dp,
+//                        color = MaterialTheme.colorScheme.onBackground,
+//                        shape = RoundedCornerShape(percent = 25)
+//                    ),
+//                containerColor = MaterialTheme.colorScheme.background,
+//                contentColor = MaterialTheme.colorScheme.onBackground
+//            ) {
+//                Icon(
+//                    imageVector = Icons.Outlined.Add,
+//                    contentDescription = "Add task",
+//                    modifier = Modifier
+//                        .combinedClickable(
+//                            onLongClick = {
+//                                vibrate(context = context, strength = 2)
+//                                onAppEvent(AppEvent.ShowMenuDialog)
+//                            },
+//                            onClick = {
+////                                vibrate(context = context, strength = 1)
+//                                onEvent(TaskEvent.ShowAddTaskDialog)
+//                            },
+//                        )
+//                )
+//            }
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(start = if (tutorialVisibility.value) 24.dp else 0.dp, end = 24.dp),
-                horizontalArrangement = if (tutorialVisibility.value) Arrangement.SpaceBetween else Arrangement.End
+                    .padding(start = if (tutorialVisibility.value) 32.dp else 0.dp),
+                horizontalArrangement = if (tutorialVisibility.value) Arrangement.SpaceBetween else Arrangement.End,
+                verticalAlignment = Alignment.CenterVertically
             ) {
                 if (tutorialVisibility.value) {
                     FloatingActionButton(
@@ -130,16 +160,19 @@ fun TaskScreen(
                                 color = MaterialTheme.colorScheme.onBackground,
                                 shape = RoundedCornerShape(percent = 50)
                             )
-                            .size(48.dp),
+                            .size(36.dp)
+                            ,
                         containerColor = MaterialTheme.colorScheme.background,
                         contentColor = MaterialTheme.colorScheme.onBackground
                     ) {
                         Icon(
                             imageVector = Icons.Default.Lightbulb,
-                            contentDescription = "Add task",
-                            modifier = Modifier.clickable {
-                                onAppEvent(AppEvent.ShowTutorialDialog)
-                            },
+                            contentDescription = "Show Tutorial",
+                            modifier = Modifier
+                                .clickable {
+                                    onAppEvent(AppEvent.ShowTutorialDialog)
+                                }
+                                .padding(8.dp),
                             tint = Priority1
                         )
                     }
