@@ -108,8 +108,6 @@ fun TaskScreen(
         }
     }
 
-    var showTutorial by remember { mutableStateOf(false) }
-
     Scaffold(
         floatingActionButton = {
             Row(
@@ -139,7 +137,7 @@ fun TaskScreen(
                         contentDescription = "Add task",
                         modifier = Modifier
                             .clickable {
-                                showTutorial = true
+                                onAppEvent(AppEvent.ShowTutorialDialog)
                             },
                         tint = Priority1
                     )
@@ -202,8 +200,23 @@ fun TaskScreen(
                 dataStoreViewModel = dataStoreViewModel,
                 onDismiss = { onAppEvent(AppEvent.HideFontSettingsDialog) }
             )
+        }ddk
+        if (appState.isTutorialDialogVisible) {
+            Tutorial(
+                onDismiss = {
+                    onAppEvent(AppEvent.ShowTutorialDialog)
+                },
+                onDisable = {
+                    onAppEvent(AppEvent.HideTutorialDialog)
+                },
+                onShowAddTaskDialog = {
+                    onEvent(TaskEvent.ShowAddTaskDialog)
+                },
+                onShowMenuDialog = {
+                    onAppEvent(AppEvent.ShowMenuDialog)
+                }
+            )
         }
-
         if (taskState.tasks.isEmpty()) {
             Box(
                 modifier = Modifier
@@ -220,22 +233,6 @@ fun TaskScreen(
             }
         } else {
             TaskList(onEvent, taskState, taskViewModel, padding)
-        }
-        if (showTutorial) {
-            Tutorial(
-                onDismiss = {
-                    showTutorial = false
-                },
-                onDisable = {
-                    showTutorial = false
-                },
-                onShowAddTaskDialog = {
-                    onEvent(TaskEvent.ShowAddTaskDialog)
-                },
-                onShowMenuDialog = {
-                    onAppEvent(AppEvent.ShowMenuDialog)
-                }
-            )
         }
     }
 }
