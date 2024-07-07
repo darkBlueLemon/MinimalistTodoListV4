@@ -116,8 +116,8 @@ fun TaskScreen(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(start = 24.dp),
-                horizontalArrangement = Arrangement.SpaceBetween
+                    .padding(start = if (tutorialVisibility.value) 24.dp else 0.dp, end = 24.dp),
+                horizontalArrangement = if (tutorialVisibility.value) Arrangement.SpaceBetween else Arrangement.End
             ) {
                 if (tutorialVisibility.value) {
                     FloatingActionButton(
@@ -137,14 +137,16 @@ fun TaskScreen(
                         Icon(
                             imageVector = Icons.Default.Lightbulb,
                             contentDescription = "Add task",
-                            modifier = Modifier
-                                .clickable {
-                                    onAppEvent(AppEvent.ShowTutorialDialog)
-                                },
+                            modifier = Modifier.clickable {
+                                onAppEvent(AppEvent.ShowTutorialDialog)
+                            },
                             tint = Priority1
                         )
                     }
+                } else {
+                    Spacer(modifier = Modifier.weight(1f))
                 }
+
                 FloatingActionButton(
                     onClick = {},
                     elevation = FloatingActionButtonDefaults.elevation(0.dp, 0.dp, 0.dp, 0.dp),
@@ -161,17 +163,15 @@ fun TaskScreen(
                     Icon(
                         imageVector = Icons.Outlined.Add,
                         contentDescription = "Add task",
-                        modifier = Modifier
-                            .combinedClickable(
-                                onLongClick = {
-                                    vibrate(context = context, strength = 1)
-                                    onAppEvent(AppEvent.ShowMenuDialog)
-                                },
-                                onClick = {
-//                                vibrate(context = context, strength = 1)
-                                    onEvent(TaskEvent.ShowAddTaskDialog)
-                                },
-                            )
+                        modifier = Modifier.combinedClickable(
+                            onLongClick = {
+                                vibrate(context = context, strength = 1)
+                                onAppEvent(AppEvent.ShowMenuDialog)
+                            },
+                            onClick = {
+                                onEvent(TaskEvent.ShowAddTaskDialog)
+                            }
+                        )
                     )
                 }
             }
