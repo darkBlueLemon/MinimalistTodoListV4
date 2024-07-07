@@ -43,6 +43,11 @@ class DataStoreViewModel(private val appPreferences: AppPreferences) : ViewModel
     val recurrenceFilter: StateFlow<RecurrenceType> = appPreferences.recurrenceFilter
         .map { it }
         .stateIn(viewModelScope, SharingStarted.Eagerly, RecurrenceType.NONE)
+
+    val tutorialVisibility: StateFlow<Boolean> = appPreferences.tutorialVisibility
+        .map { it }
+        .stateIn(viewModelScope, SharingStarted.Eagerly, true)
+
     fun saveTheme(themeType: ThemeType) {
         viewModelScope.launch { appPreferences.saveTheme(themeType) }
     }
@@ -69,6 +74,10 @@ class DataStoreViewModel(private val appPreferences: AppPreferences) : ViewModel
 
     fun saveRecurrenceFilter(recurrenceFilter: RecurrenceType) {
         viewModelScope.launch { appPreferences.saveRecurrence(recurrenceFilter) }
+    }
+
+    fun saveTutorialVisibility(tutorialVisibility: Boolean) {
+        viewModelScope.launch { appPreferences.disableTutorialDialog() }
     }
 
     private fun fontWeightFromDisplayName(displayName: String): FontWeight {

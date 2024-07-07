@@ -40,6 +40,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -108,6 +109,8 @@ fun TaskScreen(
         }
     }
 
+    val tutorialVisibility = dataStoreViewModel.tutorialVisibility.collectAsState()
+
     Scaffold(
         floatingActionButton = {
             Row(
@@ -116,31 +119,31 @@ fun TaskScreen(
                     .padding(start = 24.dp),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                FloatingActionButton(
-                    onClick = {},
-                    elevation = FloatingActionButtonDefaults.elevation(0.dp, 0.dp, 0.dp, 0.dp),
-                    modifier = Modifier
-//                        .size(12.dp)
-                        .clip(shape = RoundedCornerShape(percent = 50))
-                        .border(
-                            width = 2.dp,
-                            color = MaterialTheme.colorScheme.onBackground,
-                            shape = RoundedCornerShape(percent = 50)
-                        )
-                        .size(48.dp)
-                    ,
-                    containerColor = MaterialTheme.colorScheme.background,
-                    contentColor = MaterialTheme.colorScheme.onBackground
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Lightbulb,
-                        contentDescription = "Add task",
+                if (tutorialVisibility.value) {
+                    FloatingActionButton(
+                        onClick = {},
+                        elevation = FloatingActionButtonDefaults.elevation(0.dp, 0.dp, 0.dp, 0.dp),
                         modifier = Modifier
-                            .clickable {
-                                onAppEvent(AppEvent.ShowTutorialDialog)
-                            },
-                        tint = Priority1
-                    )
+                            .clip(shape = RoundedCornerShape(percent = 50))
+                            .border(
+                                width = 2.dp,
+                                color = MaterialTheme.colorScheme.onBackground,
+                                shape = RoundedCornerShape(percent = 50)
+                            )
+                            .size(48.dp),
+                        containerColor = MaterialTheme.colorScheme.background,
+                        contentColor = MaterialTheme.colorScheme.onBackground
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Lightbulb,
+                            contentDescription = "Add task",
+                            modifier = Modifier
+                                .clickable {
+                                    onAppEvent(AppEvent.ShowTutorialDialog)
+                                },
+                            tint = Priority1
+                        )
+                    }
                 }
                 FloatingActionButton(
                     onClick = {},
@@ -204,10 +207,11 @@ fun TaskScreen(
         if (appState.isTutorialDialogVisible) {
             Tutorial(
                 onDismiss = {
-                    onAppEvent(AppEvent.ShowTutorialDialog)
+                    onAppEvent(AppEvent.HideTutorialDialog)
                 },
                 onDisable = {
                     onAppEvent(AppEvent.HideTutorialDialog)
+                    onAppEvent(AppEvent.DisableTutorialDialog)
                 },
                 onShowAddTaskDialog = {
                     onEvent(TaskEvent.ShowAddTaskDialog)

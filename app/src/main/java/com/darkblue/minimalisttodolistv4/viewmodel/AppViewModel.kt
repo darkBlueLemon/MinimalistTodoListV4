@@ -57,6 +57,10 @@ class AppViewModel(private val appPreferences: AppPreferences) : ViewModel() {
 
             AppEvent.ShowTutorialDialog -> updateState { copy(isTutorialDialogVisible = true) }
             AppEvent.HideTutorialDialog -> updateState { copy(isTutorialDialogVisible = false) }
+            AppEvent.DisableTutorialDialog -> {
+                viewModelScope.launch { appPreferences.disableTutorialDialog() }
+                AppEvent.HideTutorialDialog
+            }
         }
     }
 

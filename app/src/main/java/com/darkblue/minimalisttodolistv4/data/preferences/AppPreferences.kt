@@ -3,6 +3,7 @@ package com.darkblue.minimalisttodolistv4.data.preferences
 import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
@@ -40,6 +41,7 @@ class AppPreferences private constructor(context: Context) {
         val FONT_WEIGHT = stringPreferencesKey("fontWeight")
         val SORTING_OPTION = stringPreferencesKey("sorting_option")
         val RECURRENCE_FILTER = stringPreferencesKey("recurrence_option")
+        val TUTORIAL_VISIBILITY = booleanPreferencesKey("tutorial_visibility")
     }
 
     val theme: Flow<ThemeType> = dataStore.data.map { preferences ->
@@ -72,6 +74,10 @@ class AppPreferences private constructor(context: Context) {
 
     val recurrenceFilter: Flow<RecurrenceType> = dataStore.data.map { preferences ->
         RecurrenceType.fromDisplayName(preferences[PreferencesKeys.RECURRENCE_FILTER] ?: RecurrenceType.NONE.displayName)
+    }
+
+    val tutorialVisibility: Flow<Boolean> = dataStore.data.map { preferences ->
+        preferences[PreferencesKeys.TUTORIAL_VISIBILITY] ?: true
     }
 
     suspend fun saveTheme(theme: ThemeType) {
@@ -111,5 +117,9 @@ class AppPreferences private constructor(context: Context) {
 
     suspend fun saveRecurrence(recurrenceFilter: RecurrenceType) {
         dataStore.edit { preferences -> preferences[PreferencesKeys.RECURRENCE_FILTER] = recurrenceFilter.displayName }
+    }
+
+    suspend fun disableTutorialDialog() {
+        dataStore.edit { preferences -> preferences[PreferencesKeys.TUTORIAL_VISIBILITY] = false }
     }
 }
