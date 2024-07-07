@@ -13,6 +13,7 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
@@ -21,10 +22,16 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Lightbulb
+import androidx.compose.material.icons.filled.TouchApp
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.CheckCircle
+import androidx.compose.material.icons.outlined.Lightbulb
 import androidx.compose.material.icons.outlined.RadioButtonUnchecked
+import androidx.compose.material.icons.rounded.Lightbulb
 import androidx.compose.material.icons.rounded.Star
+import androidx.compose.material3.Card
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
@@ -42,7 +49,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextAlign
@@ -50,6 +59,7 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import com.darkblue.minimalisttodolistv4.data.model.RecurrenceType
 import com.darkblue.minimalisttodolistv4.data.model.Task
+import com.darkblue.minimalisttodolistv4.ui.components.CustomBox
 import com.darkblue.minimalisttodolistv4.ui.components.emptyStateMessages
 import com.darkblue.minimalisttodolistv4.viewmodel.DataStoreViewModel
 import com.darkblue.minimalisttodolistv4.viewmodel.TaskEvent
@@ -60,13 +70,14 @@ import com.darkblue.minimalisttodolistv4.ui.dialogs.FontSettingsDialog
 import com.darkblue.minimalisttodolistv4.ui.dialogs.HistoryDialog
 import com.darkblue.minimalisttodolistv4.ui.dialogs.MenuDialog
 import com.darkblue.minimalisttodolistv4.ui.dialogs.ScheduleExactAlarmPermissionDialog
+import com.darkblue.minimalisttodolistv4.ui.dialogs.Tutorial
 import com.darkblue.minimalisttodolistv4.viewmodel.AppEvent
 import com.darkblue.minimalisttodolistv4.viewmodel.AppState
 import com.darkblue.minimalisttodolistv4.ui.theme.Priority0
 import com.darkblue.minimalisttodolistv4.ui.theme.Priority1
 import com.darkblue.minimalisttodolistv4.ui.theme.Priority2
 import com.darkblue.minimalisttodolistv4.ui.theme.Priority3
-import com.darkblue.minimalisttodolistv4.ui.theme.dateRed
+import com.darkblue.minimalisttodolistv4.ui.theme.DateRed
 import com.darkblue.minimalisttodolistv4.util.vibrate
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -97,36 +108,71 @@ fun TaskScreen(
         }
     }
 
+    var showTutorial by remember { mutableStateOf(false) }
+
     Scaffold(
         floatingActionButton = {
-            FloatingActionButton(
-                onClick = {},
-                elevation = FloatingActionButtonDefaults.elevation(0.dp, 0.dp, 0.dp, 0.dp),
+            Row(
                 modifier = Modifier
-                    .clip(shape = RoundedCornerShape(percent = 7))
-                    .border(
-                        width = 2.dp,
-                        color = MaterialTheme.colorScheme.onBackground,
-                        shape = RoundedCornerShape(percent = 25)
-                    ),
-                containerColor = MaterialTheme.colorScheme.background,
-                contentColor = MaterialTheme.colorScheme.onBackground
+                    .fillMaxWidth()
+                    .padding(start = 24.dp),
+                horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Icon(
-                    imageVector = Icons.Outlined.Add,
-                    contentDescription = "Add task",
+                FloatingActionButton(
+                    onClick = {},
+                    elevation = FloatingActionButtonDefaults.elevation(0.dp, 0.dp, 0.dp, 0.dp),
                     modifier = Modifier
-                        .combinedClickable(
-                            onLongClick = {
-                                vibrate(context = context, strength = 1)
-                                onAppEvent(AppEvent.ShowMenuDialog)
-                            },
-                            onClick = {
-//                                vibrate(context = context, strength = 1)
-                                onEvent(TaskEvent.ShowAddTaskDialog)
-                            },
+//                        .size(12.dp)
+                        .clip(shape = RoundedCornerShape(percent = 50))
+                        .border(
+                            width = 2.dp,
+                            color = MaterialTheme.colorScheme.onBackground,
+                            shape = RoundedCornerShape(percent = 50)
                         )
-                )
+                        .size(48.dp)
+                    ,
+                    containerColor = MaterialTheme.colorScheme.background,
+                    contentColor = MaterialTheme.colorScheme.onBackground
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Lightbulb,
+                        contentDescription = "Add task",
+                        modifier = Modifier
+                            .clickable {
+                                showTutorial = true
+                            },
+                        tint = Priority1
+                    )
+                }
+                FloatingActionButton(
+                    onClick = {},
+                    elevation = FloatingActionButtonDefaults.elevation(0.dp, 0.dp, 0.dp, 0.dp),
+                    modifier = Modifier
+                        .clip(shape = RoundedCornerShape(percent = 7))
+                        .border(
+                            width = 2.dp,
+                            color = MaterialTheme.colorScheme.onBackground,
+                            shape = RoundedCornerShape(percent = 25)
+                        ),
+                    containerColor = MaterialTheme.colorScheme.background,
+                    contentColor = MaterialTheme.colorScheme.onBackground
+                ) {
+                    Icon(
+                        imageVector = Icons.Outlined.Add,
+                        contentDescription = "Add task",
+                        modifier = Modifier
+                            .combinedClickable(
+                                onLongClick = {
+                                    vibrate(context = context, strength = 1)
+                                    onAppEvent(AppEvent.ShowMenuDialog)
+                                },
+                                onClick = {
+//                                vibrate(context = context, strength = 1)
+                                    onEvent(TaskEvent.ShowAddTaskDialog)
+                                },
+                            )
+                    )
+                }
             }
         },
     ) { padding ->
@@ -174,6 +220,22 @@ fun TaskScreen(
             }
         } else {
             TaskList(onEvent, taskState, taskViewModel, padding)
+        }
+        if (showTutorial) {
+            Tutorial(
+                onDismiss = {
+                    showTutorial = false
+                },
+                onDisable = {
+                    showTutorial = false
+                },
+                onShowAddTaskDialog = {
+                    onEvent(TaskEvent.ShowAddTaskDialog)
+                },
+                onShowMenuDialog = {
+                    onAppEvent(AppEvent.ShowMenuDialog)
+                }
+            )
         }
     }
 }
@@ -278,7 +340,7 @@ fun DueDate_Recurrence_Note(
     val textColor = if (task.dueDate?.let {
             Instant.ofEpochMilli(it).atZone(ZoneId.systemDefault()).toLocalDate().isBefore(LocalDate.now().plusDays(1))
         } == true) {
-        dateRed
+        DateRed
     } else {
         MaterialTheme.colorScheme.tertiary
     }
