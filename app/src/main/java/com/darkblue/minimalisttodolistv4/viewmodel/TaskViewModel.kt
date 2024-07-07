@@ -1,7 +1,6 @@
 package com.darkblue.minimalisttodolistv4.viewmodel
 
 import android.os.Build
-import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -21,7 +20,6 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.ZoneId
-import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -72,7 +70,7 @@ class TaskViewModel(
     fun onEvent(event: TaskEvent) {
         when (event) {
             is TaskEvent.DeleteTask -> handleDeleteTask(event.task)
-            TaskEvent.SaveTask -> handleSaveTask()
+            TaskEvent.SaveTaskAndHideAddTaskDialog -> handleSaveTask()
             is TaskEvent.SetTitle -> _state.update { it.copy(title = event.title) }
             is TaskEvent.SetPriority -> _state.update { it.copy(priority = event.priority) }
             is TaskEvent.SetNote -> _state.update { it.copy(note = event.note) }
@@ -89,7 +87,6 @@ class TaskViewModel(
             is TaskEvent.DeleteForever -> handleDeleteForever(event.deletedTask)
             is TaskEvent.UndoDeleteTask -> handleUndoDeleteTask(event.deletedTask)
             TaskEvent.ShowAddTaskDialog -> _state.update { it.copy(isAddTaskDialogVisible = true) }
-            TaskEvent.HideAddTaskDialog -> resetAddTaskDialog()
             TaskEvent.DeleteAllHistoryTasks -> viewModelScope.launch { dao.deleteAllDeletedTasks() }
             TaskEvent.RefreshTasks -> reloadTasks()
         }
@@ -107,7 +104,10 @@ class TaskViewModel(
     @RequiresApi(Build.VERSION_CODES.O)
     private fun handleSaveTask() {
         val currentState = state.value
-        if (currentState.title.isBlank()) return
+        if (currentState.title.isBlank()) {
+            resetAddTaskDialog()
+            return
+        }
 
         val task = Task(
             id = currentState.editingTaskId ?: 0,

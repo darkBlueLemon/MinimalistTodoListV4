@@ -8,7 +8,7 @@ import java.time.LocalDate
 import java.time.LocalTime
 
 sealed interface TaskEvent {
-    data object SaveTask : TaskEvent
+    data object SaveTaskAndHideAddTaskDialog : TaskEvent
     data class SetTitle(val title: String) : TaskEvent
     data class SetPriority(val priority: Int) : TaskEvent
     data class SetNote(val note: String) : TaskEvent
@@ -16,7 +16,6 @@ sealed interface TaskEvent {
 
     // AddTask Dialog
     data object ShowAddTaskDialog : TaskEvent
-    data object HideAddTaskDialog : TaskEvent
 
     // Date Picker
     data object ShowDatePicker : TaskEvent

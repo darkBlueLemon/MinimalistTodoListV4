@@ -1,7 +1,6 @@
 package com.darkblue.minimalisttodolistv4.ui.dialogs
 
 import android.os.Build
-import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
@@ -44,7 +43,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -71,7 +69,7 @@ fun AddTaskDialog(
     onAppEvent: (AppEvent) -> Unit
 ) {
     BasicAlertDialog(
-        onDismissRequest = { onEvent(TaskEvent.HideAddTaskDialog) },
+        onDismissRequest = { onEvent(TaskEvent.SaveTaskAndHideAddTaskDialog) },
     ) {
         CustomBox {
             Column(
@@ -106,7 +104,7 @@ fun AddTaskDialog(
 
                 SaveButton(
                     onSave = {
-                        onEvent(TaskEvent.SaveTask)
+                        onEvent(TaskEvent.SaveTaskAndHideAddTaskDialog)
                     },
                     modifier = Modifier.align(Alignment.CenterHorizontally)
                 )
