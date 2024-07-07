@@ -5,15 +5,15 @@ plugins {
 }
 
 android {
-    namespace = "com.darkblue.minimalisttodolistv4"
+    namespace = "com.minimalisttodolist.pleasebethelastrecyclerview"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.darkblue.minimalisttodolistv4"
+        applicationId = "com.minimalisttodolist.pleasebethelastrecyclerview"
         minSdk = 24
         targetSdk = 34
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = 15
+        versionName = "15.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -29,7 +29,6 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
-            signingConfig = signingConfigs.getByName("debug")
         }
     }
     compileOptions {
