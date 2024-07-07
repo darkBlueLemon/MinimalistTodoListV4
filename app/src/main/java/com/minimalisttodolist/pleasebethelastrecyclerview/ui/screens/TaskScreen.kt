@@ -272,8 +272,13 @@ fun TaskList(onEvent: (TaskEvent) -> Unit, taskState: TaskState, viewModel: Task
                     onDelete = {
                         coroutineScope.launch {
                             delay(300)
-                            visible = false
                             onEvent(TaskEvent.DeleteTask(task))
+                            if (
+                                task.recurrenceType == RecurrenceType.NONE ||
+                                task.dueDate?.let { it <= System.currentTimeMillis() } == false
+                                ) {
+                                visible = false
+                            }
                         }
                     },
                     viewModel = viewModel
@@ -399,6 +404,7 @@ fun CompleteIcon(modifier: Modifier = Modifier, onDelete: (Task) -> Unit, task: 
                         stiffness = Spring.StiffnessLow
                     )
                 )
+                isChecked = false
             }
         }
     }

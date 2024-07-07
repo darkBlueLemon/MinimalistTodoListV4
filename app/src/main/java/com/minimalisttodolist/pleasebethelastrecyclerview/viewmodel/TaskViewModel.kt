@@ -11,6 +11,7 @@ import com.minimalisttodolist.pleasebethelastrecyclerview.data.model.RecurrenceT
 import com.minimalisttodolist.pleasebethelastrecyclerview.data.model.SortType
 import com.minimalisttodolist.pleasebethelastrecyclerview.data.model.Task
 import com.minimalisttodolist.pleasebethelastrecyclerview.data.database.TaskDao
+import com.minimalisttodolist.pleasebethelastrecyclerview.util.calculateNextDueDate
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
@@ -92,14 +93,49 @@ class TaskViewModel(
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun handleDeleteTask(task: Task) {
         viewModelScope.launch {
             delay(500)
-            notificationHelper.cancelNotification(task.id.toInt())
-            dao.deleteTask(task)
-            dao.insertDeletedTask(task.toDeletedTask())
+
+            if (task.recurrenceType == RecurrenceType.NONE) {
+                // No recurrence, delete normally
+                if (task.dueDate?.let { it <= System.currentTimeMillis() } == true) {
+                    // Task is in the future
+                    dao.deleteTask(task)
+                    dao.insertDeletedTask(task.toDeletedTask())
+                    notificationHelper.cancelNotification(task.id.toInt())
+                } else {
+                    // Task is due now or in the past
+                    dao.deleteTask(task)
+                    dao.insertDeletedTask(task.toDeletedTask())
+                    notificationHelper.cancelNotification(task.id.toInt())
+                }
+            } else {
+                // Task has recurrence
+                if (task.dueDate?.let { it <= System.currentTimeMillis() } == true) {
+                    // Task is already due, update with the new due date
+                    val newDueDate = calculateNextDueDate(task.dueDate, task.recurrenceType)
+                    if (newDueDate != null) {
+                        val updatedTask = task.copy(dueDate = newDueDate)
+                        dao.upsertTask(updatedTask)
+                        notificationHelper.scheduleNotification(updatedTask)
+                    } else {
+                        // Recurrence could not be calculated, delete the task
+                        dao.deleteTask(task)
+                        dao.insertDeletedTask(task.toDeletedTask())
+                        notificationHelper.cancelNotification(task.id.toInt())
+                    }
+                } else {
+                    // Task is in the future, delete normally
+                    dao.deleteTask(task)
+                    dao.insertDeletedTask(task.toDeletedTask())
+                    notificationHelper.cancelNotification(task.id.toInt())
+                }
+            }
         }
     }
+
 
     @RequiresApi(Build.VERSION_CODES.O)
     private fun handleSaveTask() {

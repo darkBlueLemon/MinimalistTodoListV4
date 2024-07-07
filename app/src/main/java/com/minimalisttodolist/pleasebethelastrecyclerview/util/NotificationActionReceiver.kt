@@ -81,19 +81,4 @@ class NotificationActionReceiver : BroadcastReceiver() {
             }
         }
     }
-
-
-    @RequiresApi(Build.VERSION_CODES.O)
-    private fun calculateNextDueDate(dueDate: Long?, recurrenceType: RecurrenceType): Long? {
-        if (dueDate == null) return null
-        val date = Instant.ofEpochMilli(dueDate).atZone(ZoneId.systemDefault()).toLocalDate()
-        val nextDate = when (recurrenceType) {
-            RecurrenceType.DAILY -> date.plusDays(1)
-            RecurrenceType.WEEKLY -> date.plusWeeks(1)
-            RecurrenceType.MONTHLY -> date.plusMonths(1)
-            RecurrenceType.YEARLY -> date.plusYears(1)
-            else -> return null
-        }
-        return nextDate.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
-    }
 }
