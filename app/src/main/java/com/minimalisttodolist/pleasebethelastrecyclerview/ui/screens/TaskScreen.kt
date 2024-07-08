@@ -340,11 +340,10 @@ fun DueDate_Recurrence_Note(
     viewModel: TaskViewModel
 ) {
     val dueDate = viewModel.formatDueDateWithDateTime(task.dueDate)
-//    val nextDueDate = viewModel.formatDueDateWithDateTime(task.notificationTime)
     val note = task.note
 
     val textColor = if (task.dueDate?.let {
-            Instant.ofEpochMilli(it).atZone(ZoneId.systemDefault()).toLocalDate().isBefore(LocalDate.now().plusDays(1))
+        viewModel.isDueOrPast(it)
         } == true) {
         DateRed
     } else {

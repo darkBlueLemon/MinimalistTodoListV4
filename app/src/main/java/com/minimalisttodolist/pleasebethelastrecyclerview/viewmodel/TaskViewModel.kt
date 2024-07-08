@@ -136,7 +136,7 @@ class TaskViewModel(
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    private fun isDueOrPast(dueDate: Long?): Boolean {
+    fun isDueOrPast(dueDate: Long?): Boolean {
         if (dueDate == null) return false
         val now = Instant.now().toEpochMilli()
         return dueDate <= now
