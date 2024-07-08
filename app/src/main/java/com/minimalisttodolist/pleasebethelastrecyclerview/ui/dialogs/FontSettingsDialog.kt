@@ -137,9 +137,20 @@ fun FontWeightSelector(
 ) {
     val fontWeight by dataStoreViewModel.fontWeight.collectAsState()
     val fontWeights = listOf(
-        FontWeight.Thin, FontWeight.Light, FontWeight.Normal,
-        FontWeight.Medium, FontWeight.Bold, FontWeight.Black
+        FontWeight.W100,
+        FontWeight.W200,
+        FontWeight.W300,
+        FontWeight.W400,
+        FontWeight.W500,
+        FontWeight.W600,
+        FontWeight.W700,
+        FontWeight.W800,
+        FontWeight.W900
     )
+//    val fontWeights = listOf(
+//        FontWeight.Thin, FontWeight.Light, FontWeight.Normal,
+//        FontWeight.Medium, FontWeight.Bold, FontWeight.Black
+//    )
     var expanded by remember { mutableStateOf(false) }
 
     Row (
@@ -183,7 +194,8 @@ fun FontWeightSelector(
                 CompleteIconWithoutDelay(isChecked = fontWeight == fontWeightType)
                 Text(
                     fontWeightType.toDisplayString(),
-                    style = MaterialTheme.typography.bodyLarge
+                    style = MaterialTheme.typography.bodyLarge,
+                    fontWeight = fontWeightType
                 )
             }
         }
@@ -200,17 +212,35 @@ fun FontSizeSelector(
     val fontSize by dataStoreViewModel.fontSize.collectAsState()
 
     Text(
-        "Select Font Size: ${fontSize}sp",
+        "Select Font Size: $fontSize",
         fontSize = 16.sp
     )
-    Slider(
-        value = fontSize.toFloat(),
-        onValueChange = { newSize ->
-            dataStoreViewModel.saveFontSize(newSize.toInt())
-        },
-        valueRange = 10f..22f,
-        steps = 20
-    )
+    Row (
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center
+    ){
+        Text(
+            "A",
+            fontSize = 16.sp,
+            color = MaterialTheme.colorScheme.primary,
+//            modifier = Modifier.weight(1f)
+        )
+        Slider(
+            value = fontSize.toFloat(),
+            onValueChange = { newSize ->
+                dataStoreViewModel.saveFontSize(newSize.toInt())
+            },
+            valueRange = 10f..22f,
+            steps = 20,
+            modifier = Modifier.weight(1f)
+        )
+        Text(
+            "A",
+            fontSize = 32.sp,
+            color = MaterialTheme.colorScheme.primary,
+//            modifier = Modifier.weight(1f)
+        )
+    }
 }
 
 
