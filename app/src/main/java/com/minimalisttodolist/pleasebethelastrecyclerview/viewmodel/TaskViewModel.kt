@@ -98,42 +98,48 @@ class TaskViewModel(
         viewModelScope.launch {
             delay(500)
 
-            if (task.recurrenceType == RecurrenceType.NONE) {
-                // No recurrence, delete normally
-                if (task.dueDate?.let { it <= System.currentTimeMillis() } == true) {
-                    // Task is in the future
-                    dao.deleteTask(task)
-                    dao.insertDeletedTask(task.toDeletedTask())
-                    notificationHelper.cancelNotification(task.id.toInt())
-                } else {
-                    // Task is due now or in the past
-                    dao.deleteTask(task)
-                    dao.insertDeletedTask(task.toDeletedTask())
-                    notificationHelper.cancelNotification(task.id.toInt())
+            when {
+                task.recurrenceType == RecurrenceType.NONE -> {
+                    // Delete the task normally
+                    deleteTaskNormally(task)
                 }
-            } else {
-                // Task has recurrence
-                if (task.dueDate?.let { it <= System.currentTimeMillis() } == true) {
-                    // Task is already due, update with the new due date
-                    val newDueDate = calculateNextDueDate(task.dueDate, task.recurrenceType)
-                    if (newDueDate != null) {
-                        val updatedTask = task.copy(dueDate = newDueDate)
-                        dao.upsertTask(updatedTask)
-                        notificationHelper.scheduleNotification(updatedTask)
-                    } else {
-                        // Recurrence could not be calculated, delete the task
-                        dao.deleteTask(task)
-                        dao.insertDeletedTask(task.toDeletedTask())
-                        notificationHelper.cancelNotification(task.id.toInt())
-                    }
-                } else {
-                    // Task is in the future, delete normally
-                    dao.deleteTask(task)
-                    dao.insertDeletedTask(task.toDeletedTask())
-                    notificationHelper.cancelNotification(task.id.toInt())
+                task.recurrenceType != RecurrenceType.NONE && isDueOrPast(task.dueDate) -> {
+                    // Task is recurring and due or past due, update with new due date
+                    updateTaskWithNewDueDate(task)
+                }
+                else -> {
+                    // Task is recurring but in the future, delete normally
+                    deleteTaskNormally(task)
                 }
             }
         }
+    }
+
+    private suspend fun deleteTaskNormally(task: Task) {
+        notificationHelper.cancelNotification(task.id.toInt())
+        dao.deleteTask(task)
+        dao.insertDeletedTask(task.toDeletedTask())
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    private suspend fun updateTaskWithNewDueDate(task: Task) {
+        val newDueDate = calculateNextDueDate(task.dueDate, task.recurrenceType)
+        if (newDueDate != null) {
+            val updatedTask = task.copy(dueDate = newDueDate)
+            dao.upsertTask(updatedTask)
+            notificationHelper.cancelNotification(task.id.toInt())
+            notificationHelper.scheduleNotification(updatedTask)
+        } else {
+            // If we couldn't calculate a new due date, delete the task
+            deleteTaskNormally(task)
+        }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun isDueOrPast(dueDate: Long?): Boolean {
+        if (dueDate == null) return false
+        val now = Instant.now().toEpochMilli()
+        return dueDate <= now
     }
 
 
