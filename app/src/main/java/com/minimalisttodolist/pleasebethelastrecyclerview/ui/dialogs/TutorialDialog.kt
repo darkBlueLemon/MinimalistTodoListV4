@@ -93,16 +93,42 @@ fun Tutorial(
                     modifier = Modifier.fillMaxWidth()
                 ) { page ->
                     Column(
-                        modifier = Modifier.fillMaxWidth(),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .then(
+                                when (page) {
+                                    0 -> {
+                                        Modifier.clickable {
+                                            onShowAddTaskDialog()
+                                        }
+                                    }
+                                    1 -> {
+                                        Modifier.combinedClickable(
+                                                onLongClick = {
+//                                                    vibrate(context = context, strength = 1)
+                                                    onShowMenuDialog()
+                                                },
+                                                onClick = { }
+                                            )
+                                    }
+                                    2 -> {
+                                        Modifier.clickable {
+                                            onShowAddTaskDialog()
+                                        }
+                                    }
+                                    else -> { Modifier }
+                                }
+                            )
+                        ,
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.spacedBy(24.dp)
                     ) {
                         when (page) {
                             0 -> {
-                                AnimatedClickIcon(onClick = { onShowAddTaskDialog() })
+                                AnimatedClickIcon(onClick = { })
                             }
                             1 -> {
-                                AnimatedLongPressIcon(onLongClick = { onShowMenuDialog() })
+                                AnimatedLongPressIcon(onLongClick = { })
                             }
                             2 -> {
                                 val task = Task(

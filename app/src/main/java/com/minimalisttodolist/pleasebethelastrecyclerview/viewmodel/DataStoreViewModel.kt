@@ -34,7 +34,7 @@ class DataStoreViewModel(private val appPreferences: AppPreferences) : ViewModel
 
     val fontWeight: StateFlow<FontWeight> = appPreferences.fontWeight
         .map { fontWeightFromDisplayName(it) }
-        .stateIn(viewModelScope, SharingStarted.Eagerly, FontWeight.Normal)
+        .stateIn(viewModelScope, SharingStarted.Eagerly, FontWeight.Light)
 
     val priorityOption: StateFlow<SortType> = appPreferences.priorityOption
         .map { it }

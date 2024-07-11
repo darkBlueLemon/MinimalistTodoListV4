@@ -65,7 +65,7 @@ class AppPreferences private constructor(context: Context) {
     }
 
     val fontWeight: Flow<String> = dataStore.data.map { preferences ->
-        preferences[PreferencesKeys.FONT_WEIGHT] ?: "Normal"
+        preferences[PreferencesKeys.FONT_WEIGHT] ?: "Light"
     }
 
     val priorityOption: Flow<SortType> = dataStore.data.map { preferences ->

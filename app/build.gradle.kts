@@ -79,12 +79,6 @@ dependencies {
     // CALENDAR
     implementation (libs.calendar)
 
-    // CLOCK
-    implementation (libs.clock)
-
-    // DATE TIME
-    implementation (libs.date.time)
-
     // Lottie Animation
     implementation (libs.lottie)
 
