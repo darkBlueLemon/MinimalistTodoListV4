@@ -143,6 +143,7 @@ fun TitleAndDeleteAll(onClearHistory: () -> Unit, context: Context) {
                     expanded = false
                     vibrate(context = context, strength = 1)
                 }
+                .padding(start = 12.dp, end = 12.dp)
         )
 //        Icon(
 //            Icons.Default.Delete,
@@ -249,6 +250,7 @@ fun HistoryItem(
                     .clickable {
                         expanded = true
                     }
+                    .padding(start = 12.dp)
             )
             CustomDropdownMenu(
                 expanded = expanded,

@@ -13,6 +13,7 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
@@ -118,7 +119,9 @@ fun TaskScreen(
             ) {
                 if (tutorialVisibility.value) {
                     FloatingActionButton(
-                        onClick = {},
+                        onClick = {
+                            onAppEvent(AppEvent.ShowTutorialDialog)
+                        },
                         elevation = FloatingActionButtonDefaults.elevation(0.dp, 0.dp, 0.dp, 0.dp),
                         modifier = Modifier
                             .clip(shape = RoundedCornerShape(percent = 50))
@@ -135,9 +138,6 @@ fun TaskScreen(
                             imageVector = Icons.Default.Lightbulb,
                             contentDescription = "Show Tutorial",
                             modifier = Modifier
-                                .clickable {
-                                    onAppEvent(AppEvent.ShowTutorialDialog)
-                                }
                                 .padding(8.dp),
                             tint = PriorityColor.PRIORITY1.getColor(darkTheme)
                         )
@@ -155,7 +155,8 @@ fun TaskScreen(
                             width = 2.dp,
                             color = MaterialTheme.colorScheme.onBackground,
                             shape = RoundedCornerShape(percent = 25)
-                        ),
+                        )
+                    ,
                     containerColor = MaterialTheme.colorScheme.background,
                     contentColor = MaterialTheme.colorScheme.onBackground
                 ) {
@@ -308,7 +309,11 @@ fun TaskItem(task: Task, onEdit: (Task) -> Unit, onDelete: (Task) -> Unit, viewM
     Row(
         modifier = Modifier
             .padding(bottom = 16.dp)
-            .fillMaxWidth(),
+            .fillMaxWidth()
+            .clickable {
+                onEdit(task)
+            }
+        ,
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
@@ -322,9 +327,7 @@ fun TaskItem(task: Task, onEdit: (Task) -> Unit, onDelete: (Task) -> Unit, viewM
             modifier = Modifier
                 .weight(1f)
                 .padding(start = 8.dp)
-                .clickable {
-                    onEdit(task)
-                },
+            ,
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.Start
         ) {

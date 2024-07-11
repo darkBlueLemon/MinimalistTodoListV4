@@ -91,7 +91,7 @@ fun MenuDialog(
                     style = MaterialTheme.typography.headlineSmall,
                     modifier = Modifier
                         .align(Alignment.CenterHorizontally)
-                        .padding(bottom = 24.dp)
+                        .padding(bottom = 12.dp)
                 )
                 Text(
                     text = "History",
@@ -101,7 +101,7 @@ fun MenuDialog(
                         .clickable {
                             onAppEvent(AppEvent.ShowHistoryDialog)
                         }
-                        .padding(bottom = 24.dp)
+                        .padding(top = 12.dp, bottom = 12.dp)
                 )
                 Text(
                     text = "Font Options",
@@ -111,7 +111,7 @@ fun MenuDialog(
                         .clickable {
                             onAppEvent(AppEvent.ShowFontSettingsDialog)
                         }
-                        .padding(bottom = 24.dp)
+                        .padding(top = 12.dp, bottom = 12.dp)
                 )
                 AppIconSelector(context = context)
 //                Text(
@@ -154,7 +154,8 @@ fun AppIconSelector(modifier: Modifier = Modifier, context: Context) {
         style = MaterialTheme.typography.bodyLarge,
         modifier = Modifier
             .fillMaxWidth()
-            .clickable { expanded = true },
+            .clickable { expanded = true }
+            .padding(top = 12.dp, bottom = 12.dp)
     )
 
     CustomDropdownMenu(
@@ -177,7 +178,7 @@ fun AppIconSelector(modifier: Modifier = Modifier, context: Context) {
         }
     }
 
-    Spacer(modifier = Modifier.size(width = 0.dp, height = 24.dp))
+//    Spacer(modifier = Modifier.size(width = 0.dp, height = 24.dp))
 }
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -257,7 +258,9 @@ fun RecurrenceSelector(
     Row (
         modifier = Modifier
             .fillMaxWidth()
-            .clickable { expanded = true },
+            .clickable { expanded = true }
+            .padding(top = 12.dp, bottom = 12.dp)
+        ,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Text(
@@ -301,7 +304,7 @@ fun RecurrenceSelector(
             }
         }
     }
-    Spacer(modifier = Modifier.size(width = 0.dp, height = 24.dp))
+//    Spacer(modifier = Modifier.size(width = 0.dp, height = 24.dp))
 }
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -317,7 +320,9 @@ fun PrioritySelector(
     Row (
         modifier = Modifier
             .fillMaxWidth()
-            .clickable { expanded = true },
+            .clickable { expanded = true }
+            .padding(top = 12.dp, bottom = 12.dp)
+        ,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Text(
@@ -361,7 +366,7 @@ fun PrioritySelector(
             }
         }
     }
-    Spacer(modifier = Modifier.size(width = 0.dp, height = 24.dp))
+//    Spacer(modifier = Modifier.size(width = 0.dp, height = 24.dp))
 }
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -375,7 +380,9 @@ fun ThemeSelector(
     Row (
         modifier = Modifier
             .fillMaxWidth()
-            .clickable { expanded = true },
+            .clickable { expanded = true }
+            .padding(top = 12.dp, bottom = 12.dp)
+        ,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Text(
@@ -419,7 +426,7 @@ fun ThemeSelector(
         }
     }
 
-    Spacer(modifier = Modifier.size(width = 0.dp, height = 24.dp))
+//    Spacer(modifier = Modifier.size(width = 0.dp, height = 24.dp))
 }
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -433,7 +440,9 @@ fun ClockTypeSelector(
     Row (
         modifier = Modifier
             .fillMaxWidth()
-            .clickable { expanded = true },
+            .clickable { expanded = true }
+            .padding(top = 12.dp, bottom = 12.dp)
+        ,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Text(
@@ -477,7 +486,7 @@ fun ClockTypeSelector(
         }
     }
 
-    Spacer(modifier = Modifier.size(width = 0.dp, height = 24.dp))
+//    Spacer(modifier = Modifier.size(width = 0.dp, height = 24.dp))
 }
 
 @Composable

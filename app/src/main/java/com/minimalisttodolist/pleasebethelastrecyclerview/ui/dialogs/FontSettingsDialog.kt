@@ -60,7 +60,7 @@ fun FontSettingsDialog(
                     style = MaterialTheme.typography.headlineSmall,
                     modifier = Modifier
                         .align(Alignment.CenterHorizontally)
-                        .padding(bottom = 24.dp)
+                        .padding(top = 12.dp, bottom = 12.dp)
                 )
                 FontFamilySelector(dataStoreViewModel = dataStoreViewModel)
                 FontWeightSelector(dataStoreViewModel = dataStoreViewModel)
@@ -82,7 +82,8 @@ fun FontFamilySelector(
     Row (
         modifier = Modifier
             .fillMaxWidth()
-            .clickable { expanded = true },
+            .clickable { expanded = true }
+            .padding(top = 12.dp, bottom = 12.dp),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Text(
@@ -127,7 +128,7 @@ fun FontFamilySelector(
         }
     }
 
-    Spacer(modifier = Modifier.size(width = 0.dp, height = 24.dp))
+//    Spacer(modifier = Modifier.size(width = 0.dp, height = 24.dp))
 }
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -156,7 +157,9 @@ fun FontWeightSelector(
     Row (
         modifier = Modifier
             .fillMaxWidth()
-            .clickable { expanded = true },
+            .clickable { expanded = true }
+            .padding(top = 12.dp, bottom = 12.dp)
+        ,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Text(
@@ -201,7 +204,7 @@ fun FontWeightSelector(
         }
     }
 
-    Spacer(modifier = Modifier.size(width = 0.dp, height = 24.dp))
+//    Spacer(modifier = Modifier.size(width = 0.dp, height = 24.dp))
 }
 
 @Composable
@@ -213,7 +216,9 @@ fun FontSizeSelector(
 
     Text(
         "Select Font Size: $fontSize",
-        fontSize = 16.sp
+        fontSize = 16.sp,
+        modifier = Modifier
+            .padding(top = 12.dp)
     )
     Row (
         verticalAlignment = Alignment.CenterVertically,
