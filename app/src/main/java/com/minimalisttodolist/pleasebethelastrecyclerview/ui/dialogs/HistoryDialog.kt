@@ -10,6 +10,7 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -28,6 +29,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.Undo
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.DeleteForever
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.outlined.Delete
@@ -45,9 +47,12 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.minimalisttodolist.pleasebethelastrecyclerview.data.model.DeletedTask
 import com.minimalisttodolist.pleasebethelastrecyclerview.ui.components.CustomBox
@@ -91,7 +96,7 @@ fun HistoryDialog(
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
-                            text = "Your task history is empty",
+                            text = "History is empty",
                             textAlign = TextAlign.Center,
                             style = MaterialTheme.typography.bodyLarge,
                             color = MaterialTheme.colorScheme.tertiary
@@ -125,19 +130,33 @@ fun TitleAndDeleteAll(onClearHistory: () -> Unit, context: Context) {
             style = MaterialTheme.typography.headlineSmall,
             modifier = Modifier.align(Alignment.Center)
         )
-        Icon(
-            Icons.Default.DeleteForever,
-            contentDescription = "Clear History",
-            tint = MaterialTheme.colorScheme.primary,
+        Text(
+            text = "Clear",
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.primary,
+//            fontStyle = FontStyle.Italic,
+            textAlign = TextAlign.Center,
             modifier = Modifier
+                .align(Alignment.CenterEnd)
                 .clickable {
                     onClearHistory()
                     expanded = false
                     vibrate(context = context, strength = 1)
                 }
-                .align(Alignment.CenterEnd)
-                .padding(end = 10.dp)
         )
+//        Icon(
+//            Icons.Default.Delete,
+//            contentDescription = "Clear History",
+//            tint = MaterialTheme.colorScheme.primary,
+//            modifier = Modifier
+//                .clickable {
+//                    onClearHistory()
+//                    expanded = false
+//                    vibrate(context = context, strength = 1)
+//                }
+//                .align(Alignment.CenterEnd)
+//                .padding(end = 10.dp)
+//        )
     }
 }
 

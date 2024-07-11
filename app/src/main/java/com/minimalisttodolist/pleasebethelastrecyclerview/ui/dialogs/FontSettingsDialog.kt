@@ -137,15 +137,15 @@ fun FontWeightSelector(
 ) {
     val fontWeight by dataStoreViewModel.fontWeight.collectAsState()
     val fontWeights = listOf(
-        FontWeight.W100,
-        FontWeight.W200,
+//        FontWeight.W100,
+//        FontWeight.W200,
         FontWeight.W300,
         FontWeight.W400,
-        FontWeight.W500,
-        FontWeight.W600,
+//        FontWeight.W500,
+//        FontWeight.W600,
         FontWeight.W700,
-        FontWeight.W800,
-        FontWeight.W900
+//        FontWeight.W800,
+//        FontWeight.W900
     )
 //    val fontWeights = listOf(
 //        FontWeight.Thin, FontWeight.Light, FontWeight.Normal,

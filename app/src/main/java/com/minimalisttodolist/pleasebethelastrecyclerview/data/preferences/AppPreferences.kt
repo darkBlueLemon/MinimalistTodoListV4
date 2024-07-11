@@ -49,7 +49,7 @@ class AppPreferences private constructor(context: Context) {
     }
 
     val clockType: Flow<ClockType> = dataStore.data.map { preferences ->
-        ClockType.fromDisplayName(preferences[PreferencesKeys.CLOCK_TYPE] ?: ClockType.TWELVE_HOUR.displayName)
+        ClockType.fromDisplayName(preferences[PreferencesKeys.CLOCK_TYPE] ?: ClockType.TWENTY_FOUR_HOUR.displayName)
     }
 
     val postNotificationDenialCount: Flow<Int> = dataStore.data.map { preferences ->
