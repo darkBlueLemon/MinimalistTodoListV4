@@ -217,7 +217,11 @@ fun TaskScreen(
                 },
                 onShowMenuDialog = {
                     onAppEvent(AppEvent.ShowMenuDialog)
-                }
+                },
+                onEdit = {
+                    onEvent(TaskEvent.EditTask(it))
+                },
+                viewModel = taskViewModel
             )
         }
         if (taskState.tasks.isEmpty()) {
@@ -320,7 +324,9 @@ fun TaskItem(task: Task, onEdit: (Task) -> Unit, onDelete: (Task) -> Unit, viewM
                 .padding(start = 8.dp)
                 .clickable {
                     onEdit(task)
-                }
+                },
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.Start
         ) {
             Text(
                 task.title,
@@ -328,7 +334,9 @@ fun TaskItem(task: Task, onEdit: (Task) -> Unit, onDelete: (Task) -> Unit, viewM
             )
             DueDate_Recurrence_Note(task = task, viewModel = viewModel)
         }
-        CompleteIcon(onDelete = onDelete, task = task)
+        CompleteIcon(
+            onDelete = { onDelete(task) }
+        )
     }
 }
 
@@ -350,7 +358,7 @@ fun DueDate_Recurrence_Note(
         MaterialTheme.colorScheme.tertiary
     }
 
-    Column {
+//    Column {
         if (dueDate.isNotEmpty()) {
             Text(
                 buildAnnotatedString {
@@ -375,14 +383,14 @@ fun DueDate_Recurrence_Note(
             Text(
                 text = note,
                 color = MaterialTheme.colorScheme.tertiary,
-                style = MaterialTheme.typography.bodyMedium
+                style = MaterialTheme.typography.bodyMedium,
             )
         }
-    }
+//    }
 }
 
 @Composable
-fun CompleteIcon(modifier: Modifier = Modifier, onDelete: (Task) -> Unit, task: Task) {
+fun CompleteIcon(modifier: Modifier = Modifier, onDelete: () -> Unit) {
     var isChecked by remember { mutableStateOf(false) }
     val scale = remember { Animatable(initialValue = 1f) }
     var selected by remember { mutableStateOf(false) }
@@ -404,6 +412,7 @@ fun CompleteIcon(modifier: Modifier = Modifier, onDelete: (Task) -> Unit, task: 
                     )
                 )
                 isChecked = false
+                selected = false
             }
         }
     }
@@ -414,7 +423,7 @@ fun CompleteIcon(modifier: Modifier = Modifier, onDelete: (Task) -> Unit, task: 
             .clickable {
                 selected = !selected
                 isChecked = !isChecked
-                onDelete(task)
+                onDelete()
             }
             .padding(8.dp)
     ) {

@@ -208,12 +208,16 @@ class TaskViewModel(
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun handleUndoDeleteTask(deletedTask: DeletedTask) {
         viewModelScope.launch {
             delay(500)
             val restoredTask = deletedTask.toTask()
-            dao.upsertTask(restoredTask)
+            val taskId = dao.upsertTask(restoredTask)
+            val savedTask = dao.getTaskById(taskId.toInt())
             dao.deleteDeletedTask(deletedTask)
+            notificationHelper.cancelNotification(savedTask!!.id)
+            notificationHelper.scheduleNotification(savedTask)
         }
     }
 
