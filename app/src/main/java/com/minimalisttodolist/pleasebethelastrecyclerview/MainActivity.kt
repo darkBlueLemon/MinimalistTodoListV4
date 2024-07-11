@@ -69,7 +69,7 @@ class MainActivity : ComponentActivity() {
         setupUI()
         initializeComponents()
         setContent {
-            setupTheme()
+            SetupTheme()
         }
     }
 
@@ -106,7 +106,7 @@ class MainActivity : ComponentActivity() {
 
     @RequiresApi(Build.VERSION_CODES.O)
     @Composable
-    private fun setupTheme() {
+    private fun SetupTheme() {
         val theme by dataStoreViewModel.theme.collectAsState()
         val fontFamilyType by dataStoreViewModel.fontFamily.collectAsState()
         val fontSize by dataStoreViewModel.fontSize.collectAsState()

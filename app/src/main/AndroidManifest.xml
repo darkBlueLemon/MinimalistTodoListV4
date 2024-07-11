@@ -28,6 +28,7 @@
         <activity-alias
             android:name=".MainActivityAlias"
             android:exported="true"
+            android:enabled="false"
             android:theme="@style/Theme.MinimalistTodoListV4.MySplash"
             android:icon="@mipmap/ic_light"
             android:roundIcon="@mipmap/ic_light_round"
