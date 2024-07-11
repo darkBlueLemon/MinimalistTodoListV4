@@ -69,7 +69,7 @@ fun AddTaskDialog(
     onAppEvent: (AppEvent) -> Unit
 ) {
     BasicAlertDialog(
-        onDismissRequest = { onEvent(TaskEvent.SaveTaskAndHideAddTaskDialog) },
+        onDismissRequest = { onEvent(TaskEvent.HideAddTaskDialog) },
     ) {
         CustomBox {
             Column(
@@ -104,7 +104,7 @@ fun AddTaskDialog(
 
                 SaveButton(
                     onSave = {
-                        onEvent(TaskEvent.SaveTaskAndHideAddTaskDialog)
+                        onEvent(TaskEvent.SaveTask)
                     },
                     modifier = Modifier.align(Alignment.CenterHorizontally)
                 )

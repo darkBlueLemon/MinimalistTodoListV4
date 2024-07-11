@@ -71,7 +71,7 @@ class TaskViewModel(
     fun onEvent(event: TaskEvent) {
         when (event) {
             is TaskEvent.DeleteTask -> handleDeleteTask(event.task)
-            TaskEvent.SaveTaskAndHideAddTaskDialog -> handleSaveTask()
+            TaskEvent.SaveTask -> handleSaveTask()
             is TaskEvent.SetTitle -> _state.update { it.copy(title = event.title) }
             is TaskEvent.SetPriority -> _state.update { it.copy(priority = event.priority) }
             is TaskEvent.SetNote -> _state.update { it.copy(note = event.note) }
@@ -88,6 +88,7 @@ class TaskViewModel(
             is TaskEvent.DeleteForever -> handleDeleteForever(event.deletedTask)
             is TaskEvent.UndoDeleteTask -> handleUndoDeleteTask(event.deletedTask)
             TaskEvent.ShowAddTaskDialog -> _state.update { it.copy(isAddTaskDialogVisible = true) }
+            TaskEvent.HideAddTaskDialog -> resetAddTaskDialog()
             TaskEvent.DeleteAllHistoryTasks -> viewModelScope.launch { dao.deleteAllDeletedTasks() }
             TaskEvent.RefreshTasks -> reloadTasks()
         }
