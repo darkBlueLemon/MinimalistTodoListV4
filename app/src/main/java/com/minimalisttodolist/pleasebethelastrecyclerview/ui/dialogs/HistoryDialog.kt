@@ -250,7 +250,6 @@ fun HistoryItem(
                     .clickable {
                         expanded = true
                     }
-                    .padding(start = 12.dp)
             )
             CustomDropdownMenu(
                 expanded = expanded,

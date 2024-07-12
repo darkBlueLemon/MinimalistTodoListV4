@@ -14,6 +14,7 @@ import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -70,6 +71,7 @@ fun Tutorial(
 ) {
     val steps = listOf("Tap to add a Task", "Long Press to open the Menu", "Tap a Task to Edit")
     val pagerState = rememberPagerState(pageCount = { steps.size })
+    val context = LocalContext.current
 
     BasicAlertDialog(
         onDismissRequest = onDismiss,
@@ -78,7 +80,10 @@ fun Tutorial(
             Column(
                 modifier = Modifier
                     .padding(16.dp)
-                    .fillMaxWidth(),
+//                    .fillMaxWidth()
+                    .width(350.dp)
+//                    .width(IntrinsicSize.Max)
+                ,
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 Text(
@@ -105,7 +110,7 @@ fun Tutorial(
                                     1 -> {
                                         Modifier.combinedClickable(
                                                 onLongClick = {
-//                                                    vibrate(context = context, strength = 1)
+                                                    vibrate(context = context, strength = 1)
                                                     onShowMenuDialog()
                                                 },
                                                 onClick = { }
@@ -125,10 +130,10 @@ fun Tutorial(
                     ) {
                         when (page) {
                             0 -> {
-                                AnimatedClickIcon(onClick = { })
+                                AnimatedClickIcon()
                             }
                             1 -> {
-                                AnimatedLongPressIcon(onLongClick = { })
+                                AnimatedLongPressIcon()
                             }
                             2 -> {
                                 val task = Task(
@@ -242,7 +247,7 @@ fun TutorialTaskItem(task: Task, onEdit: (Task) -> Unit, onDelete: (Task) -> Uni
 }
 
 @Composable
-fun AnimatedClickIcon(modifier: Modifier = Modifier, onClick: () -> Unit) {
+fun AnimatedClickIcon(modifier: Modifier = Modifier) {
     var isPressed by remember { mutableStateOf(false) }
 
     val scale by animateFloatAsState(
@@ -287,20 +292,16 @@ fun AnimatedClickIcon(modifier: Modifier = Modifier, onClick: () -> Unit) {
                 shape = RoundedCornerShape(percent = 25)
             )
             .padding(16.dp)
-            .clip(shape = RoundedCornerShape(percent = 7))
-            .clickable {
-                onClick()
-            },
+            .clip(shape = RoundedCornerShape(percent = 7)),
         tint = MaterialTheme.colorScheme.onBackground.copy(alpha = alpha)
     )
 }
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun AnimatedLongPressIcon(modifier: Modifier = Modifier, onLongClick: () -> Unit) {
+fun AnimatedLongPressIcon(modifier: Modifier = Modifier) {
     var isPressed by remember { mutableStateOf(false) }
     var isLongPressed by remember { mutableStateOf(false) }
-    val context = LocalContext.current
 
     val scale by animateFloatAsState(
         targetValue = when {
@@ -347,16 +348,7 @@ fun AnimatedLongPressIcon(modifier: Modifier = Modifier, onLongClick: () -> Unit
                 shape = RoundedCornerShape(percent = 25)
             )
             .padding(16.dp)
-            .clip(shape = RoundedCornerShape(percent = 7))
-            .combinedClickable(
-                onLongClick = {
-                    vibrate(context = context, strength = 1)
-                    onLongClick()
-                },
-                onClick = {
-
-                }
-            ),
+            .clip(shape = RoundedCornerShape(percent = 7)),
         tint = MaterialTheme.colorScheme.onBackground.copy(alpha = alpha)
     )
 }

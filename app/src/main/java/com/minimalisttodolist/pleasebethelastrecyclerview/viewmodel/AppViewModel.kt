@@ -52,7 +52,7 @@ class AppViewModel(private val appPreferences: AppPreferences) : ViewModel() {
                 viewModelScope.launch { appPreferences.incrementPostNotificationDenialCount() }
             }
 
-            AppEvent.ShowTutorialDialog -> updateState { copy(isTutorialDialogVisible = true) }
+            AppEvent.ShowTutorialDialog -> updateState { copy(isTutorialDialogVisible = true, isMenuDialogVisible = false) }
             AppEvent.HideTutorialDialog -> updateState { copy(isTutorialDialogVisible = false) }
             AppEvent.DisableTutorialDialog -> {
                 viewModelScope.launch { appPreferences.disableTutorialDialog() }

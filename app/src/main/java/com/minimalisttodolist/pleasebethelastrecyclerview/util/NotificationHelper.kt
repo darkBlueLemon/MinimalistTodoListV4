@@ -32,8 +32,13 @@ class NotificationHelper(private val context: Context) {
         )
 
         val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-//        val notificationTime = task.dueDate?.minus(10 * 60 * 1000) // 10 minutes before due date
         val notificationTime = task.dueDate
+
+        // Check if the due date is in the past
+        if (notificationTime != null && notificationTime <= System.currentTimeMillis()) {
+            Log.d("TAG", "Notification time is in the past, not scheduling")
+            return
+        }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             if(alarmManager.canScheduleExactAlarms()) {

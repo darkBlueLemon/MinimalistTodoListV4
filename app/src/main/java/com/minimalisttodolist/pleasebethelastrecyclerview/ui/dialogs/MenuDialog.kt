@@ -16,6 +16,7 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -78,7 +79,8 @@ fun MenuDialog(
             onAppEvent(AppEvent.HideMenuDialog)
         },
         modifier = modifier
-            .width(350.dp)
+//            .width(350.dp)
+            .width(IntrinsicSize.Max)
     ) {
         CustomBox {
             Column(
@@ -119,6 +121,16 @@ fun MenuDialog(
 //                    modifier = Modifier
 //                        .padding(bottom = 24.dp)
 //                )
+                Text(
+                    text = "Tutorial",
+                    style = MaterialTheme.typography.bodyLarge,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable {
+                            onAppEvent(AppEvent.ShowTutorialDialog)
+                        }
+                        .padding(top = 12.dp, bottom = 12.dp)
+                )
                 RecurrenceSelector(
                     currentRecurrenceFilter = taskState.recurrenceFilter,
                     onRecurrenceFilterChange = { onEvent(TaskEvent.SetRecurrenceFilter(it)) },
@@ -132,11 +144,6 @@ fun MenuDialog(
                 ThemeSelector(
                     dataStoreViewModel
                 )
-//                Text(
-//                    text = "Tutorial",
-//                    modifier = Modifier
-//                        .padding(bottom = 24.dp)
-//                )
                 ClockTypeSelector(
                     dataStoreViewModel = dataStoreViewModel
                 )
@@ -265,7 +272,8 @@ fun RecurrenceSelector(
     ) {
         Text(
             text = "View Recurring Tasks",
-            style = MaterialTheme.typography.bodyLarge
+            style = MaterialTheme.typography.bodyLarge,
+            modifier = Modifier.padding(end = 10.dp)
         )
         Text(
             text = recurrenceFilter.toDisplayString(),
