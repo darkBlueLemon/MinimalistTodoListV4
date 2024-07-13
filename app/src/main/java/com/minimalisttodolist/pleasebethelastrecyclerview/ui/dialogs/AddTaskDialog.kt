@@ -165,15 +165,27 @@ fun PrioritySelector(
                 .padding(vertical = 8.dp)
         ) {
             PriorityStar(index = 1, selectedPriority) { priority ->
-                selectedPriority = priority
+                selectedPriority = if(priority == selectedPriority) {
+                    0
+                } else {
+                    priority
+                }
                 onPriorityChange(TaskEvent.SetPriority(priority))
             }
             PriorityStar(index = 2, selectedPriority) { priority ->
-                selectedPriority = priority
+                selectedPriority = if(priority == selectedPriority) {
+                    0
+                } else {
+                    priority
+                }
                 onPriorityChange(TaskEvent.SetPriority(priority))
             }
             PriorityStar(index = 3, selectedPriority) { priority ->
-                selectedPriority = priority
+                selectedPriority = if(priority == selectedPriority) {
+                    0
+                } else {
+                    priority
+                }
                 onPriorityChange(TaskEvent.SetPriority(priority))
             }
         }
@@ -186,7 +198,7 @@ fun PrioritySelector(
                 .padding(horizontal = 15.dp)
                 .clickable {
                     isPrioritySelected = true
-                    selectedPriority = 1
+//                    selectedPriority = 0
                     onPriorityChange(TaskEvent.SetPriority(1))
                 },
             verticalAlignment = Alignment.CenterVertically
@@ -228,23 +240,7 @@ fun PriorityStar(index: Int, selectedPriority: Int, onPriorityChange: (Int) -> U
         modifier = Modifier
             .size(30.dp)
             .clickable { onPriorityChange(index) }
-    )
-}
-
-
-@Composable
-fun PriorityStar(index: Int, selectedPriority: Int, color: Color, onClick: (Int) -> Unit) {
-
-    val starIcon = if (index == selectedPriority) Icons.Rounded.Star else Icons.Rounded.StarOutline
-    val starColor = if (index == selectedPriority) color else Color.Gray
-
-    Icon(
-        imageVector = starIcon,
-        contentDescription = "Priority $index",
-        tint = starColor,
-        modifier = Modifier
-            .size(30.dp)
-            .clickable { onClick(index) }
+//            .background(Color.Red)
     )
 }
 

@@ -236,7 +236,12 @@ fun TaskScreen(
                     text = randomMessage,
                     textAlign = TextAlign.Center,
                     style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.tertiary
+                    color = MaterialTheme.colorScheme.tertiary,
+                    modifier = Modifier
+                        .clickable {
+                            onEvent(TaskEvent.ShowAddTaskDialog)
+                        }
+                        .padding(32.dp)
                 )
             }
         } else {
