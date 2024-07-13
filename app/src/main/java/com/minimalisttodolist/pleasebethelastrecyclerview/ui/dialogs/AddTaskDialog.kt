@@ -3,8 +3,11 @@ package com.minimalisttodolist.pleasebethelastrecyclerview.ui.dialogs
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -16,6 +19,7 @@ import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -43,9 +47,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -75,28 +81,49 @@ fun AddTaskDialog(
 ) {
     val focusRequester = remember { FocusRequester() }
     val keyboardController = LocalSoftwareKeyboardController.current
+    var showWarning by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
+        delay(100) // Short delay to ensure the dialog is fully rendered
         focusRequester.requestFocus()
         keyboardController?.show()
     }
+
+    LaunchedEffect(taskState.title) {
+        if (taskState.title.isNotBlank()) {
+            showWarning = false
+        }
+    }
+
+    val warningAlpha by animateFloatAsState(
+        targetValue = if (showWarning) 1f else 0f,
+        animationSpec = tween(durationMillis = 300), label = "Title null arrow"
+    )
 
     BasicAlertDialog(
         onDismissRequest = { onEvent(TaskEvent.HideAddTaskDialog) },
     ) {
         CustomBox {
             Column(
-                // Best thing everrrrr -> IntrinsicSize
+                // Best thing ever -> IntrinsicSize
                 modifier = Modifier
                     .padding(15.dp)
                     .width(IntrinsicSize.Max),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                Title(
-                    taskState = taskState,
-                    onEvent = onEvent,
-                    focusRequester = focusRequester
-                )
+                Box(modifier = Modifier.fillMaxWidth()) {
+                    Title(
+                        taskState = taskState,
+                        onEvent = onEvent,
+                        focusRequester = focusRequester
+                    )
+                    WarningTriangle(
+                        modifier = Modifier
+                            .align(Alignment.CenterStart)
+                            .offset((-8).dp, 0.dp)
+                            .alpha(warningAlpha)
+                    )
+                }
 
                 PrioritySelector(priorityFromEdit = taskState.priority, onPriorityChange = onEvent)
 
@@ -116,12 +143,13 @@ fun AddTaskDialog(
 
                 SaveButton(
                     onSave = {
-                        if (taskState.title.isBlank()) {
-                            focusRequester.requestFocus()
-                            keyboardController?.show()
-                        } else {
-                            onEvent(TaskEvent.SaveTask)
-                        }
+                        onEvent(TaskEvent.SaveTask)
+                    },
+                    canSave = { taskState.title.isNotBlank() },
+                    onInvalidSave = {
+                        focusRequester.requestFocus()
+                        keyboardController?.show()
+                        showWarning = true
                     },
                     modifier = Modifier.align(Alignment.CenterHorizontally)
                 )
@@ -143,7 +171,7 @@ fun Title(
         singleLine = true,
         placeholder = {
             Text(
-                text = "I want to ...",
+                text = "I want to...",
                 color = MaterialTheme.colorScheme.tertiary,
                 style = MaterialTheme.typography.titleLarge,
             )
@@ -160,10 +188,27 @@ fun Title(
         textStyle = LocalTextStyle.current.copy(
             fontSize = MaterialTheme.typography.titleLarge.fontSize
         ),
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .focusRequester(focusRequester)
     )
+}
+
+@Composable
+fun WarningTriangle(modifier: Modifier = Modifier) {
+    val color = MaterialTheme.colorScheme.primary
+    Canvas(modifier = modifier.size(12.dp).padding(start = 5.dp)) {
+        val path = Path().apply {
+            moveTo(0f, 0f)
+            lineTo(0f, size.height)
+            lineTo(size.width, size.height / 2f)
+            close()
+        }
+        drawPath(
+            path = path,
+            color = color
+        )
+    }
 }
 
 @Composable
@@ -468,11 +513,19 @@ fun RecurrenceSelector(
 @Composable
 fun SaveButton(
     onSave: () -> Unit,
+    canSave: () -> Boolean,
+    onInvalidSave: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Box(
         modifier = modifier
-            .clickable { onSave() }
+            .clickable {
+                if (canSave()) {
+                    onSave()
+                } else {
+                    onInvalidSave()
+                }
+            }
             .border(
                 width = 2.dp,
                 color = MaterialTheme.colorScheme.onBackground,
