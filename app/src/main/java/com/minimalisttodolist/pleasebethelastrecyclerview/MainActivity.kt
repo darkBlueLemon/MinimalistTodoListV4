@@ -18,8 +18,9 @@ import androidx.compose.runtime.getValue
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.lifecycleScope
 import androidx.room.Room
+import com.minimalisttodolist.pleasebethelastrecyclerview.data.database.MIGRATION_1_2
 import com.minimalisttodolist.pleasebethelastrecyclerview.data.preferences.AppPreferences
-import com.minimalisttodolist.pleasebethelastrecyclerview.data.database.ContactDatabase
+import com.minimalisttodolist.pleasebethelastrecyclerview.data.database.TaskDatabase
 import com.minimalisttodolist.pleasebethelastrecyclerview.data.model.ThemeType
 import com.minimalisttodolist.pleasebethelastrecyclerview.ui.navigation.NavGraph
 import com.minimalisttodolist.pleasebethelastrecyclerview.viewmodel.AppViewModel
@@ -49,9 +50,9 @@ class MainActivity : ComponentActivity() {
     private val db by lazy {
         Room.databaseBuilder(
             applicationContext,
-            ContactDatabase::class.java,
-            "contacts.db"
-        ).build()
+            TaskDatabase::class.java,
+            "tasks.db"
+        ).addMigrations(MIGRATION_1_2).build()
     }
 
     private val notificationHelper by lazy {

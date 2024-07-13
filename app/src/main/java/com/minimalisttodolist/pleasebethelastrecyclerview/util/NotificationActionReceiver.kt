@@ -7,7 +7,8 @@ import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.room.Room
-import com.minimalisttodolist.pleasebethelastrecyclerview.data.database.ContactDatabase
+import com.minimalisttodolist.pleasebethelastrecyclerview.data.database.MIGRATION_1_2
+import com.minimalisttodolist.pleasebethelastrecyclerview.data.database.TaskDatabase
 import com.minimalisttodolist.pleasebethelastrecyclerview.data.model.DeletedTask
 import com.minimalisttodolist.pleasebethelastrecyclerview.data.model.RecurrenceType
 import kotlinx.coroutines.CoroutineScope
@@ -25,8 +26,9 @@ class NotificationActionReceiver : BroadcastReceiver() {
                 val notificationHelper = NotificationHelper(context)
                 notificationHelper.cancelNotification(taskId)
 
-                val db = Room.databaseBuilder(context, ContactDatabase::class.java, "contacts.db")
+                val db = Room.databaseBuilder(context, TaskDatabase::class.java, "tasks.db")
                     .fallbackToDestructiveMigration()
+                    .addMigrations(MIGRATION_1_2)
                     .build()
                 val taskDao = db.dao
 
@@ -68,7 +70,7 @@ class NotificationActionReceiver : BroadcastReceiver() {
                 }
             }
             "SNOOZE" -> {
-                val db = Room.databaseBuilder(context, ContactDatabase::class.java, "contacts.db").build()
+                val db = Room.databaseBuilder(context, TaskDatabase::class.java, "tasks.db").addMigrations(MIGRATION_1_2).build()
                 val taskDao = db.dao
                 val notificationHelper = NotificationHelper(context)
 
