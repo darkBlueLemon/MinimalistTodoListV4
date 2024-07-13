@@ -36,13 +36,17 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -57,6 +61,7 @@ import com.minimalisttodolist.pleasebethelastrecyclerview.ui.components.TimePick
 import com.minimalisttodolist.pleasebethelastrecyclerview.ui.theme.LocalDarkTheme
 import com.minimalisttodolist.pleasebethelastrecyclerview.viewmodel.AppEvent
 import com.minimalisttodolist.pleasebethelastrecyclerview.viewmodel.DataStoreViewModel
+import kotlinx.coroutines.delay
 
 @RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
@@ -68,6 +73,14 @@ fun AddTaskDialog(
     dataStoreViewModel: DataStoreViewModel,
     onAppEvent: (AppEvent) -> Unit
 ) {
+    val focusRequester = remember { FocusRequester() }
+    val keyboardController = LocalSoftwareKeyboardController.current
+
+    LaunchedEffect(Unit) {
+        focusRequester.requestFocus()
+        keyboardController?.show()
+    }
+
     BasicAlertDialog(
         onDismissRequest = { onEvent(TaskEvent.HideAddTaskDialog) },
     ) {
@@ -79,7 +92,11 @@ fun AddTaskDialog(
                     .width(IntrinsicSize.Max),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                Title(taskState = taskState, onEvent = onEvent)
+                Title(
+                    taskState = taskState,
+                    onEvent = onEvent,
+                    focusRequester = focusRequester
+                )
 
                 PrioritySelector(priorityFromEdit = taskState.priority, onPriorityChange = onEvent)
 
@@ -97,14 +114,14 @@ fun AddTaskDialog(
                     )
                 }
 
-//                state.nextDueDate?.let {
-//                    val nextDueDate = Instant.ofEpochMilli(it).atZone(ZoneId.systemDefault()).toLocalDate()
-//                    Text(text = "Next Due Date: ${nextDueDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))}")
-//                }
-
                 SaveButton(
                     onSave = {
-                        onEvent(TaskEvent.SaveTask)
+                        if (taskState.title.isBlank()) {
+                            focusRequester.requestFocus()
+                            keyboardController?.show()
+                        } else {
+                            onEvent(TaskEvent.SaveTask)
+                        }
                     },
                     modifier = Modifier.align(Alignment.CenterHorizontally)
                 )
@@ -114,7 +131,12 @@ fun AddTaskDialog(
 }
 
 @Composable
-fun Title(modifier: Modifier = Modifier, taskState: TaskState, onEvent: (TaskEvent) -> Unit) {
+fun Title(
+    modifier: Modifier = Modifier,
+    taskState: TaskState,
+    onEvent: (TaskEvent) -> Unit,
+    focusRequester: FocusRequester
+) {
     TextField(
         value = taskState.title,
         onValueChange = { onEvent(TaskEvent.SetTitle(it)) },
@@ -123,7 +145,6 @@ fun Title(modifier: Modifier = Modifier, taskState: TaskState, onEvent: (TaskEve
             Text(
                 text = "I want to ...",
                 color = MaterialTheme.colorScheme.tertiary,
-//                fontWeight = FontWeight.Light,
                 style = MaterialTheme.typography.titleLarge,
             )
         },
@@ -137,10 +158,11 @@ fun Title(modifier: Modifier = Modifier, taskState: TaskState, onEvent: (TaskEve
             focusedTextColor = MaterialTheme.colorScheme.primary
         ),
         textStyle = LocalTextStyle.current.copy(
-//            fontWeight = FontWeight.Light,
             fontSize = MaterialTheme.typography.titleLarge.fontSize
         ),
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier
+            .fillMaxWidth()
+            .focusRequester(focusRequester)
     )
 }
 
