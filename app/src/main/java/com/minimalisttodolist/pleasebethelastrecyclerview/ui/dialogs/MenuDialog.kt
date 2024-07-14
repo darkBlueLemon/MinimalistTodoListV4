@@ -3,6 +3,7 @@ package com.minimalisttodolist.pleasebethelastrecyclerview.ui.dialogs
 import android.content.Context
 import android.view.Menu
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.SizeTransform
@@ -12,9 +13,13 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.keyframes
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkHorizontally
+import androidx.compose.animation.shrinkVertically
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.togetherWith
 import androidx.compose.animation.with
 import androidx.compose.foundation.BorderStroke
@@ -41,6 +46,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.outlined.CheckCircle
 import androidx.compose.material.icons.outlined.ChevronRight
+import androidx.compose.material.icons.outlined.KeyboardArrowDown
 import androidx.compose.material.icons.outlined.RadioButtonUnchecked
 import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -264,36 +270,12 @@ fun ThemeSelector(
             text = "Theme",
             style = MaterialTheme.typography.bodyLarge,
         )
-
-        AnimatedContent(
-            targetState = expanded,
-            transitionSpec = {
-                fadeIn(animationSpec = tween(150)) togetherWith
-                        fadeOut(animationSpec = tween(150))
-            }, label = "menu transition animation"
-        ) { isExpanded ->
-            Box(
-                contentAlignment = Alignment.CenterEnd,
-                modifier = Modifier.width(IntrinsicSize.Max).height(24.dp)
-            ) {
-                if (isExpanded) {
-                    Icon(
-                        imageVector = Icons.Outlined.ChevronRight,
-                        contentDescription = "Expand theme options",
-                        tint = MaterialTheme.colorScheme.tertiary,
-                        modifier = Modifier.rotate(90f)
-                    )
-                } else {
-                    Text(
-                        text = theme.toDisplayString(),
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.tertiary,
-                        fontStyle = FontStyle.Italic,
-                        textAlign = TextAlign.End,
-                    )
-                }
-            }
-        }
+        Text(
+            text = theme.toDisplayString(),
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.tertiary,
+            fontStyle = FontStyle.Italic,
+        )
     }
 
     CustomDropdownMenu(
@@ -326,7 +308,7 @@ fun ThemeSelector(
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
+@OptIn(ExperimentalFoundationApi::class, ExperimentalAnimationApi::class)
 @Composable
 fun ClockTypeSelector(
     dataStoreViewModel: DataStoreViewModel
@@ -347,36 +329,12 @@ fun ClockTypeSelector(
             text = "Clock Type",
             style = MaterialTheme.typography.bodyLarge
         )
-
-        AnimatedContent(
-            targetState = expanded,
-            transitionSpec = {
-                fadeIn(animationSpec = tween(150)) togetherWith
-                        fadeOut(animationSpec = tween(150))
-            }, label = "menu transition animation"
-        ) { isExpanded ->
-            Box(
-                contentAlignment = Alignment.CenterEnd,
-                modifier = Modifier.width(IntrinsicSize.Max).height(24.dp)
-            ) {
-                if (isExpanded) {
-                    Icon(
-                        imageVector = Icons.Outlined.ChevronRight,
-                        contentDescription = "Expand theme options",
-                        tint = MaterialTheme.colorScheme.tertiary,
-                        modifier = Modifier.rotate(90f)
-                    )
-                } else {
-                    Text(
-                        text = clock.toDisplayString(),
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.tertiary,
-                        fontStyle = FontStyle.Italic,
-                        textAlign = TextAlign.End,
-                    )
-                }
-            }
-        }
+        Text(
+            text = clock.toDisplayString(),
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.tertiary,
+            fontStyle = FontStyle.Italic,
+        )
     }
 
     CustomDropdownMenu(
@@ -408,6 +366,7 @@ fun ClockTypeSelector(
         }
     }
 }
+
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
