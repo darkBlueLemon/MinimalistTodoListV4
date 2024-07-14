@@ -57,6 +57,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewModelScope
@@ -171,13 +172,20 @@ fun Title(
     focusRequester: FocusRequester,
     borderAlpha: Float
 ) {
+    val textFieldValue = remember(taskState.title) {
+        mutableStateOf(TextFieldValue(taskState.title, TextRange(taskState.title.length)))
+    }
+
 //    val borderColor = MaterialTheme.colorScheme.primary.copy(alpha = borderAlpha)
     val darkTheme = LocalDarkTheme.current
     val borderColor = PriorityColor.PRIORITY3.getColor(darkTheme).copy(alpha = borderAlpha)
 
     TextField(
-        value = taskState.title,
-        onValueChange = { onEvent(TaskEvent.SetTitle(it)) },
+        value = textFieldValue.value,
+        onValueChange = {
+            textFieldValue.value = it
+            onEvent(TaskEvent.SetTitle(it.text))
+        },
         singleLine = true,
         placeholder = {
             Text(
