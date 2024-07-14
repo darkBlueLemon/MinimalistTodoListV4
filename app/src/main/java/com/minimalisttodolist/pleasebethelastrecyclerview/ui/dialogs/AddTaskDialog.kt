@@ -348,7 +348,6 @@ fun Note(modifier: Modifier = Modifier, taskState: TaskState, onEvent: (TaskEven
                 focusedTextColor = MaterialTheme.colorScheme.primary,
             ),
             textStyle = LocalTextStyle.current.copy(
-//                fontWeight = FontWeight.Light,
             ),
             singleLine = true,
         )
