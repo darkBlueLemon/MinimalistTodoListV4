@@ -196,7 +196,9 @@ fun Title(
 
 @Composable
 fun WarningTriangle(modifier: Modifier = Modifier) {
-    val color = MaterialTheme.colorScheme.primary
+    val darkTheme = LocalDarkTheme.current
+    val color = PriorityColor.PRIORITY3.getColor(darkTheme)
+
     Canvas(modifier = modifier.size(12.dp).padding(start = 5.dp)) {
         val path = Path().apply {
             moveTo(0f, 0f)

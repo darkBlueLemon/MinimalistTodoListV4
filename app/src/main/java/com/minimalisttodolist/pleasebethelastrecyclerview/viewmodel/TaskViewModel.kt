@@ -46,11 +46,11 @@ class TaskViewModel(
     private val _deletedTasks = MutableStateFlow<List<DeletedTask>>(emptyList())
     val deletedTasks: StateFlow<List<DeletedTask>> = _deletedTasks
 
-   init {
-       initializeDataStore()
-       observeDeletedTasks()
-       reloadTasks()
-   }
+    init {
+        initializeDataStore()
+        observeDeletedTasks()
+        reloadTasks()
+    }
 
     private fun initializeDataStore() {
         viewModelScope.launch {
@@ -72,24 +72,29 @@ class TaskViewModel(
         when (event) {
             is TaskEvent.DeleteTask -> handleDeleteTask(event.task)
             TaskEvent.SaveTask -> handleSaveTask()
+
             is TaskEvent.SetTitle -> _state.update { it.copy(title = event.title) }
             is TaskEvent.SetPriority -> _state.update { it.copy(priority = event.priority) }
             is TaskEvent.SetNote -> _state.update { it.copy(note = event.note) }
+            is TaskEvent.SetDueDate -> handleSetDueDate(event.dueDate)
+            is TaskEvent.SetDueTime -> handleSetDueTime(event.dueTime)
             is TaskEvent.SortTasks -> _sortType.value = event.sortType
             is TaskEvent.SetRecurrenceType -> _state.update { it.copy(recurrenceType = event.recurrenceType) }
+
             is TaskEvent.EditTask -> handleEditTask(event.task)
             is TaskEvent.SetRecurrenceFilter -> _recurrenceFilter.value = event.recurrenceType
+
             TaskEvent.ShowDatePicker -> _state.update { it.copy(isDatePickerVisible = true) }
             TaskEvent.HideDatePicker -> _state.update { it.copy(isDatePickerVisible = false) }
-            is TaskEvent.SetDueDate -> handleSetDueDate(event.dueDate)
             TaskEvent.ShowTimePicker -> _state.update { it.copy(isTimePickerVisible = true) }
             TaskEvent.HideTimePicker -> _state.update { it.copy(isTimePickerVisible = false) }
-            is TaskEvent.SetDueTime -> handleSetDueTime(event.dueTime)
-            is TaskEvent.DeleteForever -> handleDeleteForever(event.deletedTask)
-            is TaskEvent.UndoDeleteTask -> handleUndoDeleteTask(event.deletedTask)
             TaskEvent.ShowAddTaskDialog -> _state.update { it.copy(isAddTaskDialogVisible = true) }
             TaskEvent.HideAddTaskDialog -> resetAddTaskDialog()
+
+            is TaskEvent.DeleteForever -> handleDeleteForever(event.deletedTask)
+            is TaskEvent.UndoDeleteTask -> handleUndoDeleteTask(event.deletedTask)
             TaskEvent.DeleteAllHistoryTasks -> viewModelScope.launch { dao.deleteAllDeletedTasks() }
+
             TaskEvent.RefreshTasks -> reloadTasks()
         }
     }
@@ -143,7 +148,6 @@ class TaskViewModel(
         return dueDate <= now
     }
 
-
     @RequiresApi(Build.VERSION_CODES.O)
     private fun handleSaveTask() {
         val currentState = state.value
@@ -170,13 +174,18 @@ class TaskViewModel(
         resetAddTaskDialog()
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun handleEditTask(task: Task) {
         _state.update {
+            val dueDateOnly = getLocalDateFromEpochMilli(task.dueDate)
+            val dueTimeOnly = getLocalTimeFromEpochMilli(task.dueDate)
             it.copy(
                 title = task.title,
                 priority = task.priority,
                 note = task.note,
                 dueDate = task.dueDate,
+                dueDateOnly = dueDateOnly,
+                dueTimeOnly = dueTimeOnly,
                 recurrenceType = task.recurrenceType,
                 isAddTaskDialogVisible = true,
                 editingTaskId = task.id
@@ -230,6 +239,7 @@ class TaskViewModel(
                 priority = 0,
                 note = "",
                 dueDate = null,
+                dueDateOnly = null,
                 dueTimeOnly = null,
                 recurrenceType = RecurrenceType.NONE,
                 nextDueDate = null,
