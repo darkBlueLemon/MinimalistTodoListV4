@@ -69,7 +69,7 @@ fun Tutorial(
     onEdit: (Task) -> Unit,
     viewModel: TaskViewModel
 ) {
-    val steps = listOf("Tap to add a Task", "Long Press to open the Menu", "Tap a Task to Edit")
+    val steps = listOf("Tap to add a task", "Press and hold for menu", "Tap a task to edit")
     val pagerState = rememberPagerState(pageCount = { steps.size })
     val context = LocalContext.current
 

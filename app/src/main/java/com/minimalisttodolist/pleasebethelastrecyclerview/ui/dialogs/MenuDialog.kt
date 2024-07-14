@@ -47,6 +47,7 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.minimalisttodolist.pleasebethelastrecyclerview.R
 import com.minimalisttodolist.pleasebethelastrecyclerview.data.model.ClockType
@@ -79,8 +80,8 @@ fun MenuDialog(
             onAppEvent(AppEvent.HideMenuDialog)
         },
         modifier = modifier
-//            .width(350.dp)
-            .width(IntrinsicSize.Max)
+            .width(350.dp)
+//            .width(IntrinsicSize.Max)
     ) {
         CustomBox {
             Column(
@@ -268,10 +269,12 @@ fun RecurrenceSelector(
             .clickable { expanded = true }
             .padding(top = 12.dp, bottom = 12.dp)
         ,
-        horizontalArrangement = Arrangement.SpaceBetween
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
-            text = "View Recurring Tasks",
+//            text = "View Recurring Tasks",
+            "Recurrence Filter",
             style = MaterialTheme.typography.bodyLarge,
             modifier = Modifier.padding(end = 10.dp)
         )
@@ -279,7 +282,9 @@ fun RecurrenceSelector(
             text = recurrenceFilter.toDisplayString(),
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.tertiary,
-            fontStyle = FontStyle.Italic
+            fontStyle = FontStyle.Italic,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
         )
     }
 
@@ -331,7 +336,8 @@ fun PrioritySelector(
             .clickable { expanded = true }
             .padding(top = 12.dp, bottom = 12.dp)
         ,
-        horizontalArrangement = Arrangement.SpaceBetween
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
             text = "Sorting Option",
@@ -391,8 +397,9 @@ fun ThemeSelector(
             .clickable { expanded = true }
             .padding(top = 12.dp, bottom = 12.dp)
         ,
-        horizontalArrangement = Arrangement.SpaceBetween
-    ) {
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+        ) {
         Text(
             text = "Theme",
             style = MaterialTheme.typography.bodyLarge,
@@ -451,7 +458,8 @@ fun ClockTypeSelector(
             .clickable { expanded = true }
             .padding(top = 12.dp, bottom = 12.dp)
         ,
-        horizontalArrangement = Arrangement.SpaceBetween
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
             text = "Clock Type",
