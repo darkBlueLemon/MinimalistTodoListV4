@@ -24,6 +24,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -33,6 +34,8 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.DeleteForever
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.outlined.Delete
+import androidx.compose.material.icons.rounded.ArrowBack
+import androidx.compose.material.icons.rounded.ArrowBackIosNew
 import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -87,7 +90,8 @@ fun HistoryDialog(
             ) {
                 TitleAndDeleteAll(
                     onClearHistory = { onEvent(TaskEvent.DeleteAllHistoryTasks) },
-                    context = context
+                    onBack = { onAppEvent(AppEvent.ShowMenuDialog) },
+                    context = context,
                 )
                 if (deletedTasks.isEmpty()) {
                     Box(
@@ -115,7 +119,7 @@ fun HistoryDialog(
 }
 
 @Composable
-fun TitleAndDeleteAll(onClearHistory: () -> Unit, context: Context) {
+fun TitleAndDeleteAll(onClearHistory: () -> Unit, context: Context, onBack: () -> Unit) {
     var expanded by remember { mutableStateOf(false) }
 
     Box (
@@ -124,6 +128,17 @@ fun TitleAndDeleteAll(onClearHistory: () -> Unit, context: Context) {
             .height(IntrinsicSize.Max)
             .padding(8.dp)
     ){
+        Icon(
+            imageVector = Icons.Rounded.ArrowBack,
+            contentDescription = "back arrow",
+            modifier = Modifier
+                .align(Alignment.CenterStart)
+                .fillMaxHeight()
+                .padding(start = 12.dp, end = 12.dp)
+                .clickable {
+                    onBack()
+                }
+        )
         Text(
             text = "History",
             color = MaterialTheme.colorScheme.primary,
@@ -134,8 +149,6 @@ fun TitleAndDeleteAll(onClearHistory: () -> Unit, context: Context) {
             text = "Clear",
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.primary,
-//            fontStyle = FontStyle.Italic,
-            textAlign = TextAlign.Center,
             modifier = Modifier
                 .align(Alignment.CenterEnd)
                 .clickable {
@@ -143,21 +156,10 @@ fun TitleAndDeleteAll(onClearHistory: () -> Unit, context: Context) {
                     expanded = false
                     vibrate(context = context, strength = 1)
                 }
-                .padding(start = 12.dp, end = 12.dp)
+                .padding(horizontal = 12.dp)
+                .fillMaxHeight()
+                .wrapContentHeight(Alignment.CenterVertically) // This centers the text vertically
         )
-//        Icon(
-//            Icons.Default.Delete,
-//            contentDescription = "Clear History",
-//            tint = MaterialTheme.colorScheme.primary,
-//            modifier = Modifier
-//                .clickable {
-//                    onClearHistory()
-//                    expanded = false
-//                    vibrate(context = context, strength = 1)
-//                }
-//                .align(Alignment.CenterEnd)
-//                .padding(end = 10.dp)
-//        )
     }
 }
 

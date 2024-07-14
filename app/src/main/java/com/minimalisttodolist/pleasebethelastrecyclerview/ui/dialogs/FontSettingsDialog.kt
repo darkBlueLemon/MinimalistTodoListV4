@@ -5,15 +5,22 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.ArrowBack
 import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
@@ -39,6 +46,7 @@ import com.minimalisttodolist.pleasebethelastrecyclerview.viewmodel.DataStoreVie
 fun FontSettingsDialog(
     modifier: Modifier = Modifier,
     onDismiss: () -> Unit,
+    onBack: () -> Unit,
     dataStoreViewModel: DataStoreViewModel
 ) {
     BasicAlertDialog(
@@ -55,18 +63,48 @@ fun FontSettingsDialog(
                     .padding(20.dp),
                 verticalArrangement = Arrangement.spacedBy(6.dp)
             ) {
-                Text(
-                    text = "Font Options",
-                    style = MaterialTheme.typography.headlineSmall,
-                    modifier = Modifier
-                        .align(Alignment.CenterHorizontally)
-                        .padding(top = 12.dp, bottom = 12.dp)
-                )
+                FontOptionsTitle(onBack = onBack)
                 FontFamilySelector(dataStoreViewModel = dataStoreViewModel)
                 FontWeightSelector(dataStoreViewModel = dataStoreViewModel)
                 FontSizeSelector(dataStoreViewModel = dataStoreViewModel)
             }
         }
+    }
+}
+
+@Composable
+fun FontOptionsTitle(modifier: Modifier = Modifier, onBack: () -> Unit) {
+//    Text(
+//        text = "Font Options",
+//        style = MaterialTheme.typography.headlineSmall,
+//        modifier = Modifier
+//            .align(Alignment.CenterHorizontally)
+//            .padding(top = 12.dp, bottom = 12.dp)
+//    )
+    Box (
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(IntrinsicSize.Max)
+//            .padding(8.dp)
+            .padding(top = 12.dp, bottom = 12.dp)
+    ) {
+        Icon(
+            imageVector = Icons.Rounded.ArrowBack,
+            contentDescription = "back arrow",
+            modifier = Modifier
+                .align(Alignment.CenterStart)
+                .fillMaxHeight()
+                .padding(start = 12.dp, end = 12.dp)
+                .clickable {
+                    onBack()
+                }
+        )
+        Text(
+            text = "Font Options",
+            color = MaterialTheme.colorScheme.primary,
+            style = MaterialTheme.typography.headlineSmall,
+            modifier = Modifier.align(Alignment.Center)
+        )
     }
 }
 

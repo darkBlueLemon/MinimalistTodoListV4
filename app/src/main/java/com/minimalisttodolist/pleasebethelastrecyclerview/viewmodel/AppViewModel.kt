@@ -22,7 +22,7 @@ class AppViewModel(private val appPreferences: AppPreferences) : ViewModel() {
 
     fun onEvent(event: AppEvent) {
         when (event) {
-            AppEvent.ShowMenuDialog -> updateState { copy(isMenuDialogVisible = true) }
+            AppEvent.ShowMenuDialog -> updateState { copy(isMenuDialogVisible = true, isHistoryDialogVisible = false, isFontSettingsDialogVisible = false) }
             AppEvent.HideMenuDialog -> updateState { copy(isMenuDialogVisible = false) }
 
             AppEvent.ShowHistoryDialog -> updateState {

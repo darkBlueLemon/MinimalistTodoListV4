@@ -52,10 +52,12 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewModelScope
 import com.minimalisttodolist.pleasebethelastrecyclerview.data.model.PriorityColor
 import com.minimalisttodolist.pleasebethelastrecyclerview.data.model.RecurrenceType
 import com.minimalisttodolist.pleasebethelastrecyclerview.ui.components.CustomBox
@@ -65,9 +67,11 @@ import com.minimalisttodolist.pleasebethelastrecyclerview.viewmodel.TaskState
 import com.minimalisttodolist.pleasebethelastrecyclerview.viewmodel.TaskViewModel
 import com.minimalisttodolist.pleasebethelastrecyclerview.ui.components.TimePickerFromOldApp
 import com.minimalisttodolist.pleasebethelastrecyclerview.ui.theme.LocalDarkTheme
+import com.minimalisttodolist.pleasebethelastrecyclerview.util.vibrate
 import com.minimalisttodolist.pleasebethelastrecyclerview.viewmodel.AppEvent
 import com.minimalisttodolist.pleasebethelastrecyclerview.viewmodel.DataStoreViewModel
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
@@ -83,8 +87,14 @@ fun AddTaskDialog(
     val keyboardController = LocalSoftwareKeyboardController.current
     var showWarning by remember { mutableStateOf(false) }
 
+    val borderAlpha by animateFloatAsState(
+        targetValue = if (showWarning) 1f else 0f,
+        animationSpec = tween(durationMillis = 300),
+        label = "Border flash"
+    )
+
     LaunchedEffect(Unit) {
-        delay(100) // Short delay to ensure the dialog is fully rendered
+        delay(100)
         focusRequester.requestFocus()
         keyboardController?.show()
     }
@@ -94,11 +104,6 @@ fun AddTaskDialog(
             showWarning = false
         }
     }
-
-    val warningAlpha by animateFloatAsState(
-        targetValue = if (showWarning) 1f else 0f,
-        animationSpec = tween(durationMillis = 300), label = "Title null arrow"
-    )
 
     BasicAlertDialog(
         onDismissRequest = { onEvent(TaskEvent.HideAddTaskDialog) },
@@ -111,19 +116,12 @@ fun AddTaskDialog(
                     .width(IntrinsicSize.Max),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                Box(modifier = Modifier.fillMaxWidth()) {
-                    Title(
-                        taskState = taskState,
-                        onEvent = onEvent,
-                        focusRequester = focusRequester
-                    )
-                    WarningTriangle(
-                        modifier = Modifier
-                            .align(Alignment.CenterStart)
-                            .offset((-8).dp, 0.dp)
-                            .alpha(warningAlpha)
-                    )
-                }
+                Title(
+                    taskState = taskState,
+                    onEvent = onEvent,
+                    focusRequester = focusRequester,
+                    borderAlpha = borderAlpha
+                )
 
                 PrioritySelector(priorityFromEdit = taskState.priority, onPriorityChange = onEvent)
 
@@ -150,6 +148,11 @@ fun AddTaskDialog(
                         focusRequester.requestFocus()
                         keyboardController?.show()
                         showWarning = true
+                        // Start a coroutine to reset the warning state after a delay
+                        viewModel.viewModelScope.launch {
+                            delay(500) // Adjust this delay to control how long the border flashes
+                            showWarning = false
+                        }
                     },
                     modifier = Modifier.align(Alignment.CenterHorizontally)
                 )
@@ -163,8 +166,13 @@ fun Title(
     modifier: Modifier = Modifier,
     taskState: TaskState,
     onEvent: (TaskEvent) -> Unit,
-    focusRequester: FocusRequester
+    focusRequester: FocusRequester,
+    borderAlpha: Float
 ) {
+//    val borderColor = MaterialTheme.colorScheme.primary.copy(alpha = borderAlpha)
+    val darkTheme = LocalDarkTheme.current
+    val borderColor = PriorityColor.PRIORITY3.getColor(darkTheme).copy(alpha = borderAlpha)
+
     TextField(
         value = taskState.title,
         onValueChange = { onEvent(TaskEvent.SetTitle(it)) },
@@ -191,6 +199,11 @@ fun Title(
         modifier = modifier
             .fillMaxWidth()
             .focusRequester(focusRequester)
+            .border(
+                width = 1.dp,
+                color = borderColor,
+                shape = RoundedCornerShape(percent = 25),
+            ),
     )
 }
 
@@ -212,6 +225,7 @@ fun WarningTriangle(modifier: Modifier = Modifier) {
         )
     }
 }
+
 
 @Composable
 fun PrioritySelector(

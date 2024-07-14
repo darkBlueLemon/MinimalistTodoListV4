@@ -47,6 +47,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextAlign
@@ -201,7 +202,8 @@ fun TaskScreen(
         if (appState.isFontSettingsDialogVisible) {
             FontSettingsDialog(
                 dataStoreViewModel = dataStoreViewModel,
-                onDismiss = { onAppEvent(AppEvent.HideFontSettingsDialog) }
+                onDismiss = { onAppEvent(AppEvent.HideFontSettingsDialog) },
+                onBack = { onAppEvent(AppEvent.ShowMenuDialog) }
             )
         }
         if (appState.isTutorialDialogVisible) {
