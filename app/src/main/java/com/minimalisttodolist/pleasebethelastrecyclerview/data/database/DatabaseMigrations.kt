@@ -34,7 +34,8 @@ val MIGRATION_1_2: Migration = object : Migration(1, 2) {
                 `priority` INTEGER NOT NULL,
                 `note` TEXT NOT NULL,
                 `dueDate` INTEGER,
-                `recurrenceType` TEXT NOT NULL DEFAULT 'NONE'
+                `recurrenceType` TEXT NOT NULL DEFAULT 'NONE',
+                `isCompleted` INTEGER NOT NULL DEFAULT 0
             )
         """.trimIndent())
 
@@ -72,10 +73,10 @@ val MIGRATION_1_2: Migration = object : Migration(1, 2) {
             // Insert into the new Task table
             db.execSQL(
                 """
-                INSERT INTO Task_new (id, title, priority, note, dueDate, recurrenceType)
-                VALUES (?, ?, ?, ?, ?, ?)
+                INSERT INTO Task_new (id, title, priority, note, dueDate, recurrenceType, isCompleted)
+                VALUES (?, ?, ?, ?, ?, ?, ?)
                 """.trimIndent(),
-                arrayOf(id, title, priority, note, dueDate, "NONE")
+                arrayOf(id, title, priority, note, dueDate, "NONE", 0)
             )
         }
         cursor.close()
