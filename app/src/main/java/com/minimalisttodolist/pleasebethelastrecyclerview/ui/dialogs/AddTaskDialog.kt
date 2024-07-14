@@ -20,7 +20,6 @@ import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -48,12 +47,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.font.FontWeight
@@ -70,7 +67,6 @@ import com.minimalisttodolist.pleasebethelastrecyclerview.viewmodel.TaskState
 import com.minimalisttodolist.pleasebethelastrecyclerview.viewmodel.TaskViewModel
 import com.minimalisttodolist.pleasebethelastrecyclerview.ui.components.TimePickerFromOldApp
 import com.minimalisttodolist.pleasebethelastrecyclerview.ui.theme.LocalDarkTheme
-import com.minimalisttodolist.pleasebethelastrecyclerview.util.vibrate
 import com.minimalisttodolist.pleasebethelastrecyclerview.viewmodel.AppEvent
 import com.minimalisttodolist.pleasebethelastrecyclerview.viewmodel.DataStoreViewModel
 import kotlinx.coroutines.delay
@@ -218,26 +214,6 @@ fun Title(
 }
 
 @Composable
-fun WarningTriangle(modifier: Modifier = Modifier) {
-    val darkTheme = LocalDarkTheme.current
-    val color = PriorityColor.PRIORITY3.getColor(darkTheme)
-
-    Canvas(modifier = modifier.size(12.dp).padding(start = 5.dp)) {
-        val path = Path().apply {
-            moveTo(0f, 0f)
-            lineTo(0f, size.height)
-            lineTo(size.width, size.height / 2f)
-            close()
-        }
-        drawPath(
-            path = path,
-            color = color
-        )
-    }
-}
-
-
-@Composable
 fun PrioritySelector(
     priorityFromEdit: Int,
     onPriorityChange: (TaskEvent) -> Unit
@@ -340,7 +316,7 @@ fun PriorityStar(index: Int, selectedPriority: Int, onPriorityChange: (Int) -> U
 @Composable
 fun Note(modifier: Modifier = Modifier, taskState: TaskState, onEvent: (TaskEvent) -> Unit) {
     Row(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .padding(start = 15.dp),
         verticalAlignment = Alignment.CenterVertically
@@ -385,7 +361,7 @@ fun DateSelector(modifier: Modifier = Modifier, taskState: TaskState, onEvent: (
     val text = viewModel.formatDueDateWithDateOnly(taskState.dueDate).ifEmpty { "Add date" }
 
     Row(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .padding(start = 15.dp, top = 4.dp, bottom = 4.dp)
             .clickable { onEvent(TaskEvent.ShowDatePicker) },
@@ -429,7 +405,7 @@ fun TimeSelector(modifier: Modifier = Modifier, taskState: TaskState, onEvent: (
     val text = viewModel.formatDueDateWithTimeOnly(taskState.dueDate).ifEmpty { "Add Time" }
 
     Row(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .padding(start = 15.dp, top = 4.dp, bottom = 4.dp),
         verticalAlignment = Alignment.CenterVertically
@@ -464,7 +440,6 @@ fun TimeSelector(modifier: Modifier = Modifier, taskState: TaskState, onEvent: (
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun RecurrenceSelector(
-    modifier: Modifier = Modifier,
     recurrenceFromEdit: RecurrenceType,
     onRecurrenceTypeSelected: (RecurrenceType) -> Unit
 ) {
