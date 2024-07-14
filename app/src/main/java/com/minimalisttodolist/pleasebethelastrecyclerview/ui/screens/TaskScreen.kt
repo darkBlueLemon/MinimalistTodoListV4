@@ -121,6 +121,7 @@ fun TaskScreen(
                 if (tutorialVisibility.value) {
                     FloatingActionButton(
                         onClick = {
+                            vibrate(context = context, strength = 1)
                             onAppEvent(AppEvent.ShowTutorialDialog)
                         },
                         elevation = FloatingActionButtonDefaults.elevation(0.dp, 0.dp, 0.dp, 0.dp),
@@ -170,6 +171,7 @@ fun TaskScreen(
                                 onAppEvent(AppEvent.ShowMenuDialog)
                             },
                             onClick = {
+                                vibrate(context = context, strength = 1)
                                 onEvent(TaskEvent.ShowAddTaskDialog)
                             }
                         )
@@ -258,7 +260,7 @@ fun TaskList(onEvent: (TaskEvent) -> Unit, taskState: TaskState, viewModel: Task
 //    val taskState by viewModel.state.collectAsState()
 
     LazyColumn(
-        contentPadding = PaddingValues(16.dp),
+//        contentPadding = PaddingValues(16.dp),
         modifier = Modifier
             .fillMaxSize()
             .padding(padding)
@@ -304,6 +306,7 @@ fun TaskList(onEvent: (TaskEvent) -> Unit, taskState: TaskState, viewModel: Task
 @Composable
 fun TaskItem(task: Task, onEdit: (Task) -> Unit, onDelete: (Task) -> Unit, viewModel: TaskViewModel) {
     val darkTheme = LocalDarkTheme.current
+    val context = LocalContext.current
 
     val priorityColor = when (task.priority) {
         0 -> PriorityColor.PRIORITY0.getColor(darkTheme)
@@ -315,11 +318,13 @@ fun TaskItem(task: Task, onEdit: (Task) -> Unit, onDelete: (Task) -> Unit, viewM
 
     Row(
         modifier = Modifier
-            .padding(bottom = 16.dp)
+            .padding(bottom = 8.dp)
             .fillMaxWidth()
             .clickable {
+                vibrate(context = context, strength = 1)
                 onEdit(task)
             }
+//            .background(Color.Green)
         ,
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
@@ -404,6 +409,7 @@ fun CompleteIcon(modifier: Modifier = Modifier, onDelete: () -> Unit) {
     var isChecked by remember { mutableStateOf(false) }
     val scale = remember { Animatable(initialValue = 1f) }
     var selected by remember { mutableStateOf(false) }
+    val context = LocalContext.current
 
     LaunchedEffect(key1 = selected) {
         if(selected) {
@@ -428,14 +434,16 @@ fun CompleteIcon(modifier: Modifier = Modifier, onDelete: () -> Unit) {
     }
 
     Box(
-        modifier = Modifier
+        modifier = modifier
+//            .background(Color.Red)
             .scale(scale.value)
             .clickable {
                 selected = !selected
                 isChecked = !isChecked
+                vibrate(context = context, strength = 1)
                 onDelete()
             }
-            .padding(8.dp)
+            .padding(6.dp)
     ) {
         AnimatedContent(
             targetState = isChecked,
@@ -449,12 +457,14 @@ fun CompleteIcon(modifier: Modifier = Modifier, onDelete: () -> Unit) {
                     imageVector = Icons.Outlined.CheckCircle,
                     contentDescription = "Checked",
                     tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.size(28.dp)
                 )
             } else {
                 Icon(
                     imageVector = Icons.Outlined.RadioButtonUnchecked,
                     contentDescription = "Unchecked",
                     tint = MaterialTheme.colorScheme.tertiary,
+                    modifier = Modifier.size(28.dp)
                 )
             }
         }

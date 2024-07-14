@@ -219,7 +219,7 @@ fun PrioritySelector(
     onPriorityChange: (TaskEvent) -> Unit
 ) {
     var selectedPriority by remember { mutableStateOf(priorityFromEdit) }
-    var isPrioritySelected by remember { mutableStateOf(false) }
+    var isPrioritySelected by remember { mutableStateOf(priorityFromEdit != 0) }
 
     AnimatedVisibility(
         visible = isPrioritySelected || selectedPriority != 0,
@@ -268,7 +268,7 @@ fun PrioritySelector(
                 .clickable {
                     isPrioritySelected = true
 //                    selectedPriority = 0
-                    onPriorityChange(TaskEvent.SetPriority(1))
+//                    onPriorityChange(TaskEvent.SetPriority(1))
                 },
             verticalAlignment = Alignment.CenterVertically
         ) {

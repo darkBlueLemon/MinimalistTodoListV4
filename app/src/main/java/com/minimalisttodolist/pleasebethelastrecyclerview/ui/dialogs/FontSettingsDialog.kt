@@ -74,13 +74,6 @@ fun FontSettingsDialog(
 
 @Composable
 fun FontOptionsTitle(modifier: Modifier = Modifier, onBack: () -> Unit) {
-//    Text(
-//        text = "Font Options",
-//        style = MaterialTheme.typography.headlineSmall,
-//        modifier = Modifier
-//            .align(Alignment.CenterHorizontally)
-//            .padding(top = 12.dp, bottom = 12.dp)
-//    )
     Box (
         modifier = Modifier
             .fillMaxWidth()
@@ -94,7 +87,7 @@ fun FontOptionsTitle(modifier: Modifier = Modifier, onBack: () -> Unit) {
             modifier = Modifier
                 .align(Alignment.CenterStart)
                 .fillMaxHeight()
-                .padding(start = 12.dp, end = 12.dp)
+                .padding(end = 12.dp)
                 .clickable {
                     onBack()
                 }

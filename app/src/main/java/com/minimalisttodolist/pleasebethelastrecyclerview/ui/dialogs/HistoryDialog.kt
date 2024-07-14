@@ -134,7 +134,7 @@ fun TitleAndDeleteAll(onClearHistory: () -> Unit, context: Context, onBack: () -
             modifier = Modifier
                 .align(Alignment.CenterStart)
                 .fillMaxHeight()
-                .padding(start = 12.dp, end = 12.dp)
+//                .padding(start = 12.dp, end = 12.dp)
                 .clickable {
                     onBack()
                 }
@@ -156,7 +156,6 @@ fun TitleAndDeleteAll(onClearHistory: () -> Unit, context: Context, onBack: () -
                     expanded = false
                     vibrate(context = context, strength = 1)
                 }
-                .padding(horizontal = 12.dp)
                 .fillMaxHeight()
                 .wrapContentHeight(Alignment.CenterVertically) // This centers the text vertically
         )

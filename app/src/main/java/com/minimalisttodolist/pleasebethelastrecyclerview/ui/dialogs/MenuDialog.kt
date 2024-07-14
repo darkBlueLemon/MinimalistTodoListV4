@@ -1,6 +1,7 @@
 package com.minimalisttodolist.pleasebethelastrecyclerview.ui.dialogs
 
 import android.content.Context
+import android.view.Menu
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
@@ -26,6 +27,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.CheckCircle
+import androidx.compose.material.icons.outlined.ChevronRight
 import androidx.compose.material.icons.outlined.RadioButtonUnchecked
 import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -81,7 +83,6 @@ fun MenuDialog(
         },
         modifier = modifier
             .width(350.dp)
-//            .width(IntrinsicSize.Max)
     ) {
         CustomBox {
             Column(
@@ -89,49 +90,12 @@ fun MenuDialog(
                     .fillMaxWidth()
                     .padding(20.dp),
             ) {
-                Text(
-                    text = "Menu",
-                    style = MaterialTheme.typography.headlineSmall,
-                    modifier = Modifier
-                        .align(Alignment.CenterHorizontally)
-                        .padding(bottom = 12.dp)
-                )
-                Text(
-                    text = "History",
-                    style = MaterialTheme.typography.bodyLarge,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable {
-                            onAppEvent(AppEvent.ShowHistoryDialog)
-                        }
-                        .padding(top = 12.dp, bottom = 12.dp)
-                )
-                Text(
-                    text = "Font Options",
-                    style = MaterialTheme.typography.bodyLarge,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable {
-                            onAppEvent(AppEvent.ShowFontSettingsDialog)
-                        }
-                        .padding(top = 12.dp, bottom = 12.dp)
-                )
+                MenuTitle( modifier = Modifier.align(Alignment.CenterHorizontally) )
                 AppIconSelector(context = context)
-//                Text(
-//                    text = "Notification",
-//                    modifier = Modifier
-//                        .padding(bottom = 24.dp)
-//                )
-                Text(
-                    text = "Tutorial",
-                    style = MaterialTheme.typography.bodyLarge,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable {
-                            onAppEvent(AppEvent.ShowTutorialDialog)
-                        }
-                        .padding(top = 12.dp, bottom = 12.dp)
-                )
+                Tutorial( onClick = { onAppEvent(AppEvent.ShowTutorialDialog) })
+                FontOptions( onClick = { onAppEvent(AppEvent.ShowFontSettingsDialog) } )
+                ThemeSelector( dataStoreViewModel )
+                ClockTypeSelector( dataStoreViewModel )
                 RecurrenceSelector(
                     currentRecurrenceFilter = taskState.recurrenceFilter,
                     onRecurrenceFilterChange = { onEvent(TaskEvent.SetRecurrenceFilter(it)) },
@@ -142,14 +106,97 @@ fun MenuDialog(
                     onSortChange = { onEvent(TaskEvent.SortTasks(it) ) },
                     dataStoreViewModel = dataStoreViewModel
                 )
-                ThemeSelector(
-                    dataStoreViewModel
-                )
-                ClockTypeSelector(
-                    dataStoreViewModel = dataStoreViewModel
-                )
+                History( onClick = { onAppEvent(AppEvent.ShowHistoryDialog) } )
             }
         }
+    }
+}
+
+@Composable
+fun MenuTitle(modifier: Modifier = Modifier) {
+    Text(
+        text = "Menu",
+        style = MaterialTheme.typography.headlineSmall,
+        modifier = modifier
+            .padding(bottom = 12.dp)
+    )
+}
+
+@Composable
+fun History(modifier: Modifier = Modifier, onClick: () -> Unit) {
+    Row (
+        modifier = modifier
+            .fillMaxWidth()
+            .clickable {
+                onClick()
+            }
+            .padding(top = 12.dp, bottom = 12.dp)
+        ,
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = "History",
+            style = MaterialTheme.typography.bodyLarge,
+            modifier = Modifier.padding(end = 10.dp)
+        )
+        Icon(
+            imageVector = Icons.Outlined.ChevronRight,
+            contentDescription = "History Chevron",
+            tint = MaterialTheme.colorScheme.tertiary,
+        )
+    }
+}
+
+@Composable
+fun FontOptions(modifier: Modifier = Modifier, onClick: () -> Unit) {
+    Row (
+        modifier = modifier
+            .fillMaxWidth()
+            .clickable {
+                onClick()
+            }
+            .padding(top = 12.dp, bottom = 12.dp)
+        ,
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = "Font Options",
+            style = MaterialTheme.typography.bodyLarge,
+            modifier = Modifier.padding(end = 10.dp)
+        )
+        Icon(
+            imageVector = Icons.Outlined.ChevronRight,
+            contentDescription = "History Chevron",
+            tint = MaterialTheme.colorScheme.tertiary,
+        )
+    }
+}
+
+@Composable
+fun Tutorial(modifier: Modifier = Modifier, onClick: () -> Unit) {
+    Row (
+        modifier = modifier
+            .fillMaxWidth()
+            .clickable {
+                onClick()
+            }
+            .padding(top = 12.dp, bottom = 12.dp)
+        ,
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = "Tutorial",
+            style = MaterialTheme.typography.bodyLarge,
+            modifier = Modifier.padding(end = 10.dp)
+        )
+        Icon(
+            imageVector = Icons.Outlined.ChevronRight,
+            contentDescription = "History Chevron",
+            tint = MaterialTheme.colorScheme.tertiary,
+        )
     }
 }
 
@@ -157,14 +204,28 @@ fun MenuDialog(
 fun AppIconSelector(modifier: Modifier = Modifier, context: Context) {
     var expanded by remember { mutableStateOf(false) }
 
-    Text(
-        text = "App Icon",
-        style = MaterialTheme.typography.bodyLarge,
-        modifier = Modifier
+    Row (
+        modifier = modifier
             .fillMaxWidth()
-            .clickable { expanded = true }
+            .clickable {
+                expanded = true
+            }
             .padding(top = 12.dp, bottom = 12.dp)
-    )
+        ,
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = "App Icon",
+            style = MaterialTheme.typography.bodyLarge,
+            modifier = Modifier.padding(end = 10.dp)
+        )
+        Icon(
+            imageVector = Icons.Outlined.ChevronRight,
+            contentDescription = "History Chevron",
+            tint = MaterialTheme.colorScheme.tertiary,
+        )
+    }
 
     CustomDropdownMenu(
         expanded = expanded,
@@ -185,9 +246,8 @@ fun AppIconSelector(modifier: Modifier = Modifier, context: Context) {
             })
         }
     }
-
-//    Spacer(modifier = Modifier.size(width = 0.dp, height = 24.dp))
 }
+
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun IconPreview(isLightIcon: Boolean, onClick: () -> Unit) {
@@ -340,7 +400,7 @@ fun PrioritySelector(
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
-            text = "Sorting Option",
+            text = "Sort By",
             style = MaterialTheme.typography.bodyLarge
         )
         Text(
