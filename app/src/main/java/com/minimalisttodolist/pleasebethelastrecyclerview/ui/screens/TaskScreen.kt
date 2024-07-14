@@ -257,10 +257,8 @@ fun TaskScreen(
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun TaskList(onEvent: (TaskEvent) -> Unit, taskState: TaskState, viewModel: TaskViewModel, padding: PaddingValues) {
-//    val taskState by viewModel.state.collectAsState()
-
     LazyColumn(
-//        contentPadding = PaddingValues(16.dp),
+        contentPadding = PaddingValues(start = 4.dp, end = 16.dp),
         modifier = Modifier
             .fillMaxSize()
             .padding(padding)
