@@ -98,4 +98,8 @@ dependencies {
 
     // Flow Row
     implementation (libs.androidx.foundation)
+
+    // In-App Review
+    implementation (libs.review.ktx)
+    implementation (libs.review)
 }

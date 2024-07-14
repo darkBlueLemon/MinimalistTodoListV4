@@ -1,5 +1,6 @@
 package com.minimalisttodolist.pleasebethelastrecyclerview
 
+import android.content.Context
 import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
@@ -12,12 +13,17 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.material3.Button
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.lifecycleScope
 import androidx.room.Room
+import com.google.android.play.core.review.ReviewManagerFactory
 import com.minimalisttodolist.pleasebethelastrecyclerview.data.database.MIGRATION_1_2
 import com.minimalisttodolist.pleasebethelastrecyclerview.data.preferences.AppPreferences
 import com.minimalisttodolist.pleasebethelastrecyclerview.data.database.TaskDatabase
@@ -69,8 +75,19 @@ class MainActivity : ComponentActivity() {
 
         setupUI()
         initializeComponents()
+        showFeedbackDialog()
         setContent {
             SetupTheme()
+        }
+    }
+
+    private fun showFeedbackDialog() {
+        val reviewManager = ReviewManagerFactory.create(applicationContext)
+
+        reviewManager.requestReviewFlow().addOnCompleteListener{
+            if(it.isSuccessful) {
+                reviewManager.launchReviewFlow(this, it.result)
+            }
         }
     }
 
