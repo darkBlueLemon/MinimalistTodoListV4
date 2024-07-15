@@ -18,9 +18,9 @@ val LightPriority1 = Color(0xFFFFD000)  // Bright yellow
 val LightPriority0 = Color.Transparent
 
 val DateRed = Color(0xFFCB273C)
-val dateNoteGray = Color(0x8FFFFFFF)
 
-//val TranslucentDark = Color(0x40FFFFFF)
+val TranslucentCompleteIconDark = Color(0x33FFFFFF)
+val TranslucentCompleteIconLight = Color(0x33000000)
 val TranslucentDark = Color(0x8FFFFFFF)
 val TranslucentLight = Color(0x8F000000)
 

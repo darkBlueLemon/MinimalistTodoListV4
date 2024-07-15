@@ -276,7 +276,7 @@ fun TaskList(onEvent: (TaskEvent) -> Unit, onClearFilters: () -> Unit, taskState
     }
 
     LazyColumn(
-        contentPadding = PaddingValues(start = 4.dp, end = 16.dp),
+        contentPadding = PaddingValues(start = 12.dp, end = 16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
             .fillMaxSize()
@@ -429,13 +429,13 @@ fun DueDate_Recurrence_Note(
                         }
                     }
                 },
-                style = MaterialTheme.typography.bodyMedium
+                style = MaterialTheme.typography.bodySmall
             )
         } else if(note.isNotEmpty()) {
             Text(
                 text = note,
                 color = MaterialTheme.colorScheme.tertiary,
-                style = MaterialTheme.typography.bodyMedium,
+                style = MaterialTheme.typography.bodySmall,
             )
         }
 //    }
@@ -500,7 +500,7 @@ fun CompleteIcon(modifier: Modifier = Modifier, onDelete: () -> Unit) {
                 Icon(
                     imageVector = Icons.Outlined.RadioButtonUnchecked,
                     contentDescription = "Unchecked",
-                    tint = MaterialTheme.colorScheme.tertiary,
+                    tint = MaterialTheme.colorScheme.surfaceVariant,
                     modifier = Modifier.size(28.dp)
                 )
             }

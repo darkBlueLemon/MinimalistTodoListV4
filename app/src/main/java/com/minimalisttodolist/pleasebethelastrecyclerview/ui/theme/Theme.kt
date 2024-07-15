@@ -26,6 +26,7 @@ private val LightColorScheme2 = lightColorScheme(
     onSurface = White,
 
     tertiary = TranslucentLight,
+    surfaceVariant = TranslucentCompleteIconLight,
 
     // Calender Arrow Icon Background
     secondaryContainer = Black,
@@ -46,6 +47,7 @@ private val DarkColorScheme2 = darkColorScheme(
     onSurface = Black,
 
     tertiary = TranslucentDark,
+    surfaceVariant = TranslucentCompleteIconDark,
 
     // Calender Arrow Icon Background
     secondaryContainer = White,
