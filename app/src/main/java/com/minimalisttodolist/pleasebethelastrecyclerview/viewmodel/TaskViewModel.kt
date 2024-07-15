@@ -1,6 +1,7 @@
 package com.minimalisttodolist.pleasebethelastrecyclerview.viewmodel
 
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -199,8 +200,8 @@ class TaskViewModel(
     @RequiresApi(Build.VERSION_CODES.O)
     private fun handleEditTask(task: Task) {
         _state.update {
-            val dueDateOnly = getLocalDateFromEpochMilli(task.dueDate)
-            val dueTimeOnly = getLocalTimeFromEpochMilli(task.dueDate)
+            val dueDateOnly = getLocalDateFromEpochMilliWithNull(task.dueDate)
+            val dueTimeOnly = getLocalTimeFromEpochMilliWithNull(task.dueDate)
             it.copy(
                 title = task.title,
                 priority = task.priority,
@@ -424,6 +425,18 @@ class TaskViewModel(
     @RequiresApi(Build.VERSION_CODES.O)
     fun getLocalTimeFromEpochMilli(epochMilli: Long?): LocalTime {
         epochMilli ?: return LocalTime.now()
+        return Instant.ofEpochMilli(epochMilli).atZone(ZoneId.systemDefault()).toLocalTime()
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun getLocalDateFromEpochMilliWithNull(epochMilli: Long?): LocalDate? {
+        epochMilli ?: return null
+        return Instant.ofEpochMilli(epochMilli).atZone(ZoneId.systemDefault()).toLocalDate()
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun getLocalTimeFromEpochMilliWithNull(epochMilli: Long?): LocalTime? {
+        epochMilli ?: return null
         return Instant.ofEpochMilli(epochMilli).atZone(ZoneId.systemDefault()).toLocalTime()
     }
 }
