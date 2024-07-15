@@ -84,7 +84,8 @@ fun Tutorial(
                     .width(350.dp)
 //                    .width(IntrinsicSize.Max)
                 ,
-                verticalArrangement = Arrangement.spacedBy(16.dp)
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
                     text = "${pagerState.currentPage + 1}/${steps.size}",
@@ -168,18 +169,19 @@ fun Tutorial(
                         modifier = Modifier
                             .fillMaxWidth()
                             .align(Alignment.Center),
-                        horizontalArrangement = Arrangement.Center
+                        horizontalArrangement = Arrangement.Center,
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
                         steps.forEachIndexed { index, _ ->
                             Box(
                                 modifier = Modifier
+                                    .padding(horizontal = 4.dp)
                                     .size(8.dp)
                                     .background(
                                         color = if (index == pagerState.currentPage) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.tertiaryContainer,
                                         shape = CircleShape
                                     )
                             )
-                            Spacer(modifier = Modifier.width(8.dp))
                         }
                     }
                     Text(
