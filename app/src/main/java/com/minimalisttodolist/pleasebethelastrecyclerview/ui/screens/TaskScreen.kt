@@ -277,21 +277,30 @@ fun TaskList(onEvent: (TaskEvent) -> Unit, onClearFilters: () -> Unit, taskState
 
     LazyColumn(
         contentPadding = PaddingValues(start = 4.dp, end = 16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
             .fillMaxSize()
             .padding(padding)
+            .padding(top = 8.dp)
         ,
     ) {
         item {
-            if(filterText.isNotEmpty()) {
+            AnimatedVisibility(
+                visible = filterText.isNotEmpty()
+            ) {
                 Text(
                     text = filterText,
                     style = MaterialTheme.typography.bodyMedium,
                     textAlign = TextAlign.Center,
                     modifier = Modifier
-                        .fillMaxWidth()
                         .clickable { onClearFilters() }
+                        .padding(horizontal = 32.dp, vertical = 8.dp)
                 )
+            }
+            AnimatedVisibility(
+                visible = filterText.isEmpty()
+            ) {
+                Spacer(modifier = Modifier.height(8.dp))
             }
         }
         items(taskState.tasks, key = { it.id }) { task ->
