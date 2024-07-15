@@ -279,7 +279,7 @@ fun PrioritySelector(
                 modifier = Modifier.size(20.dp)
             )
             Text(
-                text = "Add priority",
+                text = "Priority",
                 color = MaterialTheme.colorScheme.tertiary,
                 style = MaterialTheme.typography.bodyMedium,
                 modifier = Modifier.padding(15.dp)
@@ -332,7 +332,7 @@ fun Note(modifier: Modifier = Modifier, taskState: TaskState, onEvent: (TaskEven
             onValueChange = { onEvent(TaskEvent.SetNote(it)) },
             placeholder = {
                 Text(
-                    text = "Add note",
+                    text = "Note",
                     color = MaterialTheme.colorScheme.tertiary,
 //                    fontWeight = FontWeight.Light,
                     style = MaterialTheme.typography.bodyMedium,
@@ -357,7 +357,8 @@ fun Note(modifier: Modifier = Modifier, taskState: TaskState, onEvent: (TaskEven
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun DateSelector(modifier: Modifier = Modifier, taskState: TaskState, onEvent: (TaskEvent) -> Unit, viewModel: TaskViewModel, onAppEvent: (AppEvent) -> Unit) {
-    val text = viewModel.formatDueDateWithDateOnly(taskState.dueDate).ifEmpty { "Add date" }
+    val emptyText = "Date"
+    val text = viewModel.formatDueDateWithDateOnly(taskState.dueDate).ifEmpty { emptyText }
 
     Row(
         modifier = modifier
@@ -376,7 +377,7 @@ fun DateSelector(modifier: Modifier = Modifier, taskState: TaskState, onEvent: (
             text = text,
             modifier = Modifier
                 .padding(15.dp),
-            color = if (text == "Add date") MaterialTheme.colorScheme.tertiary else MaterialTheme.colorScheme.primary,
+            color = if (text == emptyText) MaterialTheme.colorScheme.tertiary else MaterialTheme.colorScheme.primary,
 //            fontWeight = FontWeight.Light,
             style = MaterialTheme.typography.bodyMedium,
         )
@@ -420,7 +421,7 @@ fun TimeSelector(modifier: Modifier = Modifier, taskState: TaskState, onEvent: (
             modifier = Modifier
                 .padding(15.dp)
                 .clickable { onEvent(TaskEvent.ShowTimePicker) },
-            color = if (text == "Add Time") MaterialTheme.colorScheme.tertiary else MaterialTheme.colorScheme.primary,
+            color = if (text == "Time") MaterialTheme.colorScheme.tertiary else MaterialTheme.colorScheme.primary,
 //            fontWeight = FontWeight.Light,
             style = MaterialTheme.typography.bodyMedium,
         )
@@ -501,7 +502,7 @@ fun RecurrenceSelector(
                 modifier = Modifier.size(20.dp)
             )
             Text(
-                text = "Add recurrence",
+                text = "Recurrence",
                 color = MaterialTheme.colorScheme.tertiary,
                 style = MaterialTheme.typography.bodyMedium,
                 modifier = Modifier.padding(15.dp)
