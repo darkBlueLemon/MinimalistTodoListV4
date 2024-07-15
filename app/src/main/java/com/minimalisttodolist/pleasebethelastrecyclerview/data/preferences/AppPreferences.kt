@@ -9,6 +9,7 @@ import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import com.minimalisttodolist.pleasebethelastrecyclerview.data.model.ClockType
+import com.minimalisttodolist.pleasebethelastrecyclerview.data.model.DueDateFilterType
 import com.minimalisttodolist.pleasebethelastrecyclerview.data.model.FontFamilyType
 import com.minimalisttodolist.pleasebethelastrecyclerview.data.model.RecurrenceType
 import com.minimalisttodolist.pleasebethelastrecyclerview.data.model.SortType
@@ -42,6 +43,7 @@ class AppPreferences private constructor(context: Context) {
         val SORTING_OPTION = stringPreferencesKey("sorting_option")
         val RECURRENCE_FILTER = stringPreferencesKey("recurrence_option")
         val TUTORIAL_VISIBILITY = booleanPreferencesKey("tutorial_visibility")
+        val DUE_DATE_FILTER = stringPreferencesKey("due_date_filter")
     }
 
     val theme: Flow<ThemeType> = dataStore.data.map { preferences ->
@@ -78,6 +80,10 @@ class AppPreferences private constructor(context: Context) {
 
     val tutorialVisibility: Flow<Boolean> = dataStore.data.map { preferences ->
         preferences[PreferencesKeys.TUTORIAL_VISIBILITY] ?: true
+    }
+
+    val dueDateFilterType: Flow<DueDateFilterType> = dataStore.data.map { preferences ->
+        DueDateFilterType.fromDisplayName(preferences[PreferencesKeys.DUE_DATE_FILTER] ?: DueDateFilterType.NONE.displayName)
     }
 
     suspend fun saveTheme(theme: ThemeType) {
@@ -121,5 +127,9 @@ class AppPreferences private constructor(context: Context) {
 
     suspend fun disableTutorialDialog() {
         dataStore.edit { preferences -> preferences[PreferencesKeys.TUTORIAL_VISIBILITY] = false }
+    }
+
+    suspend fun saveDueDateFilter(dueDateFilterType: DueDateFilterType) {
+        dataStore.edit { preferences -> preferences[PreferencesKeys.DUE_DATE_FILTER] = dueDateFilterType.displayName }
     }
 }

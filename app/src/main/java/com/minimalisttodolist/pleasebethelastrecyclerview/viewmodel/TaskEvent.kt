@@ -1,6 +1,7 @@
 package com.minimalisttodolist.pleasebethelastrecyclerview.viewmodel
 
 import com.minimalisttodolist.pleasebethelastrecyclerview.data.model.DeletedTask
+import com.minimalisttodolist.pleasebethelastrecyclerview.data.model.DueDateFilterType
 import com.minimalisttodolist.pleasebethelastrecyclerview.data.model.RecurrenceType
 import com.minimalisttodolist.pleasebethelastrecyclerview.data.model.SortType
 import com.minimalisttodolist.pleasebethelastrecyclerview.data.model.Task
@@ -31,6 +32,9 @@ sealed interface TaskEvent {
     // Recurrence
     data class SetRecurrenceType(val recurrenceType: RecurrenceType) : TaskEvent
     data class SetRecurrenceFilter(val recurrenceType: RecurrenceType) : TaskEvent
+
+    // Due Date Filter
+    data class SetDueDateFilter(val dueDateFilterType: DueDateFilterType) : TaskEvent
 
     data class EditTask(val task: Task) : TaskEvent
 

@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.minimalisttodolist.pleasebethelastrecyclerview.data.model.ClockType
+import com.minimalisttodolist.pleasebethelastrecyclerview.data.model.DueDateFilterType
 import com.minimalisttodolist.pleasebethelastrecyclerview.data.model.FontFamilyType
 import com.minimalisttodolist.pleasebethelastrecyclerview.data.model.RecurrenceType
 import com.minimalisttodolist.pleasebethelastrecyclerview.data.model.SortType
@@ -48,6 +49,10 @@ class DataStoreViewModel(private val appPreferences: AppPreferences) : ViewModel
         .map { it }
         .stateIn(viewModelScope, SharingStarted.Eagerly, true)
 
+    val dueDateFilter: StateFlow<DueDateFilterType> = appPreferences.dueDateFilterType
+        .map { it }
+        .stateIn(viewModelScope, SharingStarted.Eagerly, DueDateFilterType.NONE)
+
     fun saveTheme(themeType: ThemeType) {
         viewModelScope.launch { appPreferences.saveTheme(themeType) }
     }
@@ -78,6 +83,10 @@ class DataStoreViewModel(private val appPreferences: AppPreferences) : ViewModel
 
     fun saveTutorialVisibility(tutorialVisibility: Boolean) {
         viewModelScope.launch { appPreferences.disableTutorialDialog() }
+    }
+
+    fun saveDueDateFilter(dueDateFilterType: DueDateFilterType) {
+        viewModelScope.launch { appPreferences.saveDueDateFilter(dueDateFilterType) }
     }
 
     private fun fontWeightFromDisplayName(displayName: String): FontWeight {

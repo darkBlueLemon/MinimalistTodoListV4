@@ -11,18 +11,25 @@ import com.minimalisttodolist.pleasebethelastrecyclerview.data.model.RecurrenceT
 import com.minimalisttodolist.pleasebethelastrecyclerview.data.model.SortType
 import com.minimalisttodolist.pleasebethelastrecyclerview.data.model.Task
 import com.minimalisttodolist.pleasebethelastrecyclerview.data.database.TaskDao
+import com.minimalisttodolist.pleasebethelastrecyclerview.data.model.DueDateFilterType
 import com.minimalisttodolist.pleasebethelastrecyclerview.util.calculateNextDueDate
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import java.time.DayOfWeek
 import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
+import java.time.temporal.ChronoUnit
+import java.time.temporal.TemporalAdjusters
+import java.time.temporal.WeekFields
+import java.util.Locale
 
+@RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalCoroutinesApi::class)
 class TaskViewModel(
     private val dao: TaskDao,
@@ -32,14 +39,16 @@ class TaskViewModel(
 
     private val _sortType = MutableStateFlow(SortType.PRIORITY)
     private val _recurrenceFilter = MutableStateFlow(RecurrenceType.NONE)
+    private val _dueDateFilterType = MutableStateFlow(DueDateFilterType.NONE)
     private val _tasks = MutableStateFlow<List<Task>>(emptyList())
     private val _state = MutableStateFlow(TaskState())
 
-    val state = combine(_state, _sortType, _recurrenceFilter, _tasks) { state, sortType, recurrenceType, tasks ->
+    val state = combine(_state, _sortType, _recurrenceFilter, _tasks, _dueDateFilterType) { state, sortType, recurrenceType, tasks, dueDateFilterType ->
         state.copy(
             tasks = tasks,
             sortType = sortType,
-            recurrenceFilter = recurrenceType
+            recurrenceFilter = recurrenceType,
+            dueDateFilterType = dueDateFilterType
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), TaskState())
 
@@ -58,6 +67,9 @@ class TaskViewModel(
         }
         viewModelScope.launch {
             dataStoreViewModel.recurrenceFilter.collect { _recurrenceFilter.value = it }
+        }
+        viewModelScope.launch {
+            dataStoreViewModel.dueDateFilter.collect { _dueDateFilterType.value = it }
         }
     }
 
@@ -83,6 +95,7 @@ class TaskViewModel(
 
             is TaskEvent.EditTask -> handleEditTask(event.task)
             is TaskEvent.SetRecurrenceFilter -> _recurrenceFilter.value = event.recurrenceType
+            is TaskEvent.SetDueDateFilter -> _dueDateFilterType.value = event.dueDateFilterType
 
             TaskEvent.ShowDatePicker -> _state.update { it.copy(isDatePickerVisible = true) }
             TaskEvent.HideDatePicker -> _state.update { it.copy(isDatePickerVisible = false) }
@@ -248,12 +261,13 @@ class TaskViewModel(
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     fun reloadTasks() {
         viewModelScope.launch {
-            combine(_sortType, _recurrenceFilter) { sortType, recurrenceType ->
-                Pair(sortType, recurrenceType)
+            combine(_sortType, _recurrenceFilter, _dueDateFilterType) { sortType, recurrenceType, dueDateFilterType ->
+                Triple(sortType, recurrenceType, dueDateFilterType)
             }
-                .flatMapLatest { (sortType, recurrenceType) ->
+                .flatMapLatest { (sortType, recurrenceType, dueDateFilterType) ->
                     when (sortType) {
                         SortType.ALPHABETICAL -> dao.getTasksOrderedAlphabetically()
                         SortType.ALPHABETICAL_REV -> dao.getTasksOrderedAlphabeticallyRev()
@@ -261,13 +275,35 @@ class TaskViewModel(
                         SortType.PRIORITY -> dao.getTasksSortedByPriority()
                     }.map { tasks ->
                         tasks.filter { task ->
-                            recurrenceType == RecurrenceType.NONE || task.recurrenceType == recurrenceType
+                            (recurrenceType == RecurrenceType.NONE || task.recurrenceType == recurrenceType) &&
+                                    isWithinDueDateFilter(task, dueDateFilterType)
                         }
                     }
                 }
                 .collect { tasks ->
                     _tasks.value = tasks
                 }
+        }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun isWithinDueDateFilter(task: Task, filterType: DueDateFilterType): Boolean {
+        val taskDueDate = task.dueDate?.let {
+            Instant.ofEpochMilli(it).atZone(ZoneId.systemDefault()).toLocalDate()
+        } ?: return filterType == DueDateFilterType.NONE
+
+        val now = LocalDate.now()
+        return when (filterType) {
+            DueDateFilterType.NONE -> true
+            DueDateFilterType.TODAY -> taskDueDate == now
+            DueDateFilterType.THIS_WEEK -> {
+                val firstDayOfWeek = WeekFields.of(Locale.getDefault()).firstDayOfWeek
+                val startOfWeek = now.with(TemporalAdjusters.previousOrSame(firstDayOfWeek))
+                val endOfWeek = startOfWeek.plusDays(6)
+                taskDueDate in startOfWeek..endOfWeek
+            }
+            DueDateFilterType.THIS_MONTH -> taskDueDate.year == now.year && taskDueDate.month == now.month
+            DueDateFilterType.THIS_YEAR -> taskDueDate.year == now.year
         }
     }
 
@@ -388,6 +424,7 @@ class TaskViewModelFactory(
     private val notificationHelper: NotificationHelper,
     private val dataStoreViewModel: DataStoreViewModel
 ) : ViewModelProvider.Factory {
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(TaskViewModel::class.java)) {
             @Suppress("UNCHECKED_CAST")

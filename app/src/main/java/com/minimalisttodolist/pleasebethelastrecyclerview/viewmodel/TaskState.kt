@@ -1,5 +1,6 @@
 package com.minimalisttodolist.pleasebethelastrecyclerview.viewmodel
 
+import com.minimalisttodolist.pleasebethelastrecyclerview.data.model.DueDateFilterType
 import com.minimalisttodolist.pleasebethelastrecyclerview.data.model.RecurrenceType
 import com.minimalisttodolist.pleasebethelastrecyclerview.data.model.SortType
 import com.minimalisttodolist.pleasebethelastrecyclerview.data.model.Task
@@ -17,6 +18,7 @@ data class TaskState(
     val isAddTaskDialogVisible: Boolean = false,
     val recurrenceType: RecurrenceType = RecurrenceType.NONE,
     val recurrenceFilter: RecurrenceType = RecurrenceType.NONE,
+    val dueDateFilterType: DueDateFilterType = DueDateFilterType.NONE,
     val nextDueDate: Long? = null,
     val dueDate: Long? = null,
     val dueDateOnly: LocalDate? = null,

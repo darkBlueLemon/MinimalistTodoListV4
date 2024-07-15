@@ -75,6 +75,7 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import com.minimalisttodolist.pleasebethelastrecyclerview.R
 import com.minimalisttodolist.pleasebethelastrecyclerview.data.model.ClockType
+import com.minimalisttodolist.pleasebethelastrecyclerview.data.model.DueDateFilterType
 import com.minimalisttodolist.pleasebethelastrecyclerview.data.model.RecurrenceType
 import com.minimalisttodolist.pleasebethelastrecyclerview.data.model.SortType
 import com.minimalisttodolist.pleasebethelastrecyclerview.data.model.ThemeType
@@ -121,6 +122,11 @@ fun MenuDialog(
                 RecurrenceSelector(
                     currentRecurrenceFilter = taskState.recurrenceFilter,
                     onRecurrenceFilterChange = { onEvent(TaskEvent.SetRecurrenceFilter(it)) },
+                    dataStoreViewModel = dataStoreViewModel
+                )
+                DueDateFilterSelector(
+                    currentDueDateFilterType = taskState.dueDateFilterType,
+                    onDueDateFilterChange = { onEvent(TaskEvent.SetDueDateFilter(it)) },
                     dataStoreViewModel = dataStoreViewModel
                 )
                 PrioritySelector(
@@ -434,6 +440,72 @@ fun RecurrenceSelector(
     }
 //    Spacer(modifier = Modifier.size(width = 0.dp, height = 24.dp))
 }
+
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+fun DueDateFilterSelector(
+    currentDueDateFilterType: DueDateFilterType,
+    onDueDateFilterChange: (DueDateFilterType) -> Unit,
+    dataStoreViewModel: DataStoreViewModel
+) {
+    val dueDateFilter by dataStoreViewModel.dueDateFilter.collectAsState()
+    var expanded by remember { mutableStateOf(false) }
+
+    Row (
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { expanded = true }
+            .padding(top = 16.dp, bottom = 16.dp)
+        ,
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            "Due Date Filter",
+            style = MaterialTheme.typography.bodyLarge,
+            modifier = Modifier.padding(end = 10.dp)
+        )
+        Text(
+            text = dueDateFilter.toDisplayString(),
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.tertiary,
+            fontStyle = FontStyle.Italic,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+        )
+    }
+
+    CustomDropdownMenu(
+        expanded = expanded,
+        onDismissRequest = {
+            expanded = false
+        },
+    ) {
+        DueDateFilterType.entries.forEach { dueDateFilterType ->
+            Row(
+                horizontalArrangement = Arrangement.Start,
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .padding(start = 12.dp, end = 25.dp)
+                    .combinedClickable(
+                        indication = null,
+                        interactionSource = remember { MutableInteractionSource() },
+                        onClick = {
+                            dataStoreViewModel.saveDueDateFilter(dueDateFilterType)
+                            onDueDateFilterChange(dueDateFilterType)
+                        }
+                    )
+            ) {
+                CompleteIconWithoutDelay(isChecked = currentDueDateFilterType == dueDateFilterType)
+                Text(
+                    dueDateFilterType.toDisplayString(),
+                    style = MaterialTheme.typography.bodyLarge
+                )
+            }
+        }
+    }
+}
+
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
