@@ -267,8 +267,6 @@ fun PrioritySelector(
                 .padding(horizontal = 15.dp)
                 .clickable {
                     isPrioritySelected = true
-//                    selectedPriority = 0
-//                    onPriorityChange(TaskEvent.SetPriority(1))
                 },
             verticalAlignment = Alignment.CenterVertically
         ) {
