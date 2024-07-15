@@ -94,8 +94,10 @@ class TaskViewModel(
             is TaskEvent.SetRecurrenceType -> _state.update { it.copy(recurrenceType = event.recurrenceType) }
 
             is TaskEvent.EditTask -> handleEditTask(event.task)
+
             is TaskEvent.SetRecurrenceFilter -> _recurrenceFilter.value = event.recurrenceType
             is TaskEvent.SetDueDateFilter -> _dueDateFilterType.value = event.dueDateFilterType
+            TaskEvent.ClearFilters -> handleClearFilters()
 
             TaskEvent.ShowDatePicker -> _state.update { it.copy(isDatePickerVisible = true) }
             TaskEvent.HideDatePicker -> _state.update { it.copy(isDatePickerVisible = false) }
@@ -110,6 +112,13 @@ class TaskViewModel(
 
             TaskEvent.RefreshTasks -> reloadTasks()
         }
+    }
+
+    private fun handleClearFilters() {
+        _recurrenceFilter.value = RecurrenceType.NONE
+        _dueDateFilterType.value = DueDateFilterType.NONE
+        dataStoreViewModel.saveRecurrenceFilter(_recurrenceFilter.value)
+        dataStoreViewModel.saveDueDateFilter(_dueDateFilterType.value)
     }
 
     @RequiresApi(Build.VERSION_CODES.O)

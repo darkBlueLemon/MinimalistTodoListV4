@@ -50,9 +50,12 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
+import com.minimalisttodolist.pleasebethelastrecyclerview.data.model.DueDateFilterType
 import com.minimalisttodolist.pleasebethelastrecyclerview.data.model.PriorityColor
 import com.minimalisttodolist.pleasebethelastrecyclerview.data.model.RecurrenceType
 import com.minimalisttodolist.pleasebethelastrecyclerview.data.model.Task
@@ -77,6 +80,10 @@ import kotlinx.coroutines.launch
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
+import java.time.format.DateTimeFormatter
+import java.time.temporal.TemporalAdjusters
+import java.time.temporal.WeekFields
+import java.util.Locale
 
 @OptIn(ExperimentalFoundationApi::class)
 @RequiresApi(Build.VERSION_CODES.O)
@@ -248,15 +255,26 @@ fun TaskScreen(
                         .padding(32.dp)
                 )
             }
-        } else {
-            TaskList(onEvent, taskState, taskViewModel, padding)
         }
+        TaskList(onEvent, onClearFilters = { onEvent(TaskEvent.ClearFilters) }, taskState, taskViewModel, padding, dataStoreViewModel)
     }
 }
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun TaskList(onEvent: (TaskEvent) -> Unit, taskState: TaskState, viewModel: TaskViewModel, padding: PaddingValues) {
+fun TaskList(onEvent: (TaskEvent) -> Unit, onClearFilters: () -> Unit, taskState: TaskState, viewModel: TaskViewModel, padding: PaddingValues, dataStoreViewModel: DataStoreViewModel) {
+    val dueDateFilterType by dataStoreViewModel.dueDateFilter.collectAsState()
+    val recurrenceType by dataStoreViewModel.recurrenceFilter.collectAsState()
+    val filterText = buildString {
+        if (dueDateFilterType != DueDateFilterType.NONE) {
+            append(dueDateFilterType.toDisplayString())
+        }
+        if (recurrenceType != RecurrenceType.NONE) {
+            if (isNotEmpty()) append(", ")
+            append(recurrenceType.toDisplayString())
+        }
+    }
+
     LazyColumn(
         contentPadding = PaddingValues(start = 4.dp, end = 16.dp),
         modifier = Modifier
@@ -264,6 +282,18 @@ fun TaskList(onEvent: (TaskEvent) -> Unit, taskState: TaskState, viewModel: Task
             .padding(padding)
         ,
     ) {
+        item {
+            if(filterText.isNotEmpty()) {
+                Text(
+                    text = filterText,
+                    style = MaterialTheme.typography.bodyMedium,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable { onClearFilters() }
+                )
+            }
+        }
         items(taskState.tasks, key = { it.id }) { task ->
             var visible by remember { mutableStateOf(true) }
 

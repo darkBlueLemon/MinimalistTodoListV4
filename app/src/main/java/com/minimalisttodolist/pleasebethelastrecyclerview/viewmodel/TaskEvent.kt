@@ -29,12 +29,12 @@ sealed interface TaskEvent {
     data object HideTimePicker : TaskEvent
     data class SetDueTime(val dueTime: LocalTime) : TaskEvent
 
-    // Recurrence
     data class SetRecurrenceType(val recurrenceType: RecurrenceType) : TaskEvent
-    data class SetRecurrenceFilter(val recurrenceType: RecurrenceType) : TaskEvent
 
-    // Due Date Filter
+    // Filters
     data class SetDueDateFilter(val dueDateFilterType: DueDateFilterType) : TaskEvent
+    data class SetRecurrenceFilter(val recurrenceType: RecurrenceType) : TaskEvent
+    data object ClearFilters : TaskEvent
 
     data class EditTask(val task: Task) : TaskEvent
 

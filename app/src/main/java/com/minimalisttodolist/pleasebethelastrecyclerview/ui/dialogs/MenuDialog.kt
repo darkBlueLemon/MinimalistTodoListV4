@@ -124,14 +124,14 @@ fun MenuDialog(
                     onRecurrenceFilterChange = { onEvent(TaskEvent.SetRecurrenceFilter(it)) },
                     dataStoreViewModel = dataStoreViewModel
                 )
-                DueDateFilterSelector(
-                    currentDueDateFilterType = taskState.dueDateFilterType,
-                    onDueDateFilterChange = { onEvent(TaskEvent.SetDueDateFilter(it)) },
-                    dataStoreViewModel = dataStoreViewModel
-                )
                 PrioritySelector(
                     currentSortType = taskState.sortType,
                     onSortChange = { onEvent(TaskEvent.SortTasks(it) ) },
+                    dataStoreViewModel = dataStoreViewModel
+                )
+                DueDateFilterSelector(
+                    currentDueDateFilterType = taskState.dueDateFilterType,
+                    onDueDateFilterChange = { onEvent(TaskEvent.SetDueDateFilter(it)) },
                     dataStoreViewModel = dataStoreViewModel
                 )
                 History( onClick = { onAppEvent(AppEvent.ShowHistoryDialog) } )
@@ -438,7 +438,68 @@ fun RecurrenceSelector(
             }
         }
     }
-//    Spacer(modifier = Modifier.size(width = 0.dp, height = 24.dp))
+}
+
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+fun PrioritySelector(
+    currentSortType: SortType,
+    onSortChange: (SortType) -> Unit,
+    dataStoreViewModel: DataStoreViewModel
+) {
+    val sortingOption by dataStoreViewModel.priorityOption.collectAsState()
+    var expanded by remember { mutableStateOf(false) }
+
+    Row (
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { expanded = true }
+            .padding(top = 16.dp, bottom = 16.dp)
+        ,
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = "Sort By",
+            style = MaterialTheme.typography.bodyLarge
+        )
+        Text(
+            text = sortingOption.toDisplayString(),
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.tertiary,
+            fontStyle = FontStyle.Italic
+        )
+    }
+
+    CustomDropdownMenu(
+        expanded = expanded,
+        onDismissRequest = {
+            expanded = false
+        },
+    ) {
+        SortType.entries.forEach { sortType ->
+            Row(
+                horizontalArrangement = Arrangement.Start,
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .padding(start = 12.dp, end = 25.dp)
+                    .combinedClickable(
+                        indication = null,
+                        interactionSource = remember { MutableInteractionSource() },
+                        onClick = {
+                            onSortChange(sortType)
+                            dataStoreViewModel.savePriorityOption(sortType)
+                        }
+                    )
+            ) {
+                CompleteIconWithoutDelay(isChecked = currentSortType == sortType)
+                Text(
+                    sortType.toDisplayString(),
+                    style = MaterialTheme.typography.bodyLarge
+                )
+            }
+        }
+    }
 }
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -499,69 +560,6 @@ fun DueDateFilterSelector(
                 CompleteIconWithoutDelay(isChecked = currentDueDateFilterType == dueDateFilterType)
                 Text(
                     dueDateFilterType.toDisplayString(),
-                    style = MaterialTheme.typography.bodyLarge
-                )
-            }
-        }
-    }
-}
-
-
-@OptIn(ExperimentalFoundationApi::class)
-@Composable
-fun PrioritySelector(
-    currentSortType: SortType,
-    onSortChange: (SortType) -> Unit,
-    dataStoreViewModel: DataStoreViewModel
-) {
-    val sortingOption by dataStoreViewModel.priorityOption.collectAsState()
-    var expanded by remember { mutableStateOf(false) }
-
-    Row (
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable { expanded = true }
-            .padding(top = 16.dp, bottom = 16.dp)
-        ,
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Text(
-            text = "Sort By",
-            style = MaterialTheme.typography.bodyLarge
-        )
-        Text(
-            text = sortingOption.toDisplayString(),
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.tertiary,
-            fontStyle = FontStyle.Italic
-        )
-    }
-
-    CustomDropdownMenu(
-        expanded = expanded,
-        onDismissRequest = {
-            expanded = false
-        },
-    ) {
-        SortType.entries.forEach { sortType ->
-            Row(
-                horizontalArrangement = Arrangement.Start,
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier
-                    .padding(start = 12.dp, end = 25.dp)
-                    .combinedClickable(
-                        indication = null,
-                        interactionSource = remember { MutableInteractionSource() },
-                        onClick = {
-                            onSortChange(sortType)
-                            dataStoreViewModel.savePriorityOption(sortType)
-                        }
-                    )
-            ) {
-                CompleteIconWithoutDelay(isChecked = currentSortType == sortType)
-                Text(
-                    sortType.toDisplayString(),
                     style = MaterialTheme.typography.bodyLarge
                 )
             }
