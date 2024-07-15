@@ -217,7 +217,6 @@ fun TutorialTaskItem(task: Task, onEdit: (Task) -> Unit, onDelete: (Task) -> Uni
 
     Row(
         modifier = Modifier
-            .padding(bottom = 16.dp)
             .fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
