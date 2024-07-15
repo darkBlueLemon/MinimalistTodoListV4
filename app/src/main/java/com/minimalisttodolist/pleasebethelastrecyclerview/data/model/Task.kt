@@ -14,5 +14,5 @@ data class Task(
     val dueDate: Long?, // Timestamp in milliseconds
 
     val recurrenceType: RecurrenceType = RecurrenceType.NONE,
-    val isCompleted: Boolean = false
+    val isCompleted: Boolean = false // Future use (strike-through)
 )
