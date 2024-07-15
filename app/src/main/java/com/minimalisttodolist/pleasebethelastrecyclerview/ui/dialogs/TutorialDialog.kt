@@ -80,10 +80,7 @@ fun Tutorial(
             Column(
                 modifier = Modifier
                     .padding(16.dp)
-//                    .fillMaxWidth()
-                    .width(350.dp)
-//                    .width(IntrinsicSize.Max)
-                ,
+                    .width(350.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
@@ -202,51 +199,6 @@ fun Tutorial(
     }
 }
 
-@RequiresApi(Build.VERSION_CODES.O)
-@Composable
-fun TutorialTaskItem(task: Task, onEdit: (Task) -> Unit, onDelete: (Task) -> Unit, viewModel: TaskViewModel) {
-    val darkTheme = LocalDarkTheme.current
-
-    val priorityColor = when (task.priority) {
-        0 -> PriorityColor.PRIORITY0.getColor(darkTheme)
-        1 -> PriorityColor.PRIORITY1.getColor(darkTheme)
-        2 -> PriorityColor.PRIORITY2.getColor(darkTheme)
-        3 -> PriorityColor.PRIORITY3.getColor(darkTheme)
-        else -> Color.Gray
-    }
-
-    Row(
-        modifier = Modifier
-            .fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween
-    ) {
-        Icon(
-            imageVector = Icons.Rounded.Star,
-            contentDescription = "Priority",
-            tint = priorityColor,
-            modifier = Modifier.size(24.dp)
-        )
-        Column(
-            modifier = Modifier
-                .weight(1f)
-                .padding(start = 8.dp)
-                .clickable {
-                    onEdit(task)
-                }
-        ) {
-            Text(
-                task.title,
-                style = MaterialTheme.typography.titleLarge,
-            )
-            DueDate_Recurrence_Note(task = task, viewModel = viewModel)
-        }
-        CompleteIcon(
-            onDelete = { onDelete(task) }
-        )
-    }
-}
-
 @Composable
 fun AnimatedClickIcon(modifier: Modifier = Modifier) {
     var isPressed by remember { mutableStateOf(false) }
@@ -353,3 +305,49 @@ fun AnimatedLongPressIcon(modifier: Modifier = Modifier) {
         tint = MaterialTheme.colorScheme.onBackground.copy(alpha = alpha)
     )
 }
+
+@RequiresApi(Build.VERSION_CODES.O)
+@Composable
+fun TutorialTaskItem(task: Task, onEdit: (Task) -> Unit, onDelete: (Task) -> Unit, viewModel: TaskViewModel) {
+    val darkTheme = LocalDarkTheme.current
+
+    val priorityColor = when (task.priority) {
+        0 -> PriorityColor.PRIORITY0.getColor(darkTheme)
+        1 -> PriorityColor.PRIORITY1.getColor(darkTheme)
+        2 -> PriorityColor.PRIORITY2.getColor(darkTheme)
+        3 -> PriorityColor.PRIORITY3.getColor(darkTheme)
+        else -> Color.Gray
+    }
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Icon(
+            imageVector = Icons.Rounded.Star,
+            contentDescription = "Priority",
+            tint = priorityColor,
+            modifier = Modifier.size(24.dp)
+        )
+        Column(
+            modifier = Modifier
+                .weight(1f)
+                .padding(start = 8.dp)
+                .clickable {
+                    onEdit(task)
+                }
+        ) {
+            Text(
+                task.title,
+                style = MaterialTheme.typography.titleLarge,
+            )
+            DueDate_Recurrence_Note(task = task, viewModel = viewModel)
+        }
+        CompleteIcon(
+            onDelete = { onDelete(task) }
+        )
+    }
+}
+
