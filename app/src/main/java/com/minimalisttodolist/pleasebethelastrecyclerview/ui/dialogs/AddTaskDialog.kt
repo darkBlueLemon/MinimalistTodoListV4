@@ -233,7 +233,7 @@ fun PrioritySelector(
                 .fillMaxWidth()
                 .padding(vertical = 8.dp)
         ) {
-            PriorityStar(index = 1, selectedPriority) { priority ->
+            PriorityStar(index = 3, selectedPriority) { priority ->
                 selectedPriority = if(priority == selectedPriority) {
                     0
                 } else {
@@ -249,7 +249,7 @@ fun PrioritySelector(
                 }
                 onPriorityChange(TaskEvent.SetPriority(selectedPriority))
             }
-            PriorityStar(index = 3, selectedPriority) { priority ->
+            PriorityStar(index = 1, selectedPriority) { priority ->
                 selectedPriority = if(priority == selectedPriority) {
                     0
                 } else {
