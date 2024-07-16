@@ -239,7 +239,7 @@ fun PrioritySelector(
                 } else {
                     priority
                 }
-                onPriorityChange(TaskEvent.SetPriority(priority))
+                onPriorityChange(TaskEvent.SetPriority(selectedPriority))
             }
             PriorityStar(index = 2, selectedPriority) { priority ->
                 selectedPriority = if(priority == selectedPriority) {
@@ -247,7 +247,7 @@ fun PrioritySelector(
                 } else {
                     priority
                 }
-                onPriorityChange(TaskEvent.SetPriority(priority))
+                onPriorityChange(TaskEvent.SetPriority(selectedPriority))
             }
             PriorityStar(index = 3, selectedPriority) { priority ->
                 selectedPriority = if(priority == selectedPriority) {
@@ -255,7 +255,7 @@ fun PrioritySelector(
                 } else {
                     priority
                 }
-                onPriorityChange(TaskEvent.SetPriority(priority))
+                onPriorityChange(TaskEvent.SetPriority(selectedPriority))
             }
         }
     }
