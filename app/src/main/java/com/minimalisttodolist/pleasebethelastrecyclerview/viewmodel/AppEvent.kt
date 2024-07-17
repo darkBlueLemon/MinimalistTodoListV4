@@ -13,6 +13,9 @@ sealed interface AppEvent {
     data object ShowScheduleExactAlarmPermissionDialog : AppEvent
     data object HideScheduleExactAlarmPermissionDialog : AppEvent
 
+    data object ShowPersonalizeDialog : AppEvent
+    data object HidePersonalizeDialog : AppEvent
+
     data object ShowTutorialDialog : AppEvent
     data object HideTutorialDialog : AppEvent
     data object DisableTutorialDialog : AppEvent

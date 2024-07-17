@@ -64,6 +64,7 @@ import com.minimalisttodolist.pleasebethelastrecyclerview.ui.dialogs.AddTaskDial
 import com.minimalisttodolist.pleasebethelastrecyclerview.ui.dialogs.Theme_FontSettingsDialog
 import com.minimalisttodolist.pleasebethelastrecyclerview.ui.dialogs.HistoryDialog
 import com.minimalisttodolist.pleasebethelastrecyclerview.ui.dialogs.MenuDialog
+import com.minimalisttodolist.pleasebethelastrecyclerview.ui.dialogs.PersonalizeDialog
 import com.minimalisttodolist.pleasebethelastrecyclerview.ui.dialogs.ScheduleExactAlarmPermissionDialog
 import com.minimalisttodolist.pleasebethelastrecyclerview.ui.dialogs.Tutorial
 import com.minimalisttodolist.pleasebethelastrecyclerview.viewmodel.AppEvent
@@ -182,8 +183,26 @@ fun TaskScreen(
         if (appState.isMenuDialogVisible) {
             MenuDialog(taskState, onEvent, dataStoreViewModel = dataStoreViewModel, onAppEvent = onAppEvent)
         }
+        if (appState.isPersonalizeDialogVisible) {
+            PersonalizeDialog(
+                onAppEvent = onAppEvent,
+                dataStoreViewModel = dataStoreViewModel,
+                onBack = {
+                    onAppEvent(AppEvent.HidePersonalizeDialog)
+                    onAppEvent(AppEvent.ShowMenuDialog)
+                }
+            )
+        }
         if (appState.isHistoryDialogVisible) {
-            HistoryDialog(taskViewModel, onEvent, onAppEvent = onAppEvent)
+            HistoryDialog(
+                taskViewModel,
+                onEvent,
+                onAppEvent = onAppEvent,
+                onBack = {
+                    onAppEvent(AppEvent.HideHistoryDialog)
+                    onAppEvent(AppEvent.ShowMenuDialog)
+                }
+            )
         }
         if (appState.isScheduleExactAlarmPermissionDialogVisible) {
             ScheduleExactAlarmPermissionDialog(
@@ -201,7 +220,10 @@ fun TaskScreen(
             Theme_FontSettingsDialog(
                 dataStoreViewModel = dataStoreViewModel,
                 onDismiss = { onAppEvent(AppEvent.HideFontSettingsDialog) },
-                onBack = { onAppEvent(AppEvent.ShowMenuDialog) }
+                onBack = {
+                    onAppEvent(AppEvent.HideFontSettingsDialog)
+                    onAppEvent(AppEvent.ShowPersonalizeDialog)
+                }
             )
         }
         if (appState.isTutorialDialogVisible) {

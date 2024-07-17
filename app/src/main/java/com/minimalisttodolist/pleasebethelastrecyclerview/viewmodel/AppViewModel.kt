@@ -22,7 +22,7 @@ class AppViewModel(private val appPreferences: AppPreferences) : ViewModel() {
 
     fun onEvent(event: AppEvent) {
         when (event) {
-            AppEvent.ShowMenuDialog -> updateState { copy(isMenuDialogVisible = true, isHistoryDialogVisible = false, isFontSettingsDialogVisible = false) }
+            AppEvent.ShowMenuDialog -> updateState { copy(isMenuDialogVisible = true) }
             AppEvent.HideMenuDialog -> updateState { copy(isMenuDialogVisible = false) }
 
             AppEvent.ShowHistoryDialog -> updateState {
@@ -41,6 +41,9 @@ class AppViewModel(private val appPreferences: AppPreferences) : ViewModel() {
             AppEvent.HideScheduleExactAlarmPermissionDialog -> updateState {
                 copy(isScheduleExactAlarmPermissionDialogVisible = false)
             }
+
+            AppEvent.ShowPersonalizeDialog -> updateState { copy(isPersonalizeDialogVisible = true, isMenuDialogVisible = false) }
+            AppEvent.HidePersonalizeDialog -> updateState { copy(isPersonalizeDialogVisible = false) }
 
             AppEvent.ShowScheduleExactAlarmPermissionIntent -> {
                 permissionManager.requestScheduleExactAlarmPermission()

@@ -79,7 +79,8 @@ import kotlinx.coroutines.launch
 fun HistoryDialog(
     viewModel: TaskViewModel,
     onEvent: (TaskEvent) -> Unit,
-    onAppEvent: (AppEvent) -> Unit
+    onAppEvent: (AppEvent) -> Unit,
+    onBack: () -> Unit
 ) {
     val deletedTasks by viewModel.deletedTasks.collectAsState()
     val context = LocalContext.current
@@ -96,7 +97,7 @@ fun HistoryDialog(
             ) {
                 TitleAndDeleteAll(
                     onClearHistory = { onEvent(TaskEvent.DeleteAllHistoryTasks) },
-                    onBack = { onAppEvent(AppEvent.ShowMenuDialog) },
+                    onBack = onBack,
                     context = context,
                 )
                 if (deletedTasks.isEmpty()) {

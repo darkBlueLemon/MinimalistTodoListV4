@@ -75,7 +75,6 @@ fun MenuDialog(
     dataStoreViewModel: DataStoreViewModel,
     onAppEvent: (AppEvent) -> Unit
 ) {
-    LocalConfiguration.current.screenWidthDp
     val context = LocalContext.current
     BasicAlertDialog(
         onDismissRequest = {
@@ -91,10 +90,7 @@ fun MenuDialog(
                     .padding(20.dp),
             ) {
                 MenuTitle( modifier = Modifier.align(Alignment.CenterHorizontally) )
-                AppIconSelector(context = context)
-                Tutorial( onClick = { onAppEvent(AppEvent.ShowTutorialDialog) })
-                Theme_Font( onClick = { onAppEvent(AppEvent.ShowFontSettingsDialog) } )
-                ClockTypeSelector( dataStoreViewModel )
+                Personalize ( onClick = { onAppEvent(AppEvent.ShowPersonalizeDialog) })
                 RecurrenceSelector(
                     currentRecurrenceFilter = taskState.recurrenceFilter,
                     onRecurrenceFilterChange = { onEvent(TaskEvent.SetRecurrenceFilter(it)) },
@@ -127,60 +123,7 @@ fun MenuTitle(modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun AppIconSelector(modifier: Modifier = Modifier, context: Context) {
-    var expanded by remember { mutableStateOf(false) }
-
-    // Add this line for rotation animation
-    val rotationState by animateFloatAsState(
-        targetValue = if (expanded) 90f else 0f,
-        animationSpec = tween(durationMillis = 200)
-    )
-
-    Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .clickable {
-                expanded = !expanded
-            }
-            .padding(top = 16.dp, bottom = 16.dp),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Text(
-            text = "App Icon",
-            style = MaterialTheme.typography.bodyLarge,
-            modifier = Modifier.padding(end = 10.dp)
-        )
-        Icon(
-            imageVector = Icons.Outlined.ChevronRight,
-            contentDescription = "App Icon Selector Chevron",
-            tint = MaterialTheme.colorScheme.tertiary,
-            modifier = Modifier.rotate(rotationState) // Add this line for rotation
-        )
-    }
-    CustomDropdownMenu(
-        expanded = expanded,
-        onDismissRequest = {
-            expanded = false
-        },
-    ) {
-        Row(
-            modifier = Modifier
-                .padding(start = 12.dp, end = 12.dp, top = 4.dp, bottom = 4.dp),
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            IconPreview(isLightIcon = true, onClick = {
-                lightIcon(context)
-            })
-            IconPreview(isLightIcon = false, onClick = {
-                darkIcon(context)
-            })
-        }
-    }
-}
-
-@Composable
-fun Tutorial(modifier: Modifier = Modifier, onClick: () -> Unit) {
+fun Personalize(modifier: Modifier = Modifier, onClick: () -> Unit) {
     Row (
         modifier = modifier
             .fillMaxWidth()
@@ -193,7 +136,7 @@ fun Tutorial(modifier: Modifier = Modifier, onClick: () -> Unit) {
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
-            text = "Tutorial",
+            text = "Personalize",
             style = MaterialTheme.typography.bodyLarge,
             modifier = Modifier.padding(end = 10.dp)
         )
@@ -204,92 +147,6 @@ fun Tutorial(modifier: Modifier = Modifier, onClick: () -> Unit) {
         )
     }
 }
-
-@Composable
-fun Theme_Font(modifier: Modifier = Modifier, onClick: () -> Unit) {
-    Row (
-        modifier = modifier
-            .fillMaxWidth()
-            .clickable {
-                onClick()
-            }
-            .padding(top = 16.dp, bottom = 16.dp)
-        ,
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Text(
-            text = "Theme & Font",
-            style = MaterialTheme.typography.bodyLarge,
-            modifier = Modifier.padding(end = 10.dp)
-        )
-        Icon(
-            imageVector = Icons.Outlined.ChevronRight,
-            contentDescription = "History Chevron",
-            tint = MaterialTheme.colorScheme.tertiary,
-        )
-    }
-}
-
-@OptIn(ExperimentalFoundationApi::class, ExperimentalAnimationApi::class)
-@Composable
-fun ClockTypeSelector(
-    dataStoreViewModel: DataStoreViewModel
-) {
-    val clock by dataStoreViewModel.clockType.collectAsState()
-    var expanded by remember { mutableStateOf(false) }
-
-    Row (
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable { expanded = true }
-            .padding(top = 16.dp, bottom = 16.dp)
-        ,
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Text(
-            text = "Clock Type",
-            style = MaterialTheme.typography.bodyLarge
-        )
-        Text(
-            text = clock.toDisplayString(),
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.tertiary,
-            fontStyle = FontStyle.Italic,
-        )
-    }
-
-    CustomDropdownMenu(
-        expanded = expanded,
-        onDismissRequest = {
-            expanded = false
-        },
-    ) {
-        ClockType.entries.forEach { clockType ->
-            Row(
-                horizontalArrangement = Arrangement.Start,
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier
-                    .padding(start = 12.dp, end = 25.dp)
-                    .combinedClickable(
-                        indication = null,
-                        interactionSource = remember { MutableInteractionSource() },
-                        onClick = {
-                            dataStoreViewModel.saveClockType(clockType)
-                        }
-                    )
-            ) {
-                CompleteIconWithoutDelay(isChecked = clock == clockType)
-                Text(
-                    clockType.toDisplayString(),
-                    style = MaterialTheme.typography.bodyLarge
-                )
-            }
-        }
-    }
-}
-
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable

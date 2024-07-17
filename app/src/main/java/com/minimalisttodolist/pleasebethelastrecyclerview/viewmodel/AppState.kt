@@ -6,4 +6,5 @@ data class AppState(
     val isScheduleExactAlarmPermissionDialogVisible: Boolean = false,
     val isFontSettingsDialogVisible: Boolean = false,
     val isTutorialDialogVisible: Boolean = false,
+    val isPersonalizeDialogVisible: Boolean = false,
 )
