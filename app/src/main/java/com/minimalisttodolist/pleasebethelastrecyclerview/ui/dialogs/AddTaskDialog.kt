@@ -83,6 +83,7 @@ fun AddTaskDialog(
     onAppEvent: (AppEvent) -> Unit
 ) {
     val focusRequester = remember { FocusRequester() }
+    val focusRequesterNote = remember { FocusRequester() }
     val keyboardController = LocalSoftwareKeyboardController.current
     var showWarning by remember { mutableStateOf(false) }
 
@@ -124,7 +125,7 @@ fun AddTaskDialog(
 
                 PrioritySelector(priorityFromEdit = taskState.priority, onPriorityChange = onEvent)
 
-                Note(taskState = taskState, onEvent = onEvent)
+                Note(taskState = taskState, onEvent = onEvent, focusRequester = focusRequesterNote)
 
                 DateSelector(taskState = taskState, onEvent = onEvent, viewModel = viewModel, onAppEvent = onAppEvent)
 
@@ -144,6 +145,7 @@ fun AddTaskDialog(
                     },
                     canSave = { taskState.title.isNotBlank() },
                     onInvalidSave = {
+                        focusRequesterNote.requestFocus()
                         focusRequester.requestFocus()
                         keyboardController?.show()
                         showWarning = true
@@ -312,7 +314,7 @@ fun PriorityStar(index: Int, selectedPriority: Int, onPriorityChange: (Int) -> U
 }
 
 @Composable
-fun Note(modifier: Modifier = Modifier, taskState: TaskState, onEvent: (TaskEvent) -> Unit) {
+fun Note(modifier: Modifier = Modifier, taskState: TaskState, onEvent: (TaskEvent) -> Unit, focusRequester: FocusRequester) {
     Row(
         modifier = modifier
             .fillMaxWidth()
@@ -328,6 +330,7 @@ fun Note(modifier: Modifier = Modifier, taskState: TaskState, onEvent: (TaskEven
         TextField(
             value = taskState.note,
             onValueChange = { onEvent(TaskEvent.SetNote(it)) },
+            modifier=Modifier.focusRequester(focusRequester) ,
             placeholder = {
                 Text(
                     text = "Note",
