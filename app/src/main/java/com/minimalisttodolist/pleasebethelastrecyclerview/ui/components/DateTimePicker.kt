@@ -135,11 +135,13 @@ fun TimePickerFromOldApp(
                     ) {
                         TextButton(
                             onClick = {
+                                selectedTime.value = LocalTime.MIN
+                                onTimeSelected(selectedTime.value!!)
                                 closeSelection()
                             }
                         ) {
                             Text(
-                                text = "Cancel",
+                                text = "Clear",
                                 color = MaterialTheme.colorScheme.primary,
                                 style = MaterialTheme.typography.bodyMedium,
                             )
