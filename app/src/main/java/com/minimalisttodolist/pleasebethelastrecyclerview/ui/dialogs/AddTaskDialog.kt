@@ -400,7 +400,7 @@ fun DateSelector(modifier: Modifier = Modifier, taskState: TaskState, onEvent: (
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun TimeSelector(modifier: Modifier = Modifier, taskState: TaskState, onEvent: (TaskEvent) -> Unit, viewModel: TaskViewModel, dataStoreViewModel: DataStoreViewModel) {
-    val text = viewModel.formatDueDateWithTimeOnly(taskState.dueDate).ifEmpty { "Add Time" }
+    val text = viewModel.formatDueDateWithTimeOnly(taskState.dueDate).ifEmpty { "Time" }
 
     Row(
         modifier = modifier
@@ -500,7 +500,7 @@ fun RecurrenceSelector(
                 modifier = Modifier.size(20.dp)
             )
             Text(
-                text = "Recurrence",
+                text = "Repeat",
                 color = MaterialTheme.colorScheme.tertiary,
                 style = MaterialTheme.typography.bodyMedium,
                 modifier = Modifier.padding(15.dp)
