@@ -1,5 +1,6 @@
 package com.minimalisttodolist.pleasebethelastrecyclerview.ui.dialogs
 
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
@@ -9,12 +10,10 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.ArrowBack
@@ -37,13 +36,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.minimalisttodolist.pleasebethelastrecyclerview.data.model.FontFamilyType
+import com.minimalisttodolist.pleasebethelastrecyclerview.data.model.ThemeType
 import com.minimalisttodolist.pleasebethelastrecyclerview.ui.components.CustomBox
 import com.minimalisttodolist.pleasebethelastrecyclerview.ui.components.CustomDropdownMenu
 import com.minimalisttodolist.pleasebethelastrecyclerview.viewmodel.DataStoreViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun FontSettingsDialog(
+fun Theme_FontSettingsDialog(
     modifier: Modifier = Modifier,
     onDismiss: () -> Unit,
     onBack: () -> Unit,
@@ -63,7 +63,8 @@ fun FontSettingsDialog(
                     .padding(20.dp),
                 verticalArrangement = Arrangement.spacedBy(6.dp)
             ) {
-                FontOptionsTitle(onBack = onBack)
+                Theme_FontOptionsTitle(onBack = onBack)
+                ThemeSelector(dataStoreViewModel = dataStoreViewModel)
                 FontFamilySelector(dataStoreViewModel = dataStoreViewModel)
                 FontWeightSelector(dataStoreViewModel = dataStoreViewModel)
                 FontSizeSelector(dataStoreViewModel = dataStoreViewModel)
@@ -73,7 +74,7 @@ fun FontSettingsDialog(
 }
 
 @Composable
-fun FontOptionsTitle(modifier: Modifier = Modifier, onBack: () -> Unit) {
+fun Theme_FontOptionsTitle(modifier: Modifier = Modifier, onBack: () -> Unit) {
     Box (
         modifier = Modifier
             .fillMaxWidth()
@@ -93,11 +94,70 @@ fun FontOptionsTitle(modifier: Modifier = Modifier, onBack: () -> Unit) {
                 }
         )
         Text(
-            text = "Font Options",
+            text = "Theme & Font",
             color = MaterialTheme.colorScheme.primary,
             style = MaterialTheme.typography.headlineSmall,
             modifier = Modifier.align(Alignment.Center)
         )
+    }
+}
+
+@OptIn(ExperimentalFoundationApi::class, ExperimentalAnimationApi::class)
+@Composable
+fun ThemeSelector(
+    dataStoreViewModel: DataStoreViewModel
+) {
+    val theme by dataStoreViewModel.theme.collectAsState()
+    var expanded by remember { mutableStateOf(false) }
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { expanded = !expanded }
+            .padding(top = 16.dp, bottom = 16.dp)
+        ,
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = "Theme",
+            style = MaterialTheme.typography.bodyLarge,
+        )
+        Text(
+            text = theme.toDisplayString(),
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.tertiary,
+            fontStyle = FontStyle.Italic,
+        )
+    }
+
+    CustomDropdownMenu(
+        expanded = expanded,
+        onDismissRequest = {
+            expanded = false
+        },
+    ) {
+        ThemeType.entries.forEach { themeType ->
+            Row(
+                horizontalArrangement = Arrangement.Start,
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .padding(start = 12.dp, end = 25.dp)
+                    .combinedClickable(
+                        indication = null,
+                        interactionSource = remember { MutableInteractionSource() },
+                        onClick = {
+                            dataStoreViewModel.saveTheme(themeType)
+                        }
+                    )
+            ) {
+                CompleteIconWithoutDelay(isChecked = theme == themeType)
+                Text(
+                    themeType.toDisplayString(),
+                    style = MaterialTheme.typography.bodyLarge
+                )
+            }
+        }
     }
 }
 
@@ -158,8 +218,6 @@ fun FontFamilySelector(
             }
         }
     }
-
-//    Spacer(modifier = Modifier.size(width = 0.dp, height = 24.dp))
 }
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -234,8 +292,6 @@ fun FontWeightSelector(
             }
         }
     }
-
-//    Spacer(modifier = Modifier.size(width = 0.dp, height = 24.dp))
 }
 
 @Composable
@@ -274,7 +330,6 @@ fun FontSizeSelector(
             "A",
             fontSize = 32.sp,
             color = MaterialTheme.colorScheme.primary,
-//            modifier = Modifier.weight(1f)
         )
     }
 }

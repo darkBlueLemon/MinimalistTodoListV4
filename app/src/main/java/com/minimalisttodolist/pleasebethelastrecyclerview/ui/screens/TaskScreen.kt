@@ -13,7 +13,6 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
@@ -47,12 +46,9 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import com.minimalisttodolist.pleasebethelastrecyclerview.data.model.DueDateFilterType
@@ -65,7 +61,7 @@ import com.minimalisttodolist.pleasebethelastrecyclerview.viewmodel.TaskEvent
 import com.minimalisttodolist.pleasebethelastrecyclerview.viewmodel.TaskState
 import com.minimalisttodolist.pleasebethelastrecyclerview.viewmodel.TaskViewModel
 import com.minimalisttodolist.pleasebethelastrecyclerview.ui.dialogs.AddTaskDialog
-import com.minimalisttodolist.pleasebethelastrecyclerview.ui.dialogs.FontSettingsDialog
+import com.minimalisttodolist.pleasebethelastrecyclerview.ui.dialogs.Theme_FontSettingsDialog
 import com.minimalisttodolist.pleasebethelastrecyclerview.ui.dialogs.HistoryDialog
 import com.minimalisttodolist.pleasebethelastrecyclerview.ui.dialogs.MenuDialog
 import com.minimalisttodolist.pleasebethelastrecyclerview.ui.dialogs.ScheduleExactAlarmPermissionDialog
@@ -77,13 +73,6 @@ import com.minimalisttodolist.pleasebethelastrecyclerview.ui.theme.LocalDarkThem
 import com.minimalisttodolist.pleasebethelastrecyclerview.util.vibrate
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import java.time.Instant
-import java.time.LocalDate
-import java.time.ZoneId
-import java.time.format.DateTimeFormatter
-import java.time.temporal.TemporalAdjusters
-import java.time.temporal.WeekFields
-import java.util.Locale
 
 @OptIn(ExperimentalFoundationApi::class)
 @RequiresApi(Build.VERSION_CODES.O)
@@ -209,7 +198,7 @@ fun TaskScreen(
             )
         }
         if (appState.isFontSettingsDialogVisible) {
-            FontSettingsDialog(
+            Theme_FontSettingsDialog(
                 dataStoreViewModel = dataStoreViewModel,
                 onDismiss = { onAppEvent(AppEvent.HideFontSettingsDialog) },
                 onBack = { onAppEvent(AppEvent.ShowMenuDialog) }

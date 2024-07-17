@@ -1,27 +1,12 @@
 package com.minimalisttodolist.pleasebethelastrecyclerview.ui.dialogs
 
 import android.content.Context
-import android.view.Menu
-import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.Crossfade
 import androidx.compose.animation.ExperimentalAnimationApi
-import androidx.compose.animation.SizeTransform
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.keyframes
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.expandVertically
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.shrinkHorizontally
-import androidx.compose.animation.shrinkVertically
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutVertically
-import androidx.compose.animation.togetherWith
-import androidx.compose.animation.with
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
@@ -33,20 +18,15 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.outlined.CheckCircle
 import androidx.compose.material.icons.outlined.ChevronRight
-import androidx.compose.material.icons.outlined.KeyboardArrowDown
 import androidx.compose.material.icons.outlined.RadioButtonUnchecked
 import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -69,16 +49,13 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontStyle
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import com.minimalisttodolist.pleasebethelastrecyclerview.R
 import com.minimalisttodolist.pleasebethelastrecyclerview.data.model.ClockType
 import com.minimalisttodolist.pleasebethelastrecyclerview.data.model.DueDateFilterType
 import com.minimalisttodolist.pleasebethelastrecyclerview.data.model.RecurrenceType
 import com.minimalisttodolist.pleasebethelastrecyclerview.data.model.SortType
-import com.minimalisttodolist.pleasebethelastrecyclerview.data.model.ThemeType
 import com.minimalisttodolist.pleasebethelastrecyclerview.ui.components.CustomBox
 import com.minimalisttodolist.pleasebethelastrecyclerview.ui.components.CustomDropdownMenu
 import com.minimalisttodolist.pleasebethelastrecyclerview.util.darkIcon
@@ -116,8 +93,7 @@ fun MenuDialog(
                 MenuTitle( modifier = Modifier.align(Alignment.CenterHorizontally) )
                 AppIconSelector(context = context)
                 Tutorial( onClick = { onAppEvent(AppEvent.ShowTutorialDialog) })
-                FontOptions( onClick = { onAppEvent(AppEvent.ShowFontSettingsDialog) } )
-                ThemeSelector( dataStoreViewModel )
+                Theme_Font( onClick = { onAppEvent(AppEvent.ShowFontSettingsDialog) } )
                 ClockTypeSelector( dataStoreViewModel )
                 RecurrenceSelector(
                     currentRecurrenceFilter = taskState.recurrenceFilter,
@@ -230,7 +206,7 @@ fun Tutorial(modifier: Modifier = Modifier, onClick: () -> Unit) {
 }
 
 @Composable
-fun FontOptions(modifier: Modifier = Modifier, onClick: () -> Unit) {
+fun Theme_Font(modifier: Modifier = Modifier, onClick: () -> Unit) {
     Row (
         modifier = modifier
             .fillMaxWidth()
@@ -243,7 +219,7 @@ fun FontOptions(modifier: Modifier = Modifier, onClick: () -> Unit) {
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
-            text = "Font Options",
+            text = "Theme & Font",
             style = MaterialTheme.typography.bodyLarge,
             modifier = Modifier.padding(end = 10.dp)
         )
@@ -252,65 +228,6 @@ fun FontOptions(modifier: Modifier = Modifier, onClick: () -> Unit) {
             contentDescription = "History Chevron",
             tint = MaterialTheme.colorScheme.tertiary,
         )
-    }
-}
-
-@OptIn(ExperimentalFoundationApi::class, ExperimentalAnimationApi::class)
-@Composable
-fun ThemeSelector(
-    dataStoreViewModel: DataStoreViewModel
-) {
-    val theme by dataStoreViewModel.theme.collectAsState()
-    var expanded by remember { mutableStateOf(false) }
-
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable { expanded = !expanded }
-            .padding(top = 16.dp, bottom = 16.dp)
-        ,
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Text(
-            text = "Theme",
-            style = MaterialTheme.typography.bodyLarge,
-        )
-        Text(
-            text = theme.toDisplayString(),
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.tertiary,
-            fontStyle = FontStyle.Italic,
-        )
-    }
-
-    CustomDropdownMenu(
-        expanded = expanded,
-        onDismissRequest = {
-            expanded = false
-        },
-    ) {
-        ThemeType.entries.forEach { themeType ->
-            Row(
-                horizontalArrangement = Arrangement.Start,
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier
-                    .padding(start = 12.dp, end = 25.dp)
-                    .combinedClickable(
-                        indication = null,
-                        interactionSource = remember { MutableInteractionSource() },
-                        onClick = {
-                            dataStoreViewModel.saveTheme(themeType)
-                        }
-                    )
-            ) {
-                CompleteIconWithoutDelay(isChecked = theme == themeType)
-                Text(
-                    themeType.toDisplayString(),
-                    style = MaterialTheme.typography.bodyLarge
-                )
-            }
-        }
     }
 }
 
