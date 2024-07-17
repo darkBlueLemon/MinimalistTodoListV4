@@ -80,7 +80,8 @@ fun AddTaskDialog(
     onEvent: (TaskEvent) -> Unit,
     viewModel: TaskViewModel,
     dataStoreViewModel: DataStoreViewModel,
-    onAppEvent: (AppEvent) -> Unit
+    onAppEvent: (AppEvent) -> Unit,
+    isEdit: Boolean = false
 ) {
     val focusRequester = remember { FocusRequester() }
     val focusRequesterNote = remember { FocusRequester() }
@@ -93,10 +94,12 @@ fun AddTaskDialog(
         label = "Border flash"
     )
 
-    LaunchedEffect(Unit) {
-        delay(100)
-        focusRequester.requestFocus()
-        keyboardController?.show()
+    if(!isEdit) {
+        LaunchedEffect(Unit) {
+            delay(100)
+            focusRequester.requestFocus()
+            keyboardController?.show()
+        }
     }
 
     LaunchedEffect(taskState.title) {

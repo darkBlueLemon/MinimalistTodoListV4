@@ -188,7 +188,7 @@ fun TaskScreen(
         },
     ) { padding ->
         if (taskState.isAddTaskDialogVisible) {
-            AddTaskDialog(taskState, onEvent, taskViewModel, dataStoreViewModel, onAppEvent)
+            AddTaskDialog(taskState, onEvent, taskViewModel, dataStoreViewModel, onAppEvent, isEdit = taskState.editingTaskId != null)
         }
         if (appState.isMenuDialogVisible) {
             MenuDialog(taskState, onEvent, dataStoreViewModel = dataStoreViewModel, onAppEvent = onAppEvent)
