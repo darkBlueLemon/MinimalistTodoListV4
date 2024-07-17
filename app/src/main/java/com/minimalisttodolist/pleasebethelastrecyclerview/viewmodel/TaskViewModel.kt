@@ -3,6 +3,8 @@ package com.minimalisttodolist.pleasebethelastrecyclerview.viewmodel
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -13,6 +15,7 @@ import com.minimalisttodolist.pleasebethelastrecyclerview.data.model.SortType
 import com.minimalisttodolist.pleasebethelastrecyclerview.data.model.Task
 import com.minimalisttodolist.pleasebethelastrecyclerview.data.database.TaskDao
 import com.minimalisttodolist.pleasebethelastrecyclerview.data.model.DueDateFilterType
+import com.minimalisttodolist.pleasebethelastrecyclerview.data.model.FirstDayOfTheWeekType
 import com.minimalisttodolist.pleasebethelastrecyclerview.util.calculateNextDueDate
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
@@ -41,6 +44,7 @@ class TaskViewModel(
     private val _sortType = MutableStateFlow(SortType.PRIORITY)
     private val _recurrenceFilter = MutableStateFlow(RecurrenceType.NONE)
     private val _dueDateFilterType = MutableStateFlow(DueDateFilterType.NONE)
+    private val _firstDayOfTheWeek = MutableStateFlow(FirstDayOfTheWeekType.MONDAY)
     private val _tasks = MutableStateFlow<List<Task>>(emptyList())
     private val _state = MutableStateFlow(TaskState())
 
@@ -71,6 +75,9 @@ class TaskViewModel(
         }
         viewModelScope.launch {
             dataStoreViewModel.dueDateFilter.collect { _dueDateFilterType.value = it }
+        }
+        viewModelScope.launch {
+            dataStoreViewModel.firstDayOfTheWeekType.collect { _firstDayOfTheWeek.value = it }
         }
     }
 
@@ -284,9 +291,9 @@ class TaskViewModel(
                         SortType.DUE_DATE -> dao.getTasksSortedByDueDate()
                         SortType.PRIORITY -> dao.getTasksSortedByPriority()
                     }.map { tasks ->
-                        tasks.filter { task ->
-                            (recurrenceType == RecurrenceType.NONE || task.recurrenceType == recurrenceType) &&
-                                    isWithinDueDateFilter(task, dueDateFilterType)
+                    tasks.filter { task ->
+                        (recurrenceType == RecurrenceType.NONE || task.recurrenceType == recurrenceType) &&
+                                    isWithinDueDateFilter(task, dueDateFilterType, _firstDayOfTheWeek.value)
                         }
                     }
                 }
@@ -297,7 +304,11 @@ class TaskViewModel(
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    private fun isWithinDueDateFilter(task: Task, filterType: DueDateFilterType): Boolean {
+    private fun isWithinDueDateFilter(
+        task: Task,
+        filterType: DueDateFilterType,
+        firstDayOfWeek: FirstDayOfTheWeekType
+    ): Boolean {
         val taskDueDate = task.dueDate?.let {
             Instant.ofEpochMilli(it).atZone(ZoneId.systemDefault()).toLocalDate()
         } ?: return filterType == DueDateFilterType.NONE
@@ -307,8 +318,11 @@ class TaskViewModel(
             DueDateFilterType.NONE -> true
             DueDateFilterType.TODAY -> taskDueDate == now
             DueDateFilterType.THIS_WEEK -> {
-                val firstDayOfWeek = WeekFields.of(Locale.getDefault()).firstDayOfWeek
-                val startOfWeek = now.with(TemporalAdjusters.previousOrSame(firstDayOfWeek))
+                val startOfWeek = when (firstDayOfWeek) {
+                    FirstDayOfTheWeekType.MONDAY -> now.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY))
+                    FirstDayOfTheWeekType.SUNDAY -> now.with(TemporalAdjusters.previousOrSame(DayOfWeek.SUNDAY))
+                    FirstDayOfTheWeekType.SATURDAY -> now.with(TemporalAdjusters.previousOrSame(DayOfWeek.SATURDAY))
+                }
                 val endOfWeek = startOfWeek.plusDays(6)
                 taskDueDate in startOfWeek..endOfWeek
             }

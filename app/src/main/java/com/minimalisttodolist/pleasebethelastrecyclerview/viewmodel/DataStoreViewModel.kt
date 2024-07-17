@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.minimalisttodolist.pleasebethelastrecyclerview.data.model.ClockType
 import com.minimalisttodolist.pleasebethelastrecyclerview.data.model.DueDateFilterType
+import com.minimalisttodolist.pleasebethelastrecyclerview.data.model.FirstDayOfTheWeekType
 import com.minimalisttodolist.pleasebethelastrecyclerview.data.model.FontFamilyType
 import com.minimalisttodolist.pleasebethelastrecyclerview.data.model.RecurrenceType
 import com.minimalisttodolist.pleasebethelastrecyclerview.data.model.SortType
@@ -53,6 +54,10 @@ class DataStoreViewModel(private val appPreferences: AppPreferences) : ViewModel
         .map { it }
         .stateIn(viewModelScope, SharingStarted.Eagerly, DueDateFilterType.NONE)
 
+    val firstDayOfTheWeekType: StateFlow<FirstDayOfTheWeekType> = appPreferences.firstDayOfTheWeekType
+        .map { it }
+        .stateIn(viewModelScope, SharingStarted.Eagerly, FirstDayOfTheWeekType.MONDAY)
+
     fun saveTheme(themeType: ThemeType) {
         viewModelScope.launch { appPreferences.saveTheme(themeType) }
     }
@@ -87,6 +92,10 @@ class DataStoreViewModel(private val appPreferences: AppPreferences) : ViewModel
 
     fun saveDueDateFilter(dueDateFilterType: DueDateFilterType) {
         viewModelScope.launch { appPreferences.saveDueDateFilter(dueDateFilterType) }
+    }
+
+    fun saveFirstDayOfTheWeek(firstDayOfTheWeekType: FirstDayOfTheWeekType) {
+        viewModelScope.launch { appPreferences.saveFirstDayOfTheWeekType(firstDayOfTheWeekType) }
     }
 
     private fun fontWeightFromDisplayName(displayName: String): FontWeight {

@@ -10,6 +10,7 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import com.minimalisttodolist.pleasebethelastrecyclerview.data.model.ClockType
 import com.minimalisttodolist.pleasebethelastrecyclerview.data.model.DueDateFilterType
+import com.minimalisttodolist.pleasebethelastrecyclerview.data.model.FirstDayOfTheWeekType
 import com.minimalisttodolist.pleasebethelastrecyclerview.data.model.FontFamilyType
 import com.minimalisttodolist.pleasebethelastrecyclerview.data.model.RecurrenceType
 import com.minimalisttodolist.pleasebethelastrecyclerview.data.model.SortType
@@ -44,6 +45,7 @@ class AppPreferences private constructor(context: Context) {
         val RECURRENCE_FILTER = stringPreferencesKey("recurrence_option")
         val TUTORIAL_VISIBILITY = booleanPreferencesKey("tutorial_visibility")
         val DUE_DATE_FILTER = stringPreferencesKey("due_date_filter")
+        val FIRST_DAY_OF_THE_WEEK = stringPreferencesKey("first_day_of_the_week")
     }
 
     val theme: Flow<ThemeType> = dataStore.data.map { preferences ->
@@ -84,6 +86,10 @@ class AppPreferences private constructor(context: Context) {
 
     val dueDateFilterType: Flow<DueDateFilterType> = dataStore.data.map { preferences ->
         DueDateFilterType.fromDisplayName(preferences[PreferencesKeys.DUE_DATE_FILTER] ?: DueDateFilterType.NONE.displayName)
+    }
+
+    val firstDayOfTheWeekType: Flow<FirstDayOfTheWeekType> = dataStore.data.map { preferences ->
+        FirstDayOfTheWeekType.fromDisplayName(preferences[PreferencesKeys.FIRST_DAY_OF_THE_WEEK] ?: FirstDayOfTheWeekType.MONDAY.displayName)
     }
 
     suspend fun saveTheme(theme: ThemeType) {
@@ -131,5 +137,9 @@ class AppPreferences private constructor(context: Context) {
 
     suspend fun saveDueDateFilter(dueDateFilterType: DueDateFilterType) {
         dataStore.edit { preferences -> preferences[PreferencesKeys.DUE_DATE_FILTER] = dueDateFilterType.displayName }
+    }
+
+    suspend fun saveFirstDayOfTheWeekType(firstDayOfTheWeekType: FirstDayOfTheWeekType) {
+        dataStore.edit { preferences -> preferences[PreferencesKeys.FIRST_DAY_OF_THE_WEEK] = firstDayOfTheWeekType.displayName }
     }
 }

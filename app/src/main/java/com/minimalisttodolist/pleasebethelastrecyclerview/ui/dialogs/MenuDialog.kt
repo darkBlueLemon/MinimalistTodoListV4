@@ -56,6 +56,7 @@ import com.minimalisttodolist.pleasebethelastrecyclerview.data.model.ClockType
 import com.minimalisttodolist.pleasebethelastrecyclerview.data.model.DueDateFilterType
 import com.minimalisttodolist.pleasebethelastrecyclerview.data.model.RecurrenceType
 import com.minimalisttodolist.pleasebethelastrecyclerview.data.model.SortType
+import com.minimalisttodolist.pleasebethelastrecyclerview.ui.components.CompleteIconWithoutDelay
 import com.minimalisttodolist.pleasebethelastrecyclerview.ui.components.CustomBox
 import com.minimalisttodolist.pleasebethelastrecyclerview.ui.components.CustomDropdownMenu
 import com.minimalisttodolist.pleasebethelastrecyclerview.util.darkIcon
@@ -90,7 +91,9 @@ fun MenuDialog(
                     .padding(20.dp),
             ) {
                 MenuTitle( modifier = Modifier.align(Alignment.CenterHorizontally) )
-                Personalize ( onClick = { onAppEvent(AppEvent.ShowPersonalizeDialog) })
+                Personalize ( onClick = {
+                    onAppEvent(AppEvent.ShowPersonalizeDialog)
+                })
                 RecurrenceSelector(
                     currentRecurrenceFilter = taskState.recurrenceFilter,
                     onRecurrenceFilterChange = { onEvent(TaskEvent.SetRecurrenceFilter(it)) },
@@ -429,27 +432,5 @@ fun IconPreview(isLightIcon: Boolean, onClick: () -> Unit) {
             contentDescription = null,
             modifier = Modifier.size(80.dp)
         )
-    }
-}
-
-@Composable
-fun CompleteIconWithoutDelay(isChecked: Boolean) {
-    Box(
-        modifier = Modifier
-            .padding(8.dp) // Increase padding for a larger touch area
-    ) {
-        if (isChecked) {
-            Icon(
-                imageVector = Icons.Outlined.CheckCircle,
-                contentDescription = "Checked",
-                tint = MaterialTheme.colorScheme.primary,
-            )
-        } else {
-            Icon(
-                imageVector = Icons.Outlined.RadioButtonUnchecked,
-                contentDescription = "Unchecked",
-                tint = MaterialTheme.colorScheme.tertiary,
-            )
-        }
     }
 }

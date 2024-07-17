@@ -50,8 +50,8 @@ import androidx.compose.ui.unit.dp
 import com.minimalisttodolist.pleasebethelastrecyclerview.data.model.PriorityColor
 import com.minimalisttodolist.pleasebethelastrecyclerview.data.model.RecurrenceType
 import com.minimalisttodolist.pleasebethelastrecyclerview.data.model.Task
+import com.minimalisttodolist.pleasebethelastrecyclerview.ui.components.CompleteIcon
 import com.minimalisttodolist.pleasebethelastrecyclerview.ui.components.CustomBox
-import com.minimalisttodolist.pleasebethelastrecyclerview.ui.screens.CompleteIcon
 import com.minimalisttodolist.pleasebethelastrecyclerview.ui.screens.DueDate_Recurrence_Note
 import com.minimalisttodolist.pleasebethelastrecyclerview.ui.theme.LocalDarkTheme
 import com.minimalisttodolist.pleasebethelastrecyclerview.util.vibrate

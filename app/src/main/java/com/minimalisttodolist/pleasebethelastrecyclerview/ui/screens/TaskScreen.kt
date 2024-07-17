@@ -55,6 +55,7 @@ import com.minimalisttodolist.pleasebethelastrecyclerview.data.model.DueDateFilt
 import com.minimalisttodolist.pleasebethelastrecyclerview.data.model.PriorityColor
 import com.minimalisttodolist.pleasebethelastrecyclerview.data.model.RecurrenceType
 import com.minimalisttodolist.pleasebethelastrecyclerview.data.model.Task
+import com.minimalisttodolist.pleasebethelastrecyclerview.ui.components.CompleteIcon
 import com.minimalisttodolist.pleasebethelastrecyclerview.ui.components.emptyStateMessages
 import com.minimalisttodolist.pleasebethelastrecyclerview.viewmodel.DataStoreViewModel
 import com.minimalisttodolist.pleasebethelastrecyclerview.viewmodel.TaskEvent
@@ -190,7 +191,8 @@ fun TaskScreen(
                 onBack = {
                     onAppEvent(AppEvent.HidePersonalizeDialog)
                     onAppEvent(AppEvent.ShowMenuDialog)
-                }
+                },
+                onTaskEvent = onEvent
             )
         }
         if (appState.isHistoryDialogVisible) {
@@ -450,71 +452,4 @@ fun DueDate_Recurrence_Note(
             )
         }
 //    }
-}
-
-@Composable
-fun CompleteIcon(modifier: Modifier = Modifier, onDelete: () -> Unit) {
-    var isChecked by remember { mutableStateOf(false) }
-    val scale = remember { Animatable(initialValue = 1f) }
-    var selected by remember { mutableStateOf(false) }
-    val context = LocalContext.current
-
-    LaunchedEffect(key1 = selected) {
-        if(selected) {
-            launch {
-                scale.animateTo(
-                    targetValue = 0.6f,
-                    animationSpec = tween(
-                        durationMillis = 50
-                    )
-                )
-                scale.animateTo(
-                    targetValue = 1f,
-                    animationSpec = spring(
-                        dampingRatio = Spring.DampingRatioLowBouncy,
-                        stiffness = Spring.StiffnessLow
-                    )
-                )
-                isChecked = false
-                selected = false
-            }
-        }
-    }
-
-    Box(
-        modifier = modifier
-//            .background(Color.Red)
-            .scale(scale.value)
-            .clickable {
-                selected = !selected
-                isChecked = !isChecked
-                vibrate(context = context, strength = 1)
-                onDelete()
-            }
-            .padding(6.dp)
-    ) {
-        AnimatedContent(
-            targetState = isChecked,
-            transitionSpec = {
-                fadeIn(animationSpec = tween(300)) togetherWith
-                        fadeOut(animationSpec = tween(300))
-            }, label = "Complete Task Icon"
-        ) { targetChecked ->
-            if (targetChecked) {
-                Icon(
-                    imageVector = Icons.Outlined.CheckCircle,
-                    contentDescription = "Checked",
-                    tint = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.size(28.dp)
-                )
-            } else {
-                Icon(
-                    imageVector = Icons.Outlined.RadioButtonUnchecked,
-                    contentDescription = "Unchecked",
-                    tint = MaterialTheme.colorScheme.surfaceVariant,
-                    modifier = Modifier.size(28.dp)
-                )
-            }
-        }
-    }
 }

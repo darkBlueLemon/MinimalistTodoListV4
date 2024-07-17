@@ -37,6 +37,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.minimalisttodolist.pleasebethelastrecyclerview.data.model.FontFamilyType
 import com.minimalisttodolist.pleasebethelastrecyclerview.data.model.ThemeType
+import com.minimalisttodolist.pleasebethelastrecyclerview.ui.components.CompleteIconWithoutDelay
 import com.minimalisttodolist.pleasebethelastrecyclerview.ui.components.CustomBox
 import com.minimalisttodolist.pleasebethelastrecyclerview.ui.components.CustomDropdownMenu
 import com.minimalisttodolist.pleasebethelastrecyclerview.viewmodel.DataStoreViewModel

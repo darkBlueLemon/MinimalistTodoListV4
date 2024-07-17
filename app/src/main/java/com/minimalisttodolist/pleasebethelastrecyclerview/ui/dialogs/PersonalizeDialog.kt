@@ -31,6 +31,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -39,25 +40,35 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.unit.dp
 import com.minimalisttodolist.pleasebethelastrecyclerview.data.model.ClockType
+import com.minimalisttodolist.pleasebethelastrecyclerview.data.model.FirstDayOfTheWeekType
+import com.minimalisttodolist.pleasebethelastrecyclerview.ui.components.CompleteIconWithoutDelay
 import com.minimalisttodolist.pleasebethelastrecyclerview.ui.components.CustomBox
 import com.minimalisttodolist.pleasebethelastrecyclerview.ui.components.CustomDropdownMenu
 import com.minimalisttodolist.pleasebethelastrecyclerview.util.darkIcon
 import com.minimalisttodolist.pleasebethelastrecyclerview.util.lightIcon
 import com.minimalisttodolist.pleasebethelastrecyclerview.viewmodel.AppEvent
 import com.minimalisttodolist.pleasebethelastrecyclerview.viewmodel.DataStoreViewModel
+import com.minimalisttodolist.pleasebethelastrecyclerview.viewmodel.TaskEvent
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PersonalizeDialog(
     modifier: Modifier = Modifier,
     onAppEvent: (AppEvent) -> Unit,
+    onTaskEvent: (TaskEvent) -> Unit,
     onBack: () -> Unit,
     dataStoreViewModel: DataStoreViewModel
 ) {
     val context = LocalContext.current
+    val coroutineScope = rememberCoroutineScope()
+
     BasicAlertDialog(
         onDismissRequest = {
-            onAppEvent(AppEvent.HideTutorialDialog)
+            onAppEvent(AppEvent.HidePersonalizeDialog)
         },
         modifier = modifier
             .width(350.dp)
@@ -69,8 +80,21 @@ fun PersonalizeDialog(
                     .padding(20.dp),
             ) {
                 PersonalizeTitle( onBack = onBack )
-                Theme_Font(onClick = { onAppEvent(AppEvent.ShowFontSettingsDialog) })
+                Theme_Font(onClick = {
+                    onAppEvent(AppEvent.HidePersonalizeDialog)
+                    onAppEvent(AppEvent.ShowFontSettingsDialog)
+                })
                 ClockTypeSelector( dataStoreViewModel )
+                FirstDayOfTheWeekSelector(
+                    dataStoreViewModel = dataStoreViewModel,
+                    onClick = {
+                        coroutineScope.launch {
+                            dataStoreViewModel.saveFirstDayOfTheWeek(it)
+                            delay(500)
+                            onTaskEvent(TaskEvent.RefreshTasks)
+                        }
+                    }
+                )
                 AppIconSelector( context = context )
 //                Tutorial(onClick = { onAppEvent(AppEvent.ShowTutorialDialog) })
             }
@@ -263,6 +287,66 @@ fun ClockTypeSelector(
                 CompleteIconWithoutDelay(isChecked = clock == clockType)
                 Text(
                     clockType.toDisplayString(),
+                    style = MaterialTheme.typography.bodyLarge
+                )
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalFoundationApi::class, ExperimentalAnimationApi::class)
+@Composable
+fun FirstDayOfTheWeekSelector(
+    dataStoreViewModel: DataStoreViewModel,
+    onClick: (FirstDayOfTheWeekType) -> Unit
+) {
+    val firstDayOfWeek by dataStoreViewModel.firstDayOfTheWeekType.collectAsState()
+    var expanded by remember { mutableStateOf(false) }
+
+    Row (
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { expanded = true }
+            .padding(top = 16.dp, bottom = 16.dp)
+        ,
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = "First Day of Week",
+            style = MaterialTheme.typography.bodyLarge
+        )
+        Text(
+            text = firstDayOfWeek.toDisplayString(),
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.tertiary,
+            fontStyle = FontStyle.Italic,
+        )
+    }
+
+    CustomDropdownMenu(
+        expanded = expanded,
+        onDismissRequest = {
+            expanded = false
+        },
+    ) {
+        FirstDayOfTheWeekType.entries.forEach { firstDayOfTheWeekType ->
+            Row(
+                horizontalArrangement = Arrangement.Start,
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .padding(start = 12.dp, end = 25.dp)
+                    .combinedClickable(
+                        indication = null,
+                        interactionSource = remember { MutableInteractionSource() },
+                        onClick = {
+                            onClick(firstDayOfTheWeekType)
+                        }
+                    )
+            ) {
+                CompleteIconWithoutDelay(isChecked = firstDayOfWeek == firstDayOfTheWeekType)
+                Text(
+                    firstDayOfTheWeekType.toDisplayString(),
                     style = MaterialTheme.typography.bodyLarge
                 )
             }
