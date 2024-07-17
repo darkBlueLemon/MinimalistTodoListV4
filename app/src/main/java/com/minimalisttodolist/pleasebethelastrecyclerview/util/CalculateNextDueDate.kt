@@ -10,13 +10,14 @@ import java.time.ZoneId
 @RequiresApi(Build.VERSION_CODES.O)
 fun calculateNextDueDate(dueDate: Long?, recurrenceType: RecurrenceType): Long? {
     if (dueDate == null) return null
-    val date = Instant.ofEpochMilli(dueDate).atZone(ZoneId.systemDefault()).toLocalDate()
-    val nextDate = when (recurrenceType) {
-        RecurrenceType.DAILY -> date.plusDays(1)
-        RecurrenceType.WEEKLY -> date.plusWeeks(1)
-        RecurrenceType.MONTHLY -> date.plusMonths(1)
-        RecurrenceType.YEARLY -> date.plusYears(1)
+    val dateTime = Instant.ofEpochMilli(dueDate).atZone(ZoneId.systemDefault()).toLocalDateTime()
+    val nextDateTime = when (recurrenceType) {
+        RecurrenceType.DAILY -> dateTime.plusDays(1)
+        RecurrenceType.WEEKLY -> dateTime.plusWeeks(1)
+        RecurrenceType.MONTHLY -> dateTime.plusMonths(1)
+        RecurrenceType.YEARLY -> dateTime.plusYears(1)
         else -> return null
     }
-    return nextDate.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
+    return nextDateTime.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
 }
+
