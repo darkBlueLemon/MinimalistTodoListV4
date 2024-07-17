@@ -102,6 +102,7 @@ fun Tutorial(
                                 when (page) {
                                     0 -> {
                                         Modifier.clickable {
+                                            vibrate(context, strength = 1)
                                             onShowAddTaskDialog()
                                         }
                                     }
@@ -116,6 +117,7 @@ fun Tutorial(
                                     }
                                     2 -> {
                                         Modifier.clickable {
+                                            vibrate(context = context, strength = 1)
                                             onShowAddTaskDialog()
                                         }
                                     }
