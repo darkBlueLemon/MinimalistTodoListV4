@@ -118,7 +118,6 @@ fun TaskScreen(
                             onAppEvent(AppEvent.ShowTutorialDialog)
                         },
                         elevation = FloatingActionButtonDefaults.elevation(0.dp, 0.dp, 0.dp, 0.dp),
-//                        elevation = FloatingActionButtonDefaults.elevation(),
                         modifier = Modifier
                             .clip(shape = RoundedCornerShape(percent = 50))
                             .border(
