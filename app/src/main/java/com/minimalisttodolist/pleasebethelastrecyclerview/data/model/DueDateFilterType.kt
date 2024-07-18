@@ -1,7 +1,7 @@
 package com.minimalisttodolist.pleasebethelastrecyclerview.data.model
 
 enum class DueDateFilterType (val displayName: String) {
-    NONE("Show All"),
+    NONE("Any Time"),
     TODAY("Today"),
     THIS_WEEK("This Week"),
     THIS_MONTH("This Month"),

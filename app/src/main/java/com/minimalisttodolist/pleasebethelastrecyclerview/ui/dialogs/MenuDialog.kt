@@ -154,7 +154,7 @@ fun RecurrenceSelector(
     dataStoreViewModel: DataStoreViewModel
 ) {
     FilterSelector(
-        title = "Recurrence Filter",
+        title = "Repeat Filter",
         onFilterChange = onRecurrenceFilterChange,
         dataStoreViewModel = dataStoreViewModel,
         filterOptions = RecurrenceType.entriesWithNONE.toList(),
@@ -188,7 +188,7 @@ fun DueDateFilterSelector(
     dataStoreViewModel: DataStoreViewModel
 ) {
     FilterSelector(
-        title = "Due Date Filter",
+        title = "Due Filter",
         onFilterChange = onDueDateFilterChange,
         dataStoreViewModel = dataStoreViewModel,
         filterOptions = DueDateFilterType.entries.toList(),

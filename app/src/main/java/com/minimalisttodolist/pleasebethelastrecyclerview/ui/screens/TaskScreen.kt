@@ -13,6 +13,7 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
@@ -178,12 +179,17 @@ fun TaskScreen(
             }
         },
     ) { padding ->
+
+        TaskList(onEvent, onClearFilters = { onEvent(TaskEvent.ClearFilters) }, taskState, taskViewModel, padding, dataStoreViewModel)
+
         if (taskState.isAddTaskDialogVisible) {
             AddTaskDialog(taskState, onEvent, taskViewModel, dataStoreViewModel, onAppEvent, isEdit = taskState.editingTaskId != null)
         }
+
         if (appState.isMenuDialogVisible) {
             MenuDialog(taskState, onEvent, dataStoreViewModel = dataStoreViewModel, onAppEvent = onAppEvent)
         }
+
         if (appState.isPersonalizeDialogVisible) {
             PersonalizeDialog(
                 onAppEvent = onAppEvent,
@@ -195,6 +201,7 @@ fun TaskScreen(
                 onTaskEvent = onEvent
             )
         }
+
         if (appState.isHistoryDialogVisible) {
             HistoryDialog(
                 taskViewModel,
@@ -206,6 +213,7 @@ fun TaskScreen(
                 }
             )
         }
+
         if (appState.isScheduleExactAlarmPermissionDialogVisible) {
             ScheduleExactAlarmPermissionDialog(
                 onDismissOrDisallow = {
@@ -218,6 +226,7 @@ fun TaskScreen(
                 },
             )
         }
+
         if (appState.isFontSettingsDialogVisible) {
             Theme_FontSettingsDialog(
                 dataStoreViewModel = dataStoreViewModel,
@@ -228,6 +237,7 @@ fun TaskScreen(
                 }
             )
         }
+
         if (appState.isTutorialDialogVisible) {
             Tutorial(
                 onDismiss = {
@@ -249,6 +259,7 @@ fun TaskScreen(
                 viewModel = taskViewModel
             )
         }
+
         if (taskState.tasks.isEmpty()) {
             Box(
                 modifier = Modifier
@@ -269,7 +280,6 @@ fun TaskScreen(
                 )
             }
         }
-        TaskList(onEvent, onClearFilters = { onEvent(TaskEvent.ClearFilters) }, taskState, taskViewModel, padding, dataStoreViewModel)
     }
 }
 
@@ -304,8 +314,9 @@ fun TaskList(onEvent: (TaskEvent) -> Unit, onClearFilters: () -> Unit, taskState
                 Text(
                     text = filterText,
                     style = MaterialTheme.typography.bodyMedium,
-                    textAlign = TextAlign.Center,
+                    textAlign = TextAlign.Start,
                     modifier = Modifier
+                        .fillMaxWidth()
                         .clickable { onClearFilters() }
                         .padding(horizontal = 32.dp, vertical = 8.dp)
                 )
@@ -374,7 +385,6 @@ fun TaskItem(task: Task, onEdit: (Task) -> Unit, onDelete: (Task) -> Unit, viewM
                 vibrate(context = context, strength = 1)
                 onEdit(task)
             }
-//            .background(Color.Green)
         ,
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
@@ -422,34 +432,31 @@ fun DueDate_Recurrence_Note(
     } else {
         MaterialTheme.colorScheme.tertiary
     }
-
-//    Column {
-        if (dueDate.isNotEmpty()) {
-            Text(
-                buildAnnotatedString {
-                    withStyle(style = SpanStyle(color = textColor)) {
-                        append(dueDate)
+    if (dueDate.isNotEmpty()) {
+        Text(
+            buildAnnotatedString {
+                withStyle(style = SpanStyle(color = textColor)) {
+                    append(dueDate)
+                }
+                if(task.recurrenceType != RecurrenceType.NONE) {
+                    withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.tertiary)) {
+                        append(", " + task.recurrenceType.toDisplayString())
                     }
-                    if(task.recurrenceType != RecurrenceType.NONE) {
-                        withStyle(style = SpanStyle(color = textColor)) {
-                            append(", " + task.recurrenceType.toDisplayString())
-                        }
+                }
+                if (note.isNotBlank()) {
+                    withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.tertiary)) {
+                        append(" | ")
+                        append(note)
                     }
-                    if (note.isNotBlank()) {
-                        withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.tertiary)) {
-                            append(" | ")
-                            append(note)
-                        }
-                    }
-                },
-                style = MaterialTheme.typography.bodySmall
-            )
-        } else if(note.isNotEmpty()) {
-            Text(
-                text = note,
-                color = MaterialTheme.colorScheme.tertiary,
-                style = MaterialTheme.typography.bodySmall,
-            )
-        }
-//    }
+                }
+            },
+            style = MaterialTheme.typography.bodySmall
+        )
+    } else if(note.isNotEmpty()) {
+        Text(
+            text = note,
+            color = MaterialTheme.colorScheme.tertiary,
+            style = MaterialTheme.typography.bodySmall,
+        )
+    }
 }

@@ -1,7 +1,7 @@
 package com.minimalisttodolist.pleasebethelastrecyclerview.data.model
 
 enum class RecurrenceType(val displayName: String) {
-    NONE("Show All"),
+    NONE("All Tasks"),
     DAILY("Daily"),
     WEEKLY("Weekly"),
     MONTHLY("Monthly"),

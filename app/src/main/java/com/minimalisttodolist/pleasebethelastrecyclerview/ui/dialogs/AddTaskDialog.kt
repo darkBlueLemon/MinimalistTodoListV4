@@ -174,8 +174,6 @@ fun Title(
     val textFieldValue = remember(taskState.title) {
         mutableStateOf(TextFieldValue(taskState.title, TextRange(taskState.title.length)))
     }
-
-//    val borderColor = MaterialTheme.colorScheme.primary.copy(alpha = borderAlpha)
     val darkTheme = LocalDarkTheme.current
     val borderColor = PriorityColor.PRIORITY3.getColor(darkTheme).copy(alpha = borderAlpha)
 
@@ -185,7 +183,8 @@ fun Title(
             textFieldValue.value = it
             onEvent(TaskEvent.SetTitle(it.text))
         },
-        singleLine = true,
+//        singleLine = true,
+        maxLines = 5,
         placeholder = {
             Text(
                 text = "I want to...",
@@ -350,7 +349,8 @@ fun Note(modifier: Modifier = Modifier, taskState: TaskState, onEvent: (TaskEven
             ),
             textStyle = LocalTextStyle.current.copy(
             ),
-            singleLine = true,
+//            singleLine = true,
+            maxLines = 3,
         )
     }
 }
