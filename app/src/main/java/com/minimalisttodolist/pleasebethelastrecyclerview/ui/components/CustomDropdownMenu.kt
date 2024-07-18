@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.MaterialTheme
@@ -26,9 +27,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.layout.positionInRoot
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextOverflow
@@ -52,20 +56,21 @@ fun <T : Enum<T>> FilterSelector(
 ) {
     val filter by collectFilter(dataStoreViewModel).collectAsState(initial = initialValue)
     var expanded by remember { mutableStateOf(false) }
-
-    var pressOffset by remember { mutableStateOf(DpOffset.Zero ) }
+    var pressOffset by remember { mutableStateOf(DpOffset.Zero) }
     var itemHeight by remember { mutableStateOf(0.dp) }
+    var secondTextOffset by remember { mutableStateOf(0.dp) }
+    var secondTextWidth by remember { mutableStateOf(0.dp) }
     val density = LocalDensity.current
 
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .onSizeChanged { with (density) { itemHeight = it.height.toDp() } }
+            .onSizeChanged { with(density) { itemHeight = it.height.toDp() } }
             .pointerInput(true) {
-                detectTapGestures (
-                    onPress = {
+                detectTapGestures(
+                    onPress = { offset ->
                         expanded = true
-                        pressOffset = DpOffset(it.x.toDp(), it.y.toDp())
+                        pressOffset = DpOffset(offset.x.toDp(), offset.y.toDp())
                     }
                 )
             }
@@ -85,13 +90,23 @@ fun <T : Enum<T>> FilterSelector(
             fontStyle = FontStyle.Italic,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
+            modifier = Modifier
+                .onGloballyPositioned { coordinates ->
+                    secondTextOffset = with(density) { coordinates.positionInRoot().x.toDp() }
+                    secondTextWidth = with(density) { coordinates.size.width.toDp() }
+                }
         )
     }
+
+    val dropdownOffset = DpOffset(
+        x = secondTextOffset + secondTextWidth,
+        y = pressOffset.y - itemHeight
+    )
 
     CustomDropdownMenu(
         expanded = expanded,
         onDismissRequest = { expanded = false },
-        pressOffset = pressOffset.copy( y = pressOffset.y - itemHeight )
+        pressOffset = dropdownOffset
     ) {
         filterOptions.forEach { filterOption ->
             Row(
@@ -150,7 +165,8 @@ fun CustomDropdownMenu(
                         shape = RoundedCornerShape(16.dp)
                     ),
                 offset = pressOffset.copy(
-                    x = pressOffset.x - (widthDp/2),
+                    x = pressOffset.x - widthDp,
+                    y = 0.dp
                 )
             ) {
                 content()
@@ -158,5 +174,4 @@ fun CustomDropdownMenu(
         }
     }
 }
-
 // https://proandroiddev.com/improving-the-compose-dropdownmenu-88469b1ef34
