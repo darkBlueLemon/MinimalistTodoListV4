@@ -1,15 +1,102 @@
 package com.minimalisttodolist.pleasebethelastrecyclerview.ui.components
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.minimalisttodolist.pleasebethelastrecyclerview.viewmodel.DataStoreViewModel
+import kotlinx.coroutines.flow.Flow
+
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+fun <T : Enum<T>> FilterSelector(
+    title: String,
+    onFilterChange: (T) -> Unit,
+    dataStoreViewModel: DataStoreViewModel,
+    filterOptions: List<T>,
+    getDisplayString: (T) -> String,
+    saveFilter: (DataStoreViewModel, T) -> Unit,
+    collectFilter: (DataStoreViewModel) -> Flow<T>,
+    initialValue: T
+) {
+    val filter by collectFilter(dataStoreViewModel).collectAsState(initial = initialValue)
+    var expanded by remember { mutableStateOf(false) }
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { expanded = true }
+            .padding(top = 16.dp, bottom = 16.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = title,
+            style = MaterialTheme.typography.bodyLarge,
+            modifier = Modifier.padding(end = 10.dp)
+        )
+        Text(
+            text = getDisplayString(filter),
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.tertiary,
+            fontStyle = FontStyle.Italic,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+        )
+    }
+
+    CustomDropdownMenu(
+        expanded = expanded,
+        onDismissRequest = { expanded = false },
+    ) {
+        filterOptions.forEach { filterOption ->
+            Row(
+                horizontalArrangement = Arrangement.Start,
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .padding(start = 12.dp, end = 25.dp)
+                    .combinedClickable(
+                        indication = null,
+                        interactionSource = remember { MutableInteractionSource() },
+                        onClick = {
+                            saveFilter(dataStoreViewModel, filterOption)
+                            onFilterChange(filterOption)
+                            expanded = false
+                        }
+                    )
+            ) {
+                CompleteIconWithoutDelay(isChecked = filter == filterOption)
+                Text(
+                    getDisplayString(filterOption),
+                    style = MaterialTheme.typography.bodyLarge
+                )
+            }
+        }
+    }
+}
 
 @Composable
 fun CustomDropdownMenu(

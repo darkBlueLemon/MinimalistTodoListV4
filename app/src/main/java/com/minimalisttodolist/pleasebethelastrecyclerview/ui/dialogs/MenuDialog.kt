@@ -59,6 +59,7 @@ import com.minimalisttodolist.pleasebethelastrecyclerview.data.model.SortType
 import com.minimalisttodolist.pleasebethelastrecyclerview.ui.components.CompleteIconWithoutDelay
 import com.minimalisttodolist.pleasebethelastrecyclerview.ui.components.CustomBox
 import com.minimalisttodolist.pleasebethelastrecyclerview.ui.components.CustomDropdownMenu
+import com.minimalisttodolist.pleasebethelastrecyclerview.ui.components.FilterSelector
 import com.minimalisttodolist.pleasebethelastrecyclerview.util.darkIcon
 import com.minimalisttodolist.pleasebethelastrecyclerview.util.lightIcon
 import com.minimalisttodolist.pleasebethelastrecyclerview.viewmodel.AppEvent
@@ -95,17 +96,14 @@ fun MenuDialog(
                     onAppEvent(AppEvent.ShowPersonalizeDialog)
                 })
                 RecurrenceSelector(
-                    currentRecurrenceFilter = taskState.recurrenceFilter,
                     onRecurrenceFilterChange = { onEvent(TaskEvent.SetRecurrenceFilter(it)) },
                     dataStoreViewModel = dataStoreViewModel
                 )
                 PrioritySelector(
-                    currentSortType = taskState.sortType,
                     onSortChange = { onEvent(TaskEvent.SortTasks(it) ) },
                     dataStoreViewModel = dataStoreViewModel
                 )
                 DueDateFilterSelector(
-                    currentDueDateFilterType = taskState.dueDateFilterType,
                     onDueDateFilterChange = { onEvent(TaskEvent.SetDueDateFilter(it)) },
                     dataStoreViewModel = dataStoreViewModel
                 )
@@ -151,197 +149,55 @@ fun Personalize(modifier: Modifier = Modifier, onClick: () -> Unit) {
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun RecurrenceSelector(
-    currentRecurrenceFilter: RecurrenceType,
     onRecurrenceFilterChange: (RecurrenceType) -> Unit,
     dataStoreViewModel: DataStoreViewModel
 ) {
-    val recurrenceFilter by dataStoreViewModel.recurrenceFilter.collectAsState()
-    var expanded by remember { mutableStateOf(false) }
-
-    Row (
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable { expanded = true }
-            .padding(top = 16.dp, bottom = 16.dp)
-        ,
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Text(
-//            text = "View Recurring Tasks",
-            "Recurrence Filter",
-            style = MaterialTheme.typography.bodyLarge,
-            modifier = Modifier.padding(end = 10.dp)
-        )
-        Text(
-            text = recurrenceFilter.toDisplayString(),
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.tertiary,
-            fontStyle = FontStyle.Italic,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-        )
-    }
-
-    CustomDropdownMenu(
-        expanded = expanded,
-        onDismissRequest = {
-            expanded = false
-        },
-    ) {
-        RecurrenceType.entriesWithNONE.forEach { recurrenceType ->
-            Row(
-                horizontalArrangement = Arrangement.Start,
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier
-                    .padding(start = 12.dp, end = 25.dp)
-                    .combinedClickable(
-                        indication = null,
-                        interactionSource = remember { MutableInteractionSource() },
-                        onClick = {
-                            dataStoreViewModel.saveRecurrenceFilter(recurrenceType)
-                            onRecurrenceFilterChange(recurrenceType)
-                        }
-                    )
-            ) {
-                CompleteIconWithoutDelay(isChecked = currentRecurrenceFilter == recurrenceType)
-                Text(
-                    recurrenceType.toDisplayString(),
-                    style = MaterialTheme.typography.bodyLarge
-                )
-            }
-        }
-    }
+    FilterSelector(
+        title = "Recurrence Filter",
+        onFilterChange = onRecurrenceFilterChange,
+        dataStoreViewModel = dataStoreViewModel,
+        filterOptions = RecurrenceType.entriesWithNONE.toList(),
+        getDisplayString = { it.toDisplayString() },
+        saveFilter = { vm, filter -> vm.saveRecurrenceFilter(filter) },
+        collectFilter = { it.recurrenceFilter },
+        initialValue = RecurrenceType.NONE
+    )
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun PrioritySelector(
-    currentSortType: SortType,
     onSortChange: (SortType) -> Unit,
     dataStoreViewModel: DataStoreViewModel
 ) {
-    val sortingOption by dataStoreViewModel.priorityOption.collectAsState()
-    var expanded by remember { mutableStateOf(false) }
-
-    Row (
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable { expanded = true }
-            .padding(top = 16.dp, bottom = 16.dp)
-        ,
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Text(
-            text = "Sort By",
-            style = MaterialTheme.typography.bodyLarge
-        )
-        Text(
-            text = sortingOption.toDisplayString(),
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.tertiary,
-            fontStyle = FontStyle.Italic
-        )
-    }
-
-    CustomDropdownMenu(
-        expanded = expanded,
-        onDismissRequest = {
-            expanded = false
-        },
-    ) {
-        SortType.entries.forEach { sortType ->
-            Row(
-                horizontalArrangement = Arrangement.Start,
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier
-                    .padding(start = 12.dp, end = 25.dp)
-                    .combinedClickable(
-                        indication = null,
-                        interactionSource = remember { MutableInteractionSource() },
-                        onClick = {
-                            onSortChange(sortType)
-                            dataStoreViewModel.savePriorityOption(sortType)
-                        }
-                    )
-            ) {
-                CompleteIconWithoutDelay(isChecked = currentSortType == sortType)
-                Text(
-                    sortType.toDisplayString(),
-                    style = MaterialTheme.typography.bodyLarge
-                )
-            }
-        }
-    }
+    FilterSelector(
+        title = "Sort By",
+        onFilterChange = onSortChange,
+        dataStoreViewModel = dataStoreViewModel,
+        filterOptions = SortType.entries.toList(),
+        getDisplayString = { it.toDisplayString() },
+        saveFilter = { vm, filter -> vm.savePriorityOption(filter) },
+        collectFilter = { it.priorityOption },
+        initialValue = SortType.PRIORITY
+    )
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun DueDateFilterSelector(
-    currentDueDateFilterType: DueDateFilterType,
     onDueDateFilterChange: (DueDateFilterType) -> Unit,
     dataStoreViewModel: DataStoreViewModel
 ) {
-    val dueDateFilter by dataStoreViewModel.dueDateFilter.collectAsState()
-    var expanded by remember { mutableStateOf(false) }
-
-    Row (
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable { expanded = true }
-            .padding(top = 16.dp, bottom = 16.dp)
-        ,
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Text(
-            "Due Date Filter",
-            style = MaterialTheme.typography.bodyLarge,
-            modifier = Modifier.padding(end = 10.dp)
-        )
-        Text(
-            text = dueDateFilter.toDisplayString(),
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.tertiary,
-            fontStyle = FontStyle.Italic,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-        )
-    }
-
-    CustomDropdownMenu(
-        expanded = expanded,
-        onDismissRequest = {
-            expanded = false
-        },
-    ) {
-        DueDateFilterType.entries.forEach { dueDateFilterType ->
-            Row(
-                horizontalArrangement = Arrangement.Start,
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier
-                    .padding(start = 12.dp, end = 25.dp)
-                    .combinedClickable(
-                        indication = null,
-                        interactionSource = remember { MutableInteractionSource() },
-                        onClick = {
-                            dataStoreViewModel.saveDueDateFilter(dueDateFilterType)
-                            onDueDateFilterChange(dueDateFilterType)
-                        }
-                    )
-            ) {
-                CompleteIconWithoutDelay(isChecked = currentDueDateFilterType == dueDateFilterType)
-                Text(
-                    dueDateFilterType.toDisplayString(),
-                    style = MaterialTheme.typography.bodyLarge
-                )
-            }
-        }
-    }
+    FilterSelector(
+        title = "Due Date Filter",
+        onFilterChange = onDueDateFilterChange,
+        dataStoreViewModel = dataStoreViewModel,
+        filterOptions = DueDateFilterType.entries.toList(),
+        getDisplayString = { it.toDisplayString() },
+        saveFilter = { vm, filter -> vm.saveDueDateFilter(filter) },
+        collectFilter = { it.dueDateFilter },
+        initialValue = DueDateFilterType.NONE
+    )
 }
 
 @Composable
@@ -366,71 +222,6 @@ fun History(modifier: Modifier = Modifier, onClick: () -> Unit) {
             imageVector = Icons.Outlined.ChevronRight,
             contentDescription = "History Chevron",
             tint = MaterialTheme.colorScheme.tertiary,
-        )
-    }
-}
-
-@OptIn(ExperimentalFoundationApi::class)
-@Composable
-fun IconPreview(isLightIcon: Boolean, onClick: () -> Unit) {
-    val iconResId = if (isLightIcon) {
-        R.drawable.logo_light
-    } else {
-        R.drawable.logo_dark
-    }
-    val backgroundColor = if (isLightIcon) {
-        Color.White
-    } else {
-        Color.Black
-    }
-    val borderColor = if (isLightIcon) {
-        Color.Black
-    } else {
-        Color.White
-    }
-    val scale = remember { Animatable(initialValue = 1f) }
-    var selected by remember { mutableStateOf(false) }
-
-    LaunchedEffect(key1 = selected) {
-        if(selected) {
-            launch {
-                scale.animateTo(
-                    targetValue = 0.9f,
-                    animationSpec = tween(
-                        durationMillis = 50
-                    )
-                )
-                scale.animateTo(
-                    targetValue = 1f,
-                    animationSpec = spring(
-                        dampingRatio = Spring.DampingRatioLowBouncy,
-                        stiffness = Spring.StiffnessLow
-                    )
-                )
-                selected = false
-            }
-        }
-    }
-
-    Box(
-        modifier = Modifier
-            .scale(scale.value)
-            .background(backgroundColor, RoundedCornerShape(16.dp))
-            .border(BorderStroke(2.dp, borderColor), RoundedCornerShape(16.dp))
-            .combinedClickable(
-                indication = null,
-                interactionSource = remember { MutableInteractionSource() },
-                onClick = {
-                    selected = !selected
-                    onClick()
-                }
-            ),
-        contentAlignment = Alignment.Center
-    ) {
-        Image(
-            painter = painterResource(id = iconResId),
-            contentDescription = null,
-            modifier = Modifier.size(80.dp)
         )
     }
 }
