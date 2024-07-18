@@ -5,6 +5,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -24,8 +25,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import com.minimalisttodolist.pleasebethelastrecyclerview.viewmodel.DataStoreViewModel
 import kotlinx.coroutines.flow.Flow
@@ -45,10 +51,23 @@ fun <T : Enum<T>> FilterSelector(
     val filter by collectFilter(dataStoreViewModel).collectAsState(initial = initialValue)
     var expanded by remember { mutableStateOf(false) }
 
+    var pressOffset by remember { mutableStateOf(DpOffset.Zero ) }
+    var itemHeight by remember { mutableStateOf(0.dp) }
+    val density = LocalDensity.current
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable { expanded = true }
+//            .clickable { expanded = true }
+            .onSizeChanged { with (density) { itemHeight = it.height.toDp() } }
+            .pointerInput(true) {
+                detectTapGestures (
+                    onPress = {
+                        expanded = true
+                        pressOffset = DpOffset(it.x.toDp(), it.y.toDp())
+                    }
+                )
+            }
             .padding(top = 16.dp, bottom = 16.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
@@ -71,6 +90,7 @@ fun <T : Enum<T>> FilterSelector(
     CustomDropdownMenu(
         expanded = expanded,
         onDismissRequest = { expanded = false },
+        pressOffset = pressOffset.copy( y = pressOffset.y - itemHeight )
     ) {
         filterOptions.forEach { filterOption ->
             Row(
@@ -102,6 +122,7 @@ fun <T : Enum<T>> FilterSelector(
 fun CustomDropdownMenu(
     expanded: Boolean,
     onDismissRequest: () -> Unit,
+    pressOffset: DpOffset = DpOffset.Zero,
     content: @Composable () -> Unit
 ) {
     Box {
@@ -119,7 +140,8 @@ fun CustomDropdownMenu(
                         width = 2.dp,
                         color = MaterialTheme.colorScheme.onBackground,
                         shape = RoundedCornerShape(16.dp)
-                    )
+                    ),
+                offset = pressOffset
             ) {
                 content()
             }
