@@ -76,7 +76,8 @@ fun CompleteIcon(modifier: Modifier = Modifier, onDelete: () -> Unit) {
             transitionSpec = {
                 fadeIn(animationSpec = tween(300)) togetherWith
                         fadeOut(animationSpec = tween(300))
-            }, label = "Complete Task Icon"
+            },
+            label = "Complete Task Icon"
         ) { targetChecked ->
             if (targetChecked) {
                 Icon(

@@ -100,7 +100,8 @@ fun <T : Enum<T>> FilterSelector(
 
     val dropdownOffset = DpOffset(
         x = secondTextOffset + secondTextWidth,
-        y = pressOffset.y - itemHeight
+//        y = pressOffset.y - itemHeight
+        y = 0.dp
     )
 
     CustomDropdownMenu(
@@ -155,7 +156,6 @@ fun CustomDropdownMenu(
                 modifier = Modifier
                     .onGloballyPositioned { coordinates ->
                         widthDp = with(density) { coordinates.size.width.toDp() }
-                        Log.d("MYTAG", pressOffset.x.toString())
                     }
                     .clip(RoundedCornerShape(16.dp))
                     .background(MaterialTheme.colorScheme.background)
@@ -165,8 +165,8 @@ fun CustomDropdownMenu(
                         shape = RoundedCornerShape(16.dp)
                     ),
                 offset = pressOffset.copy(
-                    x = pressOffset.x - widthDp - 16.dp,
-                    y = 0.dp
+                    x = pressOffset.x - widthDp - 8.dp,
+//                    y = 0.dp
                 )
             ) {
                 content()

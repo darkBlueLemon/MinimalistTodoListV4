@@ -2,13 +2,16 @@ package com.minimalisttodolist.pleasebethelastrecyclerview.ui.dialogs
 
 import android.content.Context
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -30,14 +33,22 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.Undo
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.DeleteForever
+import androidx.compose.material.icons.filled.Expand
+import androidx.compose.material.icons.filled.ExpandLess
+import androidx.compose.material.icons.filled.ExpandMore
+import androidx.compose.material.icons.filled.ExploreOff
+import androidx.compose.material.icons.filled.MoreHoriz
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.ArrowBackIosNew
 import androidx.compose.material3.BasicAlertDialog
+import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -59,6 +70,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import com.minimalisttodolist.pleasebethelastrecyclerview.data.model.DeletedTask
 import com.minimalisttodolist.pleasebethelastrecyclerview.data.model.PriorityColor
@@ -84,10 +96,16 @@ fun HistoryDialog(
 ) {
     val deletedTasks by viewModel.deletedTasks.collectAsState()
     val context = LocalContext.current
+    var isConfirmVisible by remember { mutableStateOf(false) }
 
-    BasicAlertDialog(onDismissRequest = {
-        onAppEvent(AppEvent.HideHistoryDialog)
-    }) {
+    BasicAlertDialog(
+        onDismissRequest = {
+            onAppEvent(AppEvent.HideHistoryDialog)
+        },
+        modifier = Modifier.clickable {
+            isConfirmVisible = false
+        }
+    ) {
         CustomBox {
             Column(
                 modifier = Modifier
@@ -96,9 +114,11 @@ fun HistoryDialog(
                     .width(350.dp)
             ) {
                 TitleAndDeleteAll(
-                    onClearHistory = { onEvent(TaskEvent.DeleteAllHistoryTasks) },
+                    onClearHistory = { onEvent(TaskEvent.DeleteAllHistoryTasks); isConfirmVisible = false },
                     onBack = onBack,
                     context = context,
+                    isConfirmVisible = isConfirmVisible,
+                    onClearClick = { isConfirmVisible = true }
                 )
                 if (deletedTasks.isEmpty()) {
                     Box(
@@ -126,9 +146,9 @@ fun HistoryDialog(
 }
 
 @Composable
-fun TitleAndDeleteAll(onClearHistory: () -> Unit, context: Context, onBack: () -> Unit) {
+fun TitleAndDeleteAll(onClearHistory: () -> Unit, context: Context, onBack: () -> Unit, isConfirmVisible: Boolean, onClearClick: () -> Unit) {
     var expanded by remember { mutableStateOf(false) }
-    var confirmDelete by remember { mutableStateOf(false) }
+//    var confirmDelete by remember { mutableStateOf(false) }
     val confirmationTextColor =  PriorityColor.PRIORITY3.getColor(LocalDarkTheme.current)
 
     Box(
@@ -154,18 +174,17 @@ fun TitleAndDeleteAll(onClearHistory: () -> Unit, context: Context, onBack: () -
             modifier = Modifier.align(Alignment.Center)
         )
         Text(
-            text = if (confirmDelete) "Confirm?" else "Clear",
+            text = if (isConfirmVisible) "Confirm?" else "Clear",
             style = MaterialTheme.typography.bodyMedium,
-            color = if (confirmDelete) confirmationTextColor else MaterialTheme.colorScheme.primary,
-            fontWeight = if (confirmDelete) FontWeight.Bold else FontWeight.Normal,
+            color = if (isConfirmVisible) confirmationTextColor else MaterialTheme.colorScheme.primary,
+            fontWeight = if (isConfirmVisible) FontWeight.Bold else FontWeight.Normal,
             modifier = Modifier
                 .align(Alignment.CenterEnd)
                 .clickable {
-                    if (confirmDelete) {
+                    if (isConfirmVisible) {
                         onClearHistory()
-                        confirmDelete = false
                     } else {
-                        confirmDelete = true
+                        onClearClick()
                     }
                     expanded = false
                     vibrate(context = context, strength = 1)
@@ -257,20 +276,30 @@ fun HistoryItem(
             )
         }
         Box {
-            Icon(
-                imageVector = Icons.Default.MoreVert,
-                contentDescription = "More options",
-                modifier = Modifier
-                    .fillMaxHeight()
-                    .clickable {
-                        expanded = true
-                    }
-            )
+            AnimatedContent(
+                targetState = expanded,
+                transitionSpec = {
+                    fadeIn(animationSpec = tween(300)) togetherWith
+                            fadeOut(animationSpec = tween(300))
+                },
+                label = "history dialog more vert button"
+            ) { targetExpanded ->
+                Icon(
+                    imageVector = if(!targetExpanded) Icons.Default.MoreVert else Icons.Default.Close,
+                    contentDescription = "More options",
+                    modifier = Modifier
+                        .fillMaxHeight()
+                        .clickable {
+                            expanded = true
+                        }
+                )
+            }
             CustomDropdownMenu(
                 expanded = expanded,
                 onDismissRequest = {
                     expanded = false
-                }
+                },
+                pressOffset = DpOffset(x = 10.dp, y = (-42.0).dp)
             ) {
                 DropDownItem(
                     onRecoverClick = {
@@ -290,10 +319,12 @@ fun HistoryItem(
 
 @Composable
 fun DropDownItem(modifier: Modifier = Modifier, onRecoverClick: () -> Unit, onDeleteClick: () -> Unit) {
-    Row(
-        modifier = Modifier
-            .padding(start = 20.dp, end = 20.dp, top = 5.dp, bottom = 5.dp)
-            .fillMaxHeight()
+    Column(
+        modifier = modifier
+            .padding(start = 16.dp, end = 16.dp, top = 5.dp, bottom = 5.dp)
+            .fillMaxHeight(),
+        verticalArrangement = Arrangement.spacedBy(5.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Column(
             verticalArrangement = Arrangement.Center,
@@ -313,7 +344,9 @@ fun DropDownItem(modifier: Modifier = Modifier, onRecoverClick: () -> Unit, onDe
                 style = MaterialTheme.typography.bodySmall
             )
         }
-        Spacer(modifier = Modifier.width(30.dp))
+        Spacer(modifier = Modifier.width(15.dp))
+        HorizontalDivider()
+        Spacer(modifier = Modifier.width(15.dp))
         Column(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
