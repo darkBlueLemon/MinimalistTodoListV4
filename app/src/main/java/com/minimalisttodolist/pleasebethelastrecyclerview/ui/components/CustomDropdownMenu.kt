@@ -165,7 +165,7 @@ fun CustomDropdownMenu(
                         shape = RoundedCornerShape(16.dp)
                     ),
                 offset = pressOffset.copy(
-                    x = pressOffset.x - widthDp,
+                    x = pressOffset.x - widthDp - 16.dp,
                     y = 0.dp
                 )
             ) {

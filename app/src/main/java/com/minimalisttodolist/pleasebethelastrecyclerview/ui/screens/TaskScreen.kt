@@ -2,18 +2,14 @@ package com.minimalisttodolist.pleasebethelastrecyclerview.ui.screens
 
 import android.os.Build
 import androidx.annotation.RequiresApi
-import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.Animatable
-import androidx.compose.animation.core.Spring
-import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
-import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.background
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
@@ -22,19 +18,17 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Lightbulb
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.outlined.Add
-import androidx.compose.material.icons.outlined.CheckCircle
-import androidx.compose.material.icons.outlined.RadioButtonUnchecked
 import androidx.compose.material.icons.rounded.Star
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -44,9 +38,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextAlign
@@ -124,6 +118,7 @@ fun TaskScreen(
                             onAppEvent(AppEvent.ShowTutorialDialog)
                         },
                         elevation = FloatingActionButtonDefaults.elevation(0.dp, 0.dp, 0.dp, 0.dp),
+//                        elevation = FloatingActionButtonDefaults.elevation(),
                         modifier = Modifier
                             .clip(shape = RoundedCornerShape(percent = 50))
                             .border(
@@ -135,13 +130,21 @@ fun TaskScreen(
                         containerColor = MaterialTheme.colorScheme.background,
                         contentColor = MaterialTheme.colorScheme.onBackground
                     ) {
-                        Icon(
-                            imageVector = Icons.Default.Lightbulb,
+                        Image(
+                            painter = painterResource(
+                                id = com.minimalisttodolist.pleasebethelastrecyclerview.R.drawable.light_bulb_dark
+                            ),
                             contentDescription = "Show Tutorial",
                             modifier = Modifier
                                 .padding(8.dp),
-                            tint = PriorityColor.PRIORITY1.getColor(darkTheme)
                         )
+//                        Icon(
+//                            imageVector = Icons.Default.Lightbulb,
+//                            contentDescription = "Show Tutorial",
+//                            modifier = Modifier
+//                                .padding(8.dp),
+//                            tint = PriorityColor.PRIORITY1.getColor(darkTheme)
+//                        )
                     }
                 } else {
                     Spacer(modifier = Modifier.weight(1f))
@@ -283,6 +286,46 @@ fun TaskScreen(
     }
 }
 
+@Composable
+fun FilterChip(filterText: String, onClearFilters: () -> Unit) {
+    Surface(
+        shape = RoundedCornerShape(16.dp),
+//        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.6f),
+//        color = MaterialTheme.colorScheme.primary.copy(alpha = 0.1f),
+        color = Color.Blue.copy(alpha = 0.15f),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.onBackground.copy(alpha = 0.25f)),
+        modifier = Modifier
+            .padding(horizontal = 4.dp, vertical = 8.dp)
+//            .wrapContentWidth(Alignment.Start)
+            .clickable(onClick = onClearFilters),
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+        ) {
+//            Icon(
+//                imageVector = Icons.Default.FilterList,
+//                contentDescription = "Active filters",
+//                tint = MaterialTheme.colorScheme.primary,
+//                modifier = Modifier.size(18.dp)
+//            )
+            Spacer(modifier = Modifier.width(8.dp))
+            Text(
+                text = filterText,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.primary
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+            Icon(
+                imageVector = Icons.Default.Close,
+                contentDescription = "Clear filters",
+                tint = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.size(18.dp)
+            )
+        }
+    }
+}
+
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun TaskList(onEvent: (TaskEvent) -> Unit, onClearFilters: () -> Unit, taskState: TaskState, viewModel: TaskViewModel, padding: PaddingValues, dataStoreViewModel: DataStoreViewModel) {
@@ -314,12 +357,16 @@ fun TaskList(onEvent: (TaskEvent) -> Unit, onClearFilters: () -> Unit, taskState
                 Text(
                     text = filterText,
                     style = MaterialTheme.typography.bodyMedium,
-                    textAlign = TextAlign.Start,
+                    textAlign = TextAlign.Center,
                     modifier = Modifier
                         .fillMaxWidth()
                         .clickable { onClearFilters() }
                         .padding(horizontal = 32.dp, vertical = 8.dp)
                 )
+//                Row {
+//                    FilterChip(filterText = filterText) { onClearFilters() }
+//                    FilterChip(filterText = "Today") { onClearFilters() }
+//                }
             }
             AnimatedVisibility(
                 visible = filterText.isEmpty()
