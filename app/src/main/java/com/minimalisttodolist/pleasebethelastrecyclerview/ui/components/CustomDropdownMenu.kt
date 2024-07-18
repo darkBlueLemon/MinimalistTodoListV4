@@ -1,5 +1,6 @@
 package com.minimalisttodolist.pleasebethelastrecyclerview.ui.components
 
+import android.util.Log
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -26,6 +27,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontStyle
@@ -58,7 +60,6 @@ fun <T : Enum<T>> FilterSelector(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-//            .clickable { expanded = true }
             .onSizeChanged { with (density) { itemHeight = it.height.toDp() } }
             .pointerInput(true) {
                 detectTapGestures (
@@ -125,6 +126,9 @@ fun CustomDropdownMenu(
     pressOffset: DpOffset = DpOffset.Zero,
     content: @Composable () -> Unit
 ) {
+    val density = LocalDensity.current
+    var widthDp by remember { mutableStateOf(0.dp) }
+
     Box {
         MaterialTheme(
             colorScheme = MaterialTheme.colorScheme,
@@ -134,6 +138,10 @@ fun CustomDropdownMenu(
                 expanded = expanded,
                 onDismissRequest = onDismissRequest,
                 modifier = Modifier
+                    .onGloballyPositioned { coordinates ->
+                        widthDp = with(density) { coordinates.size.width.toDp() }
+                        Log.d("MYTAG", pressOffset.x.toString())
+                    }
                     .clip(RoundedCornerShape(16.dp))
                     .background(MaterialTheme.colorScheme.background)
                     .border(
@@ -141,7 +149,9 @@ fun CustomDropdownMenu(
                         color = MaterialTheme.colorScheme.onBackground,
                         shape = RoundedCornerShape(16.dp)
                     ),
-                offset = pressOffset
+                offset = pressOffset.copy(
+                    x = pressOffset.x - (widthDp/2),
+                )
             ) {
                 content()
             }
