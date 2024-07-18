@@ -249,11 +249,11 @@ fun HistoryItem(
                 text = deletedTask.title,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
-                style = MaterialTheme.typography.bodyLarge,
+                style = MaterialTheme.typography.titleLarge,
             )
             Text(
                 text = viewModel.formatDueDateWithDateTime(deletedTask.deletedAt),
-                style = MaterialTheme.typography.bodyLarge,
+                style = MaterialTheme.typography.bodySmall,
             )
         }
         Box {
