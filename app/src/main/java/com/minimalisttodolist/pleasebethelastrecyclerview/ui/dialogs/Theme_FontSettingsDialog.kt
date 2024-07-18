@@ -35,11 +35,14 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.minimalisttodolist.pleasebethelastrecyclerview.data.model.ClockType
 import com.minimalisttodolist.pleasebethelastrecyclerview.data.model.FontFamilyType
+import com.minimalisttodolist.pleasebethelastrecyclerview.data.model.FontWeightType
 import com.minimalisttodolist.pleasebethelastrecyclerview.data.model.ThemeType
 import com.minimalisttodolist.pleasebethelastrecyclerview.ui.components.CompleteIconWithoutDelay
 import com.minimalisttodolist.pleasebethelastrecyclerview.ui.components.CustomBox
 import com.minimalisttodolist.pleasebethelastrecyclerview.ui.components.CustomDropdownMenu
+import com.minimalisttodolist.pleasebethelastrecyclerview.ui.components.FilterSelector
 import com.minimalisttodolist.pleasebethelastrecyclerview.viewmodel.DataStoreViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -65,9 +68,18 @@ fun Theme_FontSettingsDialog(
                 verticalArrangement = Arrangement.spacedBy(6.dp)
             ) {
                 Theme_FontOptionsTitle(onBack = onBack)
-                ThemeSelector(dataStoreViewModel = dataStoreViewModel)
-                FontFamilySelector(dataStoreViewModel = dataStoreViewModel)
-                FontWeightSelector(dataStoreViewModel = dataStoreViewModel)
+                ThemeSelector(
+                    dataStoreViewModel = dataStoreViewModel,
+                    onThemeTypeChange = { dataStoreViewModel.saveTheme(it) }
+                )
+                FontFamilySelector(
+                    dataStoreViewModel = dataStoreViewModel,
+                    onFontFamilyChange = { dataStoreViewModel.saveFontFamily(it) }
+                )
+                FontWeightSelector(
+                    dataStoreViewModel = dataStoreViewModel,
+                    onFontWeightChange = { dataStoreViewModel.saveFontWeight(it) }
+                )
                 FontSizeSelector(dataStoreViewModel = dataStoreViewModel)
             }
         }
@@ -80,7 +92,6 @@ fun Theme_FontOptionsTitle(modifier: Modifier = Modifier, onBack: () -> Unit) {
         modifier = Modifier
             .fillMaxWidth()
             .height(IntrinsicSize.Max)
-//            .padding(8.dp)
             .padding(top = 12.dp, bottom = 12.dp)
     ) {
         Icon(
@@ -103,196 +114,55 @@ fun Theme_FontOptionsTitle(modifier: Modifier = Modifier, onBack: () -> Unit) {
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class, ExperimentalAnimationApi::class)
 @Composable
 fun ThemeSelector(
+    onThemeTypeChange: (ThemeType) -> Unit,
     dataStoreViewModel: DataStoreViewModel
 ) {
-    val theme by dataStoreViewModel.theme.collectAsState()
-    var expanded by remember { mutableStateOf(false) }
-
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable { expanded = !expanded }
-            .padding(top = 16.dp, bottom = 16.dp)
-        ,
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Text(
-            text = "Theme",
-            style = MaterialTheme.typography.bodyLarge,
-        )
-        Text(
-            text = theme.toDisplayString(),
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.tertiary,
-            fontStyle = FontStyle.Italic,
-        )
-    }
-
-    CustomDropdownMenu(
-        expanded = expanded,
-        onDismissRequest = {
-            expanded = false
-        },
-    ) {
-        ThemeType.entries.forEach { themeType ->
-            Row(
-                horizontalArrangement = Arrangement.Start,
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier
-                    .padding(start = 12.dp, end = 25.dp)
-                    .combinedClickable(
-                        indication = null,
-                        interactionSource = remember { MutableInteractionSource() },
-                        onClick = {
-                            dataStoreViewModel.saveTheme(themeType)
-                        }
-                    )
-            ) {
-                CompleteIconWithoutDelay(isChecked = theme == themeType)
-                Text(
-                    themeType.toDisplayString(),
-                    style = MaterialTheme.typography.bodyLarge
-                )
-            }
-        }
-    }
+    FilterSelector(
+        title = "Theme",
+        onFilterChange = onThemeTypeChange,
+        dataStoreViewModel = dataStoreViewModel,
+        filterOptions = ThemeType.entries.toList(),
+        getDisplayString = { it.toDisplayString() },
+        saveFilter = { vm, filter -> vm.saveTheme(filter) },
+        collectFilter = { it.theme },
+        initialValue = ThemeType.DARK
+    )
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun FontFamilySelector(
-    modifier: Modifier = Modifier,
+    onFontFamilyChange: (FontFamilyType) -> Unit,
     dataStoreViewModel: DataStoreViewModel
 ) {
-    val fontFamily by dataStoreViewModel.fontFamily.collectAsState()
-    var expanded by remember { mutableStateOf(false) }
-
-    Row (
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable { expanded = true }
-            .padding(top = 12.dp, bottom = 12.dp),
-        horizontalArrangement = Arrangement.SpaceBetween
-    ) {
-        Text(
-            text = "Font Family",
-            style = MaterialTheme.typography.bodyLarge
-        )
-        Text(
-            text = fontFamily.toDisplayString(),
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.tertiary,
-            fontStyle = FontStyle.Italic
-        )
-    }
-
-    CustomDropdownMenu(
-        expanded = expanded,
-        onDismissRequest = {
-            expanded = false
-        },
-    ) {
-        FontFamilyType.entries.forEach { fontFamilyType ->
-            Row(
-                horizontalArrangement = Arrangement.Start,
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier
-                    .padding(start = 12.dp, end = 25.dp)
-                    .combinedClickable(
-                        indication = null,
-                        interactionSource = remember { MutableInteractionSource() },
-                        onClick = {
-                            dataStoreViewModel.saveFontFamily(fontFamilyType)
-                        }
-                    )
-            ) {
-                CompleteIconWithoutDelay(isChecked = fontFamily == fontFamilyType)
-                Text(
-                    fontFamilyType.toDisplayString(),
-                    style = MaterialTheme.typography.bodyLarge,
-                    fontFamily = fontFamilyType.getFontFamily()
-                )
-            }
-        }
-    }
+    FilterSelector(
+        title = "Font Family",
+        onFilterChange = onFontFamilyChange,
+        dataStoreViewModel = dataStoreViewModel,
+        filterOptions = FontFamilyType.entries.toList(),
+        getDisplayString = { it.toDisplayString() },
+        saveFilter = { vm, filter -> vm.saveFontFamily(filter) },
+        collectFilter = { it.fontFamily },
+        initialValue = FontFamilyType.DEFAULT
+    )
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun FontWeightSelector(
+    onFontWeightChange: (FontWeightType) -> Unit,
     dataStoreViewModel: DataStoreViewModel
 ) {
-    val fontWeight by dataStoreViewModel.fontWeight.collectAsState()
-    val fontWeights = listOf(
-//        FontWeight.W100,
-//        FontWeight.W200,
-        FontWeight.W300,
-        FontWeight.W400,
-//        FontWeight.W500,
-//        FontWeight.W600,
-        FontWeight.W700,
-//        FontWeight.W800,
-//        FontWeight.W900
+    FilterSelector(
+        title = "Font Weight",
+        onFilterChange = onFontWeightChange,
+        dataStoreViewModel = dataStoreViewModel,
+        filterOptions = FontWeightType.entries.toList(),
+        getDisplayString = { it.toDisplayString() },
+        saveFilter = { vm, filter -> vm.saveFontWeight(filter) },
+        collectFilter = { it.fontWeight },
+        initialValue = FontWeightType.LIGHT
     )
-//    val fontWeights = listOf(
-//        FontWeight.Thin, FontWeight.Light, FontWeight.Normal,
-//        FontWeight.Medium, FontWeight.Bold, FontWeight.Black
-//    )
-    var expanded by remember { mutableStateOf(false) }
-
-    Row (
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable { expanded = true }
-            .padding(top = 12.dp, bottom = 12.dp)
-        ,
-        horizontalArrangement = Arrangement.SpaceBetween
-    ) {
-        Text(
-            text = "Font Weight",
-            style = MaterialTheme.typography.bodyLarge
-        )
-        Text(
-            text = fontWeight.toDisplayString(),
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.tertiary,
-            fontStyle = FontStyle.Italic
-        )
-    }
-
-    CustomDropdownMenu(
-        expanded = expanded,
-        onDismissRequest = {
-            expanded = false
-        },
-    ) {
-        fontWeights.forEach { fontWeightType ->
-            Row(
-                horizontalArrangement = Arrangement.Start,
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier
-                    .padding(start = 12.dp, end = 25.dp)
-                    .combinedClickable(
-                        indication = null,
-                        interactionSource = remember { MutableInteractionSource() },
-                        onClick = {
-                            dataStoreViewModel.saveFontWeight(fontWeightType)
-                        }
-                    )
-            ) {
-                CompleteIconWithoutDelay(isChecked = fontWeight == fontWeightType)
-                Text(
-                    fontWeightType.toDisplayString(),
-                    style = MaterialTheme.typography.bodyLarge,
-                    fontWeight = fontWeightType
-                )
-            }
-        }
-    }
 }
 
 @Composable

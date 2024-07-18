@@ -12,6 +12,7 @@ import com.minimalisttodolist.pleasebethelastrecyclerview.data.model.ClockType
 import com.minimalisttodolist.pleasebethelastrecyclerview.data.model.DueDateFilterType
 import com.minimalisttodolist.pleasebethelastrecyclerview.data.model.FirstDayOfTheWeekType
 import com.minimalisttodolist.pleasebethelastrecyclerview.data.model.FontFamilyType
+import com.minimalisttodolist.pleasebethelastrecyclerview.data.model.FontWeightType
 import com.minimalisttodolist.pleasebethelastrecyclerview.data.model.RecurrenceType
 import com.minimalisttodolist.pleasebethelastrecyclerview.data.model.SortType
 import com.minimalisttodolist.pleasebethelastrecyclerview.data.model.ThemeType
@@ -68,8 +69,8 @@ class AppPreferences private constructor(context: Context) {
         preferences[PreferencesKeys.FONT_SIZE] ?: 16
     }
 
-    val fontWeight: Flow<String> = dataStore.data.map { preferences ->
-        preferences[PreferencesKeys.FONT_WEIGHT] ?: "Light"
+    val fontWeight: Flow<FontWeightType> = dataStore.data.map { preferences ->
+        FontWeightType.fromDisplayName(preferences[PreferencesKeys.FONT_WEIGHT] ?: FontWeightType.LIGHT.displayName)
     }
 
     val priorityOption: Flow<SortType> = dataStore.data.map { preferences ->
@@ -119,8 +120,8 @@ class AppPreferences private constructor(context: Context) {
         dataStore.edit { preferences -> preferences[PreferencesKeys.FONT_SIZE] = fontSize }
     }
 
-    suspend fun saveFontWeight(fontWeight: String) {
-        dataStore.edit { preferences -> preferences[PreferencesKeys.FONT_WEIGHT] = fontWeight }
+    suspend fun saveFontWeight(fontWeight: FontWeightType) {
+        dataStore.edit { preferences -> preferences[PreferencesKeys.FONT_WEIGHT] = fontWeight.displayName}
     }
 
     suspend fun savePriority(priority: SortType) {

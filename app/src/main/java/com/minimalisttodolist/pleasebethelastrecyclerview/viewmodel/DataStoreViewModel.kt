@@ -8,6 +8,7 @@ import com.minimalisttodolist.pleasebethelastrecyclerview.data.model.ClockType
 import com.minimalisttodolist.pleasebethelastrecyclerview.data.model.DueDateFilterType
 import com.minimalisttodolist.pleasebethelastrecyclerview.data.model.FirstDayOfTheWeekType
 import com.minimalisttodolist.pleasebethelastrecyclerview.data.model.FontFamilyType
+import com.minimalisttodolist.pleasebethelastrecyclerview.data.model.FontWeightType
 import com.minimalisttodolist.pleasebethelastrecyclerview.data.model.RecurrenceType
 import com.minimalisttodolist.pleasebethelastrecyclerview.data.model.SortType
 import com.minimalisttodolist.pleasebethelastrecyclerview.data.preferences.AppPreferences
@@ -34,9 +35,9 @@ class DataStoreViewModel(private val appPreferences: AppPreferences) : ViewModel
     val fontSize: StateFlow<Int> = appPreferences.fontSize
         .stateIn(viewModelScope, SharingStarted.Eagerly, 16)
 
-    val fontWeight: StateFlow<FontWeight> = appPreferences.fontWeight
-        .map { fontWeightFromDisplayName(it) }
-        .stateIn(viewModelScope, SharingStarted.Eagerly, FontWeight.Light)
+    val fontWeight: StateFlow<FontWeightType> = appPreferences.fontWeight
+        .map { it }
+        .stateIn(viewModelScope, SharingStarted.Eagerly, FontWeightType.LIGHT)
 
     val priorityOption: StateFlow<SortType> = appPreferences.priorityOption
         .map { it }
@@ -74,8 +75,8 @@ class DataStoreViewModel(private val appPreferences: AppPreferences) : ViewModel
         viewModelScope.launch { appPreferences.saveFontSize(fontSize) }
     }
 
-    fun saveFontWeight(fontWeight: FontWeight) {
-        viewModelScope.launch { appPreferences.saveFontWeight(fontWeight.toDisplayString()) }
+    fun saveFontWeight(fontWeightType: FontWeightType) {
+        viewModelScope.launch { appPreferences.saveFontWeight(fontWeightType) }
     }
 
     fun savePriorityOption(priority: SortType) {

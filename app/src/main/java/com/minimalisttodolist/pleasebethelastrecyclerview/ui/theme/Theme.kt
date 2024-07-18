@@ -12,6 +12,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import com.minimalisttodolist.pleasebethelastrecyclerview.data.model.FontFamilyType
+import com.minimalisttodolist.pleasebethelastrecyclerview.data.model.FontWeightType
 
 private val LightColorScheme2 = lightColorScheme(
     primary = Black,
@@ -60,27 +61,27 @@ fun MinimalistTodoListV4Theme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     fontFamilyType: FontFamilyType = FontFamilyType.DEFAULT,
     baseFontSize: Int = 16,
-    fontWeight: FontWeight = FontWeight.Normal,
+    fontWeight: FontWeightType = FontWeightType.LIGHT,
     content: @Composable () -> Unit
 ) {
     val colorScheme = if (darkTheme) DarkColorScheme2 else LightColorScheme2
 
     val customTypography = Typography(
-        displayLarge = TextStyle(fontFamily = fontFamilyType.getFontFamily(), fontWeight = fontWeight, fontSize = (baseFontSize * 2.125).sp),
-        displayMedium = TextStyle(fontFamily = fontFamilyType.getFontFamily(), fontWeight = fontWeight, fontSize = (baseFontSize * 1.5).sp),
-        displaySmall = TextStyle(fontFamily = fontFamilyType.getFontFamily(), fontWeight = fontWeight, fontSize = (baseFontSize * 1.25).sp),
-        headlineLarge = TextStyle(fontFamily = fontFamilyType.getFontFamily(), fontWeight = fontWeight, fontSize = (baseFontSize * 2.0).sp),
-        headlineMedium = TextStyle(fontFamily = fontFamilyType.getFontFamily(), fontWeight = fontWeight, fontSize = (baseFontSize * 1.75).sp),
-        headlineSmall = TextStyle(fontFamily = fontFamilyType.getFontFamily(), fontWeight = fontWeight, fontSize = (baseFontSize * 1.5).sp),
-        titleLarge = TextStyle(fontFamily = fontFamilyType.getFontFamily(), fontWeight = fontWeight, fontSize = (baseFontSize * 1.25).sp),
-        titleMedium = TextStyle(fontFamily = fontFamilyType.getFontFamily(), fontWeight = fontWeight, fontSize = (baseFontSize * 1.0).sp),
-        titleSmall = TextStyle(fontFamily = fontFamilyType.getFontFamily(), fontWeight = fontWeight, fontSize = (baseFontSize * 0.875).sp),
-        bodyLarge = TextStyle(fontFamily = fontFamilyType.getFontFamily(), fontWeight = fontWeight, fontSize = (baseFontSize * 1.0).sp),
-        bodyMedium = TextStyle(fontFamily = fontFamilyType.getFontFamily(), fontWeight = fontWeight, fontSize = (baseFontSize * 0.875).sp),
-        bodySmall = TextStyle(fontFamily = fontFamilyType.getFontFamily(), fontWeight = fontWeight, fontSize = (baseFontSize * 0.75).sp),
-        labelLarge = TextStyle(fontFamily = fontFamilyType.getFontFamily(), fontWeight = fontWeight, fontSize = (baseFontSize * 0.875).sp),
-        labelMedium = TextStyle(fontFamily = fontFamilyType.getFontFamily(), fontWeight = fontWeight, fontSize = (baseFontSize * 0.75).sp),
-        labelSmall = TextStyle(fontFamily = fontFamilyType.getFontFamily(), fontWeight = fontWeight, fontSize = (baseFontSize * 0.625).sp)
+        displayLarge = TextStyle(fontFamily = fontFamilyType.getFontFamily(), fontWeight = fontWeight.getFontWeight(), fontSize = (baseFontSize * 2.125).sp),
+        displayMedium = TextStyle(fontFamily = fontFamilyType.getFontFamily(), fontWeight = fontWeight.getFontWeight(), fontSize = (baseFontSize * 1.5).sp),
+        displaySmall = TextStyle(fontFamily = fontFamilyType.getFontFamily(), fontWeight = fontWeight.getFontWeight(), fontSize = (baseFontSize * 1.25).sp),
+        headlineLarge = TextStyle(fontFamily = fontFamilyType.getFontFamily(), fontWeight = fontWeight.getFontWeight(), fontSize = (baseFontSize * 2.0).sp),
+        headlineMedium = TextStyle(fontFamily = fontFamilyType.getFontFamily(), fontWeight = fontWeight.getFontWeight(), fontSize = (baseFontSize * 1.75).sp),
+        headlineSmall = TextStyle(fontFamily = fontFamilyType.getFontFamily(), fontWeight = fontWeight.getFontWeight(), fontSize = (baseFontSize * 1.5).sp),
+        titleLarge = TextStyle(fontFamily = fontFamilyType.getFontFamily(), fontWeight = fontWeight.getFontWeight(), fontSize = (baseFontSize * 1.25).sp),
+        titleMedium = TextStyle(fontFamily = fontFamilyType.getFontFamily(), fontWeight = fontWeight.getFontWeight(), fontSize = (baseFontSize * 1.0).sp),
+        titleSmall = TextStyle(fontFamily = fontFamilyType.getFontFamily(), fontWeight = fontWeight.getFontWeight(), fontSize = (baseFontSize * 0.875).sp),
+        bodyLarge = TextStyle(fontFamily = fontFamilyType.getFontFamily(), fontWeight = fontWeight.getFontWeight(), fontSize = (baseFontSize * 1.0).sp),
+        bodyMedium = TextStyle(fontFamily = fontFamilyType.getFontFamily(), fontWeight = fontWeight.getFontWeight(), fontSize = (baseFontSize * 0.875).sp),
+        bodySmall = TextStyle(fontFamily = fontFamilyType.getFontFamily(), fontWeight = fontWeight.getFontWeight(), fontSize = (baseFontSize * 0.75).sp),
+        labelLarge = TextStyle(fontFamily = fontFamilyType.getFontFamily(), fontWeight = fontWeight.getFontWeight(), fontSize = (baseFontSize * 0.875).sp),
+        labelMedium = TextStyle(fontFamily = fontFamilyType.getFontFamily(), fontWeight = fontWeight.getFontWeight(), fontSize = (baseFontSize * 0.75).sp),
+        labelSmall = TextStyle(fontFamily = fontFamilyType.getFontFamily(), fontWeight = fontWeight.getFontWeight(), fontSize = (baseFontSize * 0.625).sp)
     )
 
     CompositionLocalProvider(LocalDarkTheme provides darkTheme) {
