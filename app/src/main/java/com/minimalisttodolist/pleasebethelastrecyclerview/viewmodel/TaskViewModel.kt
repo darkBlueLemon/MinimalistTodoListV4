@@ -14,6 +14,7 @@ import com.minimalisttodolist.pleasebethelastrecyclerview.data.model.RecurrenceT
 import com.minimalisttodolist.pleasebethelastrecyclerview.data.model.SortType
 import com.minimalisttodolist.pleasebethelastrecyclerview.data.model.Task
 import com.minimalisttodolist.pleasebethelastrecyclerview.data.database.TaskDao
+import com.minimalisttodolist.pleasebethelastrecyclerview.data.model.ClockType
 import com.minimalisttodolist.pleasebethelastrecyclerview.data.model.DueDateFilterType
 import com.minimalisttodolist.pleasebethelastrecyclerview.data.model.FirstDayOfTheWeekType
 import com.minimalisttodolist.pleasebethelastrecyclerview.util.calculateNextDueDate
@@ -368,11 +369,20 @@ class TaskViewModel(
 
     @RequiresApi(Build.VERSION_CODES.O)
     fun formatDueDateWithDateTime(epochMilli: Long?): String {
-        val formatter = DateTimeFormatter.ofPattern("MMM dd, yyyy HH:mm")
+        val formatter = when (dataStoreViewModel.clockType.value) {
+            ClockType.TWELVE_HOUR -> DateTimeFormatter.ofPattern("MMM dd, yyyy hh:mm a")
+            ClockType.TWENTY_FOUR_HOUR -> DateTimeFormatter.ofPattern("MMM dd, yyyy HH:mm")
+        }
         val dateFormatterWithoutTime = DateTimeFormatter.ofPattern("MMM dd, yyyy")
         val dateFormatterCurrentYear = DateTimeFormatter.ofPattern("MMM dd")
-        val dateTimeFormatterCurrentYear = DateTimeFormatter.ofPattern("MMM dd HH:mm")
-        val timeFormatter = DateTimeFormatter.ofPattern("HH:mm")
+        val dateTimeFormatterCurrentYear = when (dataStoreViewModel.clockType.value) {
+            ClockType.TWELVE_HOUR -> DateTimeFormatter.ofPattern("MMM dd hh:mm a")
+            ClockType.TWENTY_FOUR_HOUR -> DateTimeFormatter.ofPattern("MMM dd HH:mm")
+        }
+        val timeFormatter = when (dataStoreViewModel.clockType.value) {
+            ClockType.TWELVE_HOUR -> DateTimeFormatter.ofPattern("hh:mm a")
+            ClockType.TWENTY_FOUR_HOUR -> DateTimeFormatter.ofPattern("HH:mm")
+        }
         val currentYear = LocalDateTime.now().year
         val today = LocalDateTime.now().toLocalDate()
         val yesterday = today.minusDays(1)
@@ -421,7 +431,10 @@ class TaskViewModel(
 
     @RequiresApi(Build.VERSION_CODES.O)
     fun formatDueDateWithTimeOnly(epochMilli: Long?): String {
-        val timeFormatter = DateTimeFormatter.ofPattern("HH:mm")
+        val timeFormatter = when (dataStoreViewModel.clockType.value) {
+            ClockType.TWELVE_HOUR -> DateTimeFormatter.ofPattern("hh:mm a")
+            ClockType.TWENTY_FOUR_HOUR -> DateTimeFormatter.ofPattern("HH:mm")
+        }
         epochMilli ?: return ""
         val dateTime = Instant.ofEpochMilli(epochMilli).atZone(ZoneId.systemDefault()).toLocalDateTime()
         if (dateTime.hour == 0 && dateTime.minute == 0) {
