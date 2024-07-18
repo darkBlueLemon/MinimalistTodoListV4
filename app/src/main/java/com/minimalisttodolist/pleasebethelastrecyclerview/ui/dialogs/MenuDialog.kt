@@ -58,7 +58,6 @@ import com.minimalisttodolist.pleasebethelastrecyclerview.data.model.RecurrenceT
 import com.minimalisttodolist.pleasebethelastrecyclerview.data.model.SortType
 import com.minimalisttodolist.pleasebethelastrecyclerview.ui.components.CompleteIconWithoutDelay
 import com.minimalisttodolist.pleasebethelastrecyclerview.ui.components.CustomBox
-import com.minimalisttodolist.pleasebethelastrecyclerview.ui.components.CustomDropdownMenu
 import com.minimalisttodolist.pleasebethelastrecyclerview.ui.components.FilterSelector
 import com.minimalisttodolist.pleasebethelastrecyclerview.util.darkIcon
 import com.minimalisttodolist.pleasebethelastrecyclerview.util.lightIcon
