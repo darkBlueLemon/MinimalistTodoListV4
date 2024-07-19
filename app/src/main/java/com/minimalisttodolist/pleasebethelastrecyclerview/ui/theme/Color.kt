@@ -21,8 +21,8 @@ val DateRed = Color(0xFFCB273C)
 
 val TranslucentCompleteIconDark = Color(0x33FFFFFF)
 val TranslucentCompleteIconLight = Color(0x33000000)
-val TranslucentDark = Color(0x73FFFFFF)
-val TranslucentLight = Color(0x73000000)
+val TranslucentDark = Color(0x8FFFFFFF)
+val TranslucentLight = Color(0x8F000000)
 
 val BulletSecondaryLight = Color.LightGray
 val BulletSecondaryDark = Color.Gray
