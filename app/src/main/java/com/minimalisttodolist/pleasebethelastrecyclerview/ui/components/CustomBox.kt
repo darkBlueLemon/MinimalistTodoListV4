@@ -15,6 +15,7 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun CustomBox(
+    modifier: Modifier = Modifier,
     backgroundColor: Color = MaterialTheme.colorScheme.background,
     borderColor: Color = MaterialTheme.colorScheme.onBackground,
     borderWidth: Dp = 2.dp,
@@ -22,7 +23,7 @@ fun CustomBox(
     content: @Composable () -> Unit
 ) {
     Box(
-        modifier = Modifier
+        modifier = modifier
             .clip(RoundedCornerShape(percent = cornerRadiusPercent))
             .background(backgroundColor)
             .border(
