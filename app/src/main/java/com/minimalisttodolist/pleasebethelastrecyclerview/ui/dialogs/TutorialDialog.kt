@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -92,75 +93,84 @@ fun Tutorial(
                     style = MaterialTheme.typography.bodySmall,
                 )
 
-                HorizontalPager(
-                    state = pagerState,
-                    modifier = Modifier.fillMaxWidth()
-                ) { page ->
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .then(
-                                when (page) {
-                                    0 -> {
-                                        Modifier.clickable {
-                                            vibrate(context, strength = 1)
-                                            onShowAddTaskDialog()
+                // Set a fixed height for the content area
+                Box(modifier = Modifier.height(100.dp)) {
+                    HorizontalPager(
+                        state = pagerState,
+                        modifier = Modifier.fillMaxSize()
+                    ) { page ->
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .then(
+                                    when (page) {
+                                        0 -> {
+                                            Modifier.clickable {
+                                                vibrate(context, strength = 1)
+                                                onShowAddTaskDialog()
+                                            }
                                         }
-                                    }
-                                    1 -> {
-                                        Modifier.combinedClickable(
+
+                                        1 -> {
+                                            Modifier.combinedClickable(
                                                 onLongClick = {
                                                     vibrate(context = context, strength = 1)
                                                     onShowMenuDialog()
                                                 },
                                                 onClick = { }
                                             )
-                                    }
-                                    2 -> {
-                                        Modifier.clickable {
-                                            vibrate(context = context, strength = 1)
-                                            onShowAddTaskDialog()
+                                        }
+
+                                        2 -> {
+                                            Modifier.clickable {
+                                                vibrate(context = context, strength = 1)
+                                                onShowAddTaskDialog()
+                                            }
+                                        }
+
+                                        else -> {
+                                            Modifier
                                         }
                                     }
-                                    else -> { Modifier }
+                                ),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.spacedBy(24.dp)
+                        ) {
+                            when (page) {
+                                0 -> {
+                                    AnimatedClickIcon()
                                 }
+
+                                1 -> {
+                                    AnimatedLongPressIcon()
+                                }
+
+                                2 -> {
+                                    val task = Task(
+                                        title = "Task",
+                                        priority = 3,
+                                        note = "Note",
+                                        recurrenceType = RecurrenceType.WEEKLY,
+                                        dueDate = null
+                                    )
+                                    TutorialTaskItem(
+                                        onEdit = {
+                                            onEdit(task)
+                                            onDismiss()
+                                        },
+                                        onDelete = {},
+                                        task = task,
+                                        viewModel = viewModel
+                                    )
+                                }
+                            }
+                            Text(
+                                text = steps[page],
+                                color = MaterialTheme.colorScheme.primary,
+                                style = MaterialTheme.typography.bodyLarge,
+                                textAlign = TextAlign.Center
                             )
-                        ,
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.spacedBy(24.dp)
-                    ) {
-                        when (page) {
-                            0 -> {
-                                AnimatedClickIcon()
-                            }
-                            1 -> {
-                                AnimatedLongPressIcon()
-                            }
-                            2 -> {
-                                val task = Task(
-                                    title = "Task",
-                                    priority = 3,
-                                    note = "Note",
-                                    recurrenceType = RecurrenceType.WEEKLY,
-                                    dueDate = null
-                                )
-                                TutorialTaskItem(
-                                    onEdit = {
-                                        onEdit(task)
-                                        onDismiss()
-                                    },
-                                    onDelete = {},
-                                    task = task,
-                                    viewModel = viewModel
-                                )
-                            }
                         }
-                        Text(
-                            text = steps[page],
-                            color = MaterialTheme.colorScheme.primary,
-                            style = MaterialTheme.typography.bodyLarge,
-                            textAlign = TextAlign.Center
-                        )
                     }
                 }
 
