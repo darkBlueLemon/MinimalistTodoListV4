@@ -299,7 +299,7 @@ fun HistoryItem(
                 onDismissRequest = {
                     expanded = false
                 },
-                pressOffset = DpOffset(x = 10.dp, y = (-42.0).dp)
+                pressOffset = DpOffset(x = 0.dp, y = (-42.0).dp)
             ) {
                 DropDownItem(
                     onRecoverClick = {
