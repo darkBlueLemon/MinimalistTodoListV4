@@ -143,7 +143,13 @@ fun FontFamilySelector(
         getDisplayString = { it.toDisplayString() },
         saveFilter = { vm, filter -> vm.saveFontFamily(filter) },
         collectFilter = { it.fontFamily },
-        initialValue = FontFamilyType.DEFAULT
+        initialValue = FontFamilyType.DEFAULT,
+        customDisplayContent = { option ->
+            Text(
+                text = option.toDisplayString(),
+                fontFamily = option.getFontFamily()
+            )
+        }
     )
 }
 
@@ -160,7 +166,13 @@ fun FontWeightSelector(
         getDisplayString = { it.toDisplayString() },
         saveFilter = { vm, filter -> vm.saveFontWeight(filter) },
         collectFilter = { it.fontWeight },
-        initialValue = FontWeightType.LIGHT
+        initialValue = FontWeightType.LIGHT,
+        customDisplayContent = { option ->
+            Text(
+                text = option.toDisplayString(),
+                fontWeight = option.getFontWeight()
+            )
+        }
     )
 }
 

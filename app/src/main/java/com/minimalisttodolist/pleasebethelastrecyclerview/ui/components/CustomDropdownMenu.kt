@@ -52,7 +52,8 @@ fun <T : Enum<T>> FilterSelector(
     getDisplayString: (T) -> String,
     saveFilter: (DataStoreViewModel, T) -> Unit,
     collectFilter: (DataStoreViewModel) -> Flow<T>,
-    initialValue: T
+    initialValue: T,
+    customDisplayContent: (@Composable (T) -> Unit)? = null
 ) {
     val filter by collectFilter(dataStoreViewModel).collectAsState(initial = initialValue)
     var expanded by remember { mutableStateOf(false) }
@@ -126,10 +127,14 @@ fun <T : Enum<T>> FilterSelector(
                     )
             ) {
                 CompleteIconWithoutDelay(isChecked = filter == filterOption)
-                Text(
-                    getDisplayString(filterOption),
-                    style = MaterialTheme.typography.bodyLarge
-                )
+                if (customDisplayContent != null) {
+                    customDisplayContent(filterOption)
+                } else {
+                    Text(
+                        text = getDisplayString(filterOption),
+                        style = MaterialTheme.typography.bodyLarge,
+                    )
+                }
             }
         }
     }
