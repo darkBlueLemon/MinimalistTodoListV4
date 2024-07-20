@@ -19,7 +19,10 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Lightbulb
 import androidx.compose.material.icons.outlined.Add
+import androidx.compose.material.icons.outlined.Lightbulb
+import androidx.compose.material.icons.rounded.Lightbulb
 import androidx.compose.material.icons.rounded.Star
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.FloatingActionButtonDefaults
@@ -39,6 +42,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
@@ -130,12 +134,11 @@ fun TaskScreen(
                         contentColor = MaterialTheme.colorScheme.onBackground
                     ) {
                         Image(
-                            painter = painterResource(
-                                id = com.minimalisttodolist.pleasebethelastrecyclerview.R.drawable.light_bulb_dark
-                            ),
+                            painter = painterResource( id = com.minimalisttodolist.pleasebethelastrecyclerview.R.drawable.light_bulb ),
                             contentDescription = "Show Tutorial",
                             modifier = Modifier
                                 .padding(8.dp),
+                            colorFilter = ColorFilter.tint(PriorityColor.PRIORITY1.getColor(darkTheme))
                         )
 //                        Icon(
 //                            imageVector = Icons.Default.Lightbulb,
