@@ -2,6 +2,7 @@ package com.minimalisttodolist.pleasebethelastrecyclerview.ui.dialogs
 
 import android.os.Build
 import androidx.annotation.RequiresApi
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.EaseOutExpo
 import androidx.compose.animation.core.animateFloatAsState
@@ -19,6 +20,7 @@ import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -223,67 +225,67 @@ fun PrioritySelector(
     var selectedPriority by remember { mutableStateOf(priorityFromEdit) }
     var isPrioritySelected by remember { mutableStateOf(priorityFromEdit != 0) }
 
-    AnimatedVisibility(
-        visible = isPrioritySelected || selectedPriority != 0,
-        enter = fadeIn(),
-        exit = fadeOut()
-    ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceEvenly,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 8.dp)
-        ) {
-            PriorityStar(index = 3, selectedPriority) { priority ->
-                selectedPriority = if(priority == selectedPriority) {
-                    0
-                } else {
-                    priority
+    AnimatedContent(
+        targetState = isPrioritySelected || selectedPriority != 0,
+        label = "Priority Selector Size Change Animation"
+    ) { targetState ->
+        if (targetState) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceEvenly,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 8.dp)
+            ) {
+                PriorityStar(index = 3, selectedPriority) { priority ->
+                    selectedPriority = if (priority == selectedPriority) {
+                        0
+                    } else {
+                        priority
+                    }
+                    onPriorityChange(TaskEvent.SetPriority(selectedPriority))
                 }
-                onPriorityChange(TaskEvent.SetPriority(selectedPriority))
-            }
-            PriorityStar(index = 2, selectedPriority) { priority ->
-                selectedPriority = if(priority == selectedPriority) {
-                    0
-                } else {
-                    priority
+                PriorityStar(index = 2, selectedPriority) { priority ->
+                    selectedPriority = if (priority == selectedPriority) {
+                        0
+                    } else {
+                        priority
+                    }
+                    onPriorityChange(TaskEvent.SetPriority(selectedPriority))
                 }
-                onPriorityChange(TaskEvent.SetPriority(selectedPriority))
-            }
-            PriorityStar(index = 1, selectedPriority) { priority ->
-                selectedPriority = if(priority == selectedPriority) {
-                    0
-                } else {
-                    priority
+                PriorityStar(index = 1, selectedPriority) { priority ->
+                    selectedPriority = if (priority == selectedPriority) {
+                        0
+                    } else {
+                        priority
+                    }
+                    onPriorityChange(TaskEvent.SetPriority(selectedPriority))
                 }
-                onPriorityChange(TaskEvent.SetPriority(selectedPriority))
             }
         }
-    }
-
-    if (!isPrioritySelected && selectedPriority == 0) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 15.dp)
-                .clickable {
-                    isPrioritySelected = true
-                },
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Icon(
-                imageVector = Icons.Rounded.Star,
-                tint = MaterialTheme.colorScheme.tertiary,
-                contentDescription = "Priority Toggle Icon",
-                modifier = Modifier.size(20.dp)
-            )
-            Text(
-                text = "Priority",
-                color = MaterialTheme.colorScheme.tertiary,
-                style = MaterialTheme.typography.bodyMedium,
-                modifier = Modifier.padding(15.dp)
-            )
+        else {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 15.dp)
+                    .clickable {
+                        isPrioritySelected = true
+                    },
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    imageVector = Icons.Rounded.Star,
+                    tint = MaterialTheme.colorScheme.tertiary,
+                    contentDescription = "Priority Toggle Icon",
+                    modifier = Modifier.size(20.dp)
+                )
+                Text(
+                    text = "Priority",
+                    color = MaterialTheme.colorScheme.tertiary,
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier.padding(15.dp)
+                )
+            }
         }
     }
 }
@@ -349,7 +351,6 @@ fun Note(modifier: Modifier = Modifier, taskState: TaskState, onEvent: (TaskEven
             ),
             textStyle = LocalTextStyle.current.copy(
             ),
-//            singleLine = true,
             maxLines = 3,
         )
     }
@@ -379,7 +380,6 @@ fun DateSelector(modifier: Modifier = Modifier, taskState: TaskState, onEvent: (
             modifier = Modifier
                 .padding(15.dp),
             color = if (text == emptyText) MaterialTheme.colorScheme.tertiary else MaterialTheme.colorScheme.primary,
-//            fontWeight = FontWeight.Light,
             style = MaterialTheme.typography.bodyMedium,
         )
     }
@@ -445,69 +445,67 @@ fun RecurrenceSelector(
     onRecurrenceTypeSelected: (RecurrenceType) -> Unit
 ) {
     var selectedRecurrenceType by remember { mutableStateOf(recurrenceFromEdit) }
-    var isRecurrenceSelected by remember { mutableStateOf(false) }
+    var isRecurrenceSelected by remember { mutableStateOf(recurrenceFromEdit != RecurrenceType.NONE) }
 
-    AnimatedVisibility(
-        visible = isRecurrenceSelected || selectedRecurrenceType != RecurrenceType.NONE,
-        enter = fadeIn(),
-        exit = fadeOut()
-    ) {
-        FlowRow(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 11.dp, bottom = 11.dp),
-            horizontalArrangement = Arrangement.Center,
-            verticalArrangement = Arrangement.Top,
-            maxItemsInEachRow = Int.MAX_VALUE // This is optional as it's the default value
-        ) {
-            RecurrenceType.entriesWithoutNONE.forEach { recurrenceType ->
-                Text(
-                    text = recurrenceType.toDisplayString(),
-                    style = MaterialTheme.typography.bodySmall,
-                    modifier = Modifier
-                        .clickable {
-                            selectedRecurrenceType = if (selectedRecurrenceType == recurrenceType) {
-                                RecurrenceType.NONE
-                            } else {
-                                recurrenceType
+    AnimatedContent(
+        targetState = isRecurrenceSelected || selectedRecurrenceType != RecurrenceType.NONE,
+        label = "Recurrence Selector Size Change Animation"
+    ) { targetState ->
+        if(targetState) {
+            FlowRow(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 11.dp, bottom = 11.dp),
+                horizontalArrangement = Arrangement.Center,
+                verticalArrangement = Arrangement.Top,
+            ) {
+                RecurrenceType.entriesWithoutNONE.forEach { recurrenceType ->
+                    Text(
+                        text = recurrenceType.toDisplayString(),
+                        style = MaterialTheme.typography.bodySmall,
+                        modifier = Modifier
+                            .clickable {
+                                selectedRecurrenceType = if (selectedRecurrenceType == recurrenceType) {
+                                    RecurrenceType.NONE
+                                } else {
+                                    recurrenceType
+                                }
+                                onRecurrenceTypeSelected(selectedRecurrenceType)
                             }
-                            onRecurrenceTypeSelected(selectedRecurrenceType)
-                        }
-                        .background(
-                            color = if (recurrenceType == selectedRecurrenceType) MaterialTheme.colorScheme.primary
-                            else Color.Transparent,
-                            shape = RoundedCornerShape(8.dp)
-                        )
-                        .padding(horizontal = 16.dp, vertical = 8.dp),
-                    color = if (recurrenceType == selectedRecurrenceType) MaterialTheme.colorScheme.onPrimary
-                    else MaterialTheme.colorScheme.primary,
+                            .background(
+                                color = if (recurrenceType == selectedRecurrenceType) MaterialTheme.colorScheme.primary
+                                else Color.Transparent,
+                                shape = RoundedCornerShape(8.dp)
+                            )
+                            .padding(horizontal = 16.dp, vertical = 8.dp),
+                        color = if (recurrenceType == selectedRecurrenceType) MaterialTheme.colorScheme.onPrimary
+                        else MaterialTheme.colorScheme.primary,
+                    )
+                }
+            }
+        } else {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = 15.dp, top = 4.dp, bottom = 4.dp)
+                    .clickable {
+                        isRecurrenceSelected = true
+                    },
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    imageVector = Icons.Rounded.Repeat,
+                    tint = MaterialTheme.colorScheme.tertiary,
+                    contentDescription = "Recurrence Toggle Icon",
+                    modifier = Modifier.size(20.dp)
+                )
+                Text(
+                    text = "Repeat",
+                    color = MaterialTheme.colorScheme.tertiary,
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier.padding(15.dp)
                 )
             }
-        }
-    }
-
-    if (!isRecurrenceSelected && selectedRecurrenceType == RecurrenceType.NONE) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(start = 15.dp, top = 4.dp, bottom = 4.dp)
-                .clickable {
-                    isRecurrenceSelected = true
-                },
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Icon(
-                imageVector = Icons.Rounded.Repeat,
-                tint = MaterialTheme.colorScheme.tertiary,
-                contentDescription = "Recurrence Toggle Icon",
-                modifier = Modifier.size(20.dp)
-            )
-            Text(
-                text = "Repeat",
-                color = MaterialTheme.colorScheme.tertiary,
-                style = MaterialTheme.typography.bodyMedium,
-                modifier = Modifier.padding(15.dp)
-            )
         }
     }
 }
