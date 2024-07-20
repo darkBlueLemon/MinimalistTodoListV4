@@ -63,7 +63,6 @@ class TaskViewModel(
 
     init {
         initializeDataStore()
-        observeDeletedTasks()
         reloadTasks()
     }
 
@@ -79,12 +78,6 @@ class TaskViewModel(
         }
         viewModelScope.launch {
             dataStoreViewModel.firstDayOfTheWeekType.collect { _firstDayOfTheWeek.value = it }
-        }
-    }
-
-    private fun observeDeletedTasks() {
-        viewModelScope.launch {
-            dao.getDeletedTasks().collect { _deletedTasks.value = it }
         }
     }
 
@@ -282,24 +275,34 @@ class TaskViewModel(
     @RequiresApi(Build.VERSION_CODES.O)
     fun reloadTasks() {
         viewModelScope.launch {
-            combine(_sortType, _recurrenceFilter, _dueDateFilterType) { sortType, recurrenceType, dueDateFilterType ->
-                Triple(sortType, recurrenceType, dueDateFilterType)
+            combine(
+                _sortType,
+                _recurrenceFilter,
+                _dueDateFilterType,
+                dao.getDeletedTasks()
+            ) { sortType, recurrenceType, dueDateFilterType, deletedTasks ->
+                Pair(Triple(sortType, recurrenceType, dueDateFilterType), deletedTasks)
             }
-                .flatMapLatest { (sortType, recurrenceType, dueDateFilterType) ->
+                .flatMapLatest { (triple, deletedTasks) ->
+                    val (sortType, recurrenceType, dueDateFilterType) = triple
                     when (sortType) {
                         SortType.ALPHABETICAL -> dao.getTasksOrderedAlphabetically()
                         SortType.ALPHABETICAL_REV -> dao.getTasksOrderedAlphabeticallyRev()
                         SortType.DUE_DATE -> dao.getTasksSortedByDueDate()
                         SortType.PRIORITY -> dao.getTasksSortedByPriority()
                     }.map { tasks ->
-                    tasks.filter { task ->
-                        (recurrenceType == RecurrenceType.NONE || task.recurrenceType == recurrenceType) &&
-                                    isWithinDueDateFilter(task, dueDateFilterType, _firstDayOfTheWeek.value)
-                        }
+                        Pair(
+                            tasks.filter { task ->
+                                (recurrenceType == RecurrenceType.NONE || task.recurrenceType == recurrenceType) &&
+                                        isWithinDueDateFilter(task, dueDateFilterType, _firstDayOfTheWeek.value)
+                            },
+                            deletedTasks
+                        )
                     }
                 }
-                .collect { tasks ->
-                    _tasks.value = tasks
+                .collect { (filteredTasks, deletedTasks) ->
+                    _tasks.value = filteredTasks
+                    _deletedTasks.value = deletedTasks
                 }
         }
     }
