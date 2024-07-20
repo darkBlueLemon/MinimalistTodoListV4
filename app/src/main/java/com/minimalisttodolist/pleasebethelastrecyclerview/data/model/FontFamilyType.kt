@@ -1,6 +1,7 @@
 package com.minimalisttodolist.pleasebethelastrecyclerview.data.model
 
 import androidx.compose.ui.text.font.FontFamily
+import com.minimalisttodolist.pleasebethelastrecyclerview.ui.theme.CustomFonts
 
 enum class FontFamilyType(val displayName: String) {
     DEFAULT("Default"),
@@ -19,11 +20,11 @@ enum class FontFamilyType(val displayName: String) {
 
     fun getFontFamily(): FontFamily {
         return when (this) {
-            DEFAULT -> FontFamily.Default
-            SERIF -> FontFamily.Serif
-            SANS_SERIF -> FontFamily.SansSerif
-            MONOSPACE -> FontFamily.Monospace
-            CURSIVE -> FontFamily.Cursive
+            DEFAULT -> CustomFonts.Default
+            SERIF -> CustomFonts.Serif
+            SANS_SERIF -> CustomFonts.SansSerif
+            MONOSPACE -> CustomFonts.Monospace
+            CURSIVE -> CustomFonts.Cursive
         }
     }
 }

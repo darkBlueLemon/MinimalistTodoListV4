@@ -1,34 +1,67 @@
 package com.minimalisttodolist.pleasebethelastrecyclerview.ui.theme
 
-import androidx.compose.material3.Typography
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.sp
+import androidx.compose.ui.text.googlefonts.Font
+import androidx.compose.ui.text.googlefonts.GoogleFont
+import com.minimalisttodolist.pleasebethelastrecyclerview.R
 
-// Set of Material typography styles to start with
-val Typography = Typography(
-    bodyLarge = TextStyle(
-        fontFamily = FontFamily.Default,
-        fontWeight = FontWeight.Normal,
-        fontSize = 16.sp,
-        lineHeight = 24.sp,
-        letterSpacing = 0.5.sp
+object CustomFonts {
+    private val provider = GoogleFont.Provider(
+        providerAuthority = "com.google.android.gms.fonts",
+        providerPackage = "com.google.android.gms",
+        certificates = R.array.com_google_android_gms_fonts_certs
     )
-    /* Other default text styles to override
-    titleLarge = TextStyle(
-        fontFamily = FontFamily.Default,
-        fontWeight = FontWeight.Normal,
-        fontSize = 22.sp,
-        lineHeight = 28.sp,
-        letterSpacing = 0.sp
-    ),
-    labelSmall = TextStyle(
-        fontFamily = FontFamily.Default,
-        fontWeight = FontWeight.Medium,
-        fontSize = 11.sp,
-        lineHeight = 16.sp,
-        letterSpacing = 0.5.sp
+
+    private val DefaultFont = GoogleFont("Open Sans")
+    private val SerifFont = GoogleFont("Playfair Display")
+    private val SansSerifFont = GoogleFont("Montserrat")
+    private val MonospaceFont = GoogleFont("Roboto Mono")
+    private val CursiveFont = GoogleFont("Dancing Script")
+
+    val Default = FontFamily(
+        Font(googleFont = DefaultFont, fontProvider = provider, weight = FontWeight.Light),
+        Font(googleFont = DefaultFont, fontProvider = provider, weight = FontWeight.Normal),
+        Font(googleFont = DefaultFont, fontProvider = provider, weight = FontWeight.Bold),
+        Font(googleFont = DefaultFont, fontProvider = provider, weight = FontWeight.Light, FontStyle.Italic),
+        Font(googleFont = DefaultFont, fontProvider = provider, weight = FontWeight.Normal, FontStyle.Italic),
+        Font(googleFont = DefaultFont, fontProvider = provider, weight = FontWeight.Bold, FontStyle.Italic),
     )
-    */
-)
+
+    val Serif = FontFamily(
+        Font(googleFont = SerifFont, fontProvider = provider, weight = FontWeight.Light),
+        Font(googleFont = SerifFont, fontProvider = provider, weight = FontWeight.Normal),
+        Font(googleFont = SerifFont, fontProvider = provider, weight = FontWeight.Bold),
+        Font(googleFont = SerifFont, fontProvider = provider, weight = FontWeight.Light, FontStyle.Italic),
+        Font(googleFont = SerifFont, fontProvider = provider, weight = FontWeight.Normal, FontStyle.Italic),
+        Font(googleFont = SerifFont, fontProvider = provider, weight = FontWeight.Bold, FontStyle.Italic),
+    )
+
+    val SansSerif = FontFamily(
+        Font(googleFont = SansSerifFont, fontProvider = provider, weight = FontWeight.Light),
+        Font(googleFont = SansSerifFont, fontProvider = provider, weight = FontWeight.Normal),
+        Font(googleFont = SansSerifFont, fontProvider = provider, weight = FontWeight.Bold),
+        Font(googleFont = SansSerifFont, fontProvider = provider, weight = FontWeight.Light, FontStyle.Italic),
+        Font(googleFont = SansSerifFont, fontProvider = provider, weight = FontWeight.Normal, FontStyle.Italic),
+        Font(googleFont = SansSerifFont, fontProvider = provider, weight = FontWeight.Bold, FontStyle.Italic),
+    )
+
+    val Monospace = FontFamily(
+        Font(googleFont = MonospaceFont, fontProvider = provider, weight = FontWeight.Light),
+        Font(googleFont = MonospaceFont, fontProvider = provider, weight = FontWeight.Normal),
+        Font(googleFont = MonospaceFont, fontProvider = provider, weight = FontWeight.Bold),
+        Font(googleFont = MonospaceFont, fontProvider = provider, weight = FontWeight.Light, FontStyle.Italic),
+        Font(googleFont = MonospaceFont, fontProvider = provider, weight = FontWeight.Normal, FontStyle.Italic),
+        Font(googleFont = MonospaceFont, fontProvider = provider, weight = FontWeight.Bold, FontStyle.Italic),
+    )
+
+    val Cursive = FontFamily(
+        Font(googleFont = CursiveFont, fontProvider = provider, weight = FontWeight.Light),
+        Font(googleFont = CursiveFont, fontProvider = provider, weight = FontWeight.Normal),
+        Font(googleFont = CursiveFont, fontProvider = provider, weight = FontWeight.Bold),
+        Font(googleFont = CursiveFont, fontProvider = provider, weight = FontWeight.Light, FontStyle.Italic),
+        Font(googleFont = CursiveFont, fontProvider = provider, weight = FontWeight.Normal, FontStyle.Italic),
+        Font(googleFont = CursiveFont, fontProvider = provider, weight = FontWeight.Bold, FontStyle.Italic),
+    )
+}

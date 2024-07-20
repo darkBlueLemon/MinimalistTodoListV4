@@ -98,4 +98,7 @@ dependencies {
 
     // Flow Row
     implementation (libs.androidx.foundation)
+
+    // Downloadable Fonts
+    implementation (libs.androidx.ui.text.google.fonts)
 }
