@@ -94,7 +94,7 @@ fun Tutorial(
                 )
 
                 // Set a fixed height for the content area
-                Box(modifier = Modifier.height(100.dp)) {
+                Box(modifier = Modifier.height(120.dp)) {
                     HorizontalPager(
                         state = pagerState,
                         modifier = Modifier.fillMaxSize()

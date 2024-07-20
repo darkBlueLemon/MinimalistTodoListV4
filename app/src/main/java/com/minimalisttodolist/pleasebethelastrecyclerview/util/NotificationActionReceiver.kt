@@ -50,6 +50,7 @@ class NotificationActionReceiver : BroadcastReceiver() {
                                 taskDao.deleteTask(task)
                                 taskDao.insertDeletedTask(
                                     DeletedTask(
+                                        id = taskId,
                                         title = task.title,
                                         priority = task.priority,
                                         note = task.note,

@@ -33,6 +33,8 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.Undo
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.DeleteForever
@@ -285,7 +287,7 @@ fun HistoryItem(
                 label = "history dialog more vert button"
             ) { targetExpanded ->
                 Icon(
-                    imageVector = if(!targetExpanded) Icons.Default.MoreVert else Icons.Default.Close,
+                    imageVector = if(!targetExpanded) Icons.Default.MoreVert else Icons.Default.ChevronRight,
                     contentDescription = "More options",
                     modifier = Modifier
                         .fillMaxHeight()
@@ -299,7 +301,7 @@ fun HistoryItem(
                 onDismissRequest = {
                     expanded = false
                 },
-                pressOffset = DpOffset(x = 0.dp, y = (-42.0).dp)
+                pressOffset = DpOffset(x = 0.dp, y = (-10).dp)
             ) {
                 DropDownItem(
                     onRecoverClick = {
@@ -319,34 +321,13 @@ fun HistoryItem(
 
 @Composable
 fun DropDownItem(modifier: Modifier = Modifier, onRecoverClick: () -> Unit, onDeleteClick: () -> Unit) {
-    Column(
+    Row (
         modifier = modifier
             .padding(start = 16.dp, end = 16.dp, top = 5.dp, bottom = 5.dp)
             .fillMaxHeight(),
-        verticalArrangement = Arrangement.spacedBy(5.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
+        horizontalArrangement = Arrangement.Center,
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        Column(
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Icon(
-                Icons.AutoMirrored.Outlined.Undo,
-                contentDescription = "Recover",
-                tint = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.clickable {
-                    onRecoverClick()
-                }
-            )
-            Text(
-                "Recover",
-                color = MaterialTheme.colorScheme.tertiary,
-                style = MaterialTheme.typography.bodySmall
-            )
-        }
-        Spacer(modifier = Modifier.width(15.dp))
-        HorizontalDivider()
-        Spacer(modifier = Modifier.width(15.dp))
         Column(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
@@ -361,6 +342,25 @@ fun DropDownItem(modifier: Modifier = Modifier, onRecoverClick: () -> Unit, onDe
             )
             Text(
                 "Delete",
+                color = MaterialTheme.colorScheme.tertiary,
+                style = MaterialTheme.typography.bodySmall
+            )
+        }
+        Spacer(modifier = Modifier.width(24.dp))
+        Column(
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Icon(
+                Icons.AutoMirrored.Outlined.Undo,
+                contentDescription = "Recover",
+                tint = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.clickable {
+                    onRecoverClick()
+                }
+            )
+            Text(
+                "Recover",
                 color = MaterialTheme.colorScheme.tertiary,
                 style = MaterialTheme.typography.bodySmall
             )
