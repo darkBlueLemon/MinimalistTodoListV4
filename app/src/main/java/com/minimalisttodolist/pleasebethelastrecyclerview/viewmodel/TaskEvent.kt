@@ -22,7 +22,7 @@ sealed interface TaskEvent {
     // Date Picker
     data object ShowDatePicker : TaskEvent
     data object HideDatePicker : TaskEvent
-    data class SetDueDate(val dueDate: LocalDate) : TaskEvent
+    data class SetDueDate(val dueDate: LocalDate?) : TaskEvent
 
     // Time Picker
     data object ShowTimePicker : TaskEvent

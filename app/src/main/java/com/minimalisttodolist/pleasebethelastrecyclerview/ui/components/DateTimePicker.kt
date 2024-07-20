@@ -59,13 +59,13 @@ import java.time.ZoneOffset
 @Composable
 fun DatePicker(
     modifier: Modifier = Modifier,
-    onDateSelected: (LocalDate) -> Unit,
+    onDateSelected: (LocalDate?) -> Unit,
     closeSelection: () -> Unit,
     initialDate: LocalDate
 ) {
     val initialMillis = initialDate.atStartOfDay(ZoneOffset.UTC).toInstant().toEpochMilli()
     val datePickerState = rememberDatePickerState(initialSelectedDateMillis = initialMillis)
-    val dialogButtonsPadding = PaddingValues(bottom = 8.dp, end = 6.dp)
+    val dialogButtonsPadding = PaddingValues(bottom = 8.dp, end = 18.dp)
 
     BasicAlertDialog(
         onDismissRequest = { closeSelection() },
@@ -79,7 +79,6 @@ fun DatePicker(
             Column(verticalArrangement = Arrangement.SpaceBetween) {
                 androidx.compose.material3.DatePicker(
                     state = datePickerState,
-                    modifier = modifier,
                     headline = null,
                     title = null,
                     showModeToggle = false,
@@ -111,10 +110,13 @@ fun DatePicker(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         TextButton(
-                            onClick = closeSelection,
+                            onClick = {
+                                onDateSelected(null)
+                                closeSelection()
+                            },
                             colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.primary)
                         ) {
-                            Text("Cancel")
+                            Text("Clear")
                         }
                         TextButton(
                             onClick = {
@@ -160,49 +162,52 @@ fun TimePickerFromOldApp(
         initialMinute = initialTime.minute,
         is24Hour = is24Hour
     )
-    val padding = if(is24Hour) 32.dp else 18.dp
+    val dialogButtonsPadding = PaddingValues(bottom = 8.dp, end = 18.dp)
 
     BasicAlertDialog(
         onDismissRequest = {
             closeSelection()
         },
     ) {
-        Column {
-            Box(
+        CustomBox(
+            modifier = Modifier
+                .requiredWidth(360.dp),
+        ) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center,
                 modifier = Modifier
-                    .clip(RoundedCornerShape(7))
-                    .background(MaterialTheme.colorScheme.background)
-                    .border(2.dp, MaterialTheme.colorScheme.primary, RoundedCornerShape(7))
-                    .padding(padding)
+                    .padding(top = 24.dp)
             ) {
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center,
-                    modifier = Modifier
-                ) {
-                    TimePicker(
-                        state = timePickerState,
-                        colors = TimePickerDefaults.colors(
-                            clockDialColor = MaterialTheme.colorScheme.background,
-                            clockDialSelectedContentColor = MaterialTheme.colorScheme.background,
-                            clockDialUnselectedContentColor = MaterialTheme.colorScheme.primary,
-                            selectorColor = MaterialTheme.colorScheme.primary,
-                            periodSelectorBorderColor = MaterialTheme.colorScheme.primary,
-                            periodSelectorSelectedContainerColor = MaterialTheme.colorScheme.primary,
-                            periodSelectorUnselectedContainerColor = MaterialTheme.colorScheme.background,
-                            periodSelectorSelectedContentColor = MaterialTheme.colorScheme.background,
-                            periodSelectorUnselectedContentColor = MaterialTheme.colorScheme.primary,
-                            timeSelectorSelectedContainerColor = MaterialTheme.colorScheme.primary,
-                            timeSelectorUnselectedContainerColor = MaterialTheme.colorScheme.background,
-                            timeSelectorSelectedContentColor = MaterialTheme.colorScheme.background,
-                            timeSelectorUnselectedContentColor = MaterialTheme.colorScheme.primary
-                        )
+                TimePicker(
+                    state = timePickerState,
+                    colors = TimePickerDefaults.colors(
+                        clockDialColor = MaterialTheme.colorScheme.background,
+                        clockDialSelectedContentColor = MaterialTheme.colorScheme.background,
+                        clockDialUnselectedContentColor = MaterialTheme.colorScheme.primary,
+                        selectorColor = MaterialTheme.colorScheme.primary,
+                        periodSelectorBorderColor = MaterialTheme.colorScheme.primary,
+                        periodSelectorSelectedContainerColor = MaterialTheme.colorScheme.primary,
+                        periodSelectorUnselectedContainerColor = MaterialTheme.colorScheme.background,
+                        periodSelectorSelectedContentColor = MaterialTheme.colorScheme.background,
+                        periodSelectorUnselectedContentColor = MaterialTheme.colorScheme.primary,
+                        timeSelectorSelectedContainerColor = MaterialTheme.colorScheme.primary,
+                        timeSelectorUnselectedContainerColor = MaterialTheme.colorScheme.background,
+                        timeSelectorSelectedContentColor = MaterialTheme.colorScheme.background,
+                        timeSelectorUnselectedContentColor = MaterialTheme.colorScheme.primary
                     )
+                )
 
-                    // Buttons
+                // Buttons
+                Box(
+                    modifier = Modifier
+                        .align(Alignment.End)
+                        .padding(dialogButtonsPadding)
+                ) {
                     Row(
-                        modifier = Modifier.align(Alignment.End),
-                        horizontalArrangement = Arrangement.End
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.End,
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
                         TextButton(
                             onClick = {
@@ -219,7 +224,11 @@ fun TimePickerFromOldApp(
                         }
                         TextButton(
                             onClick = {
-                                selectedTime.value = LocalTime.of(timePickerState.hour, timePickerState.minute, 0)
+                                selectedTime.value = LocalTime.of(
+                                    timePickerState.hour,
+                                    timePickerState.minute,
+                                    0
+                                )
                                 onTimeSelected(selectedTime.value!!)
                                 closeSelection()
                             }

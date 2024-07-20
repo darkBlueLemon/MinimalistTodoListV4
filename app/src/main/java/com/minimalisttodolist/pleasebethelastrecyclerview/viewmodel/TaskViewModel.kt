@@ -225,7 +225,7 @@ class TaskViewModel(
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    private fun handleSetDueDate(dueDate: LocalDate) {
+    private fun handleSetDueDate(dueDate: LocalDate?) {
         _state.update {
             it.copy(dueDateOnly = dueDate).also { updatedState ->
                 combineDateAndTime(updatedState)
@@ -340,6 +340,10 @@ class TaskViewModel(
             val combinedDateTime = if (time != null) date.atTime(time) else date.atStartOfDay()
             _state.update {
                 it.copy(dueDate = combinedDateTime.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli())
+            }
+        } else {
+            _state.update {
+                it.copy(dueDate = null, dueTimeOnly = null, recurrenceType = RecurrenceType.NONE)
             }
         }
     }
