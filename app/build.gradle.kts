@@ -12,8 +12,8 @@ android {
         applicationId = "com.minimalisttodolist.pleasebethelastrecyclerview"
         minSdk = 24
         targetSdk = 34
-        versionCode = 19
-        versionName = "15.5"
+        versionCode = 22
+        versionName = "15.8"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -29,11 +29,7 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
-            signingConfig = signingConfigs.getByName("debug")
-            ndk {
-                // change to "SYMBOL_TABLE" for smaller app size
-                debugSymbolLevel = "FULL"
-            }
+            ndk.debugSymbolLevel = "FULL"
         }
     }
     compileOptions {
@@ -54,6 +50,7 @@ android {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
     }
+    ndkVersion = "27.0.12077973"
 }
 
 dependencies {
