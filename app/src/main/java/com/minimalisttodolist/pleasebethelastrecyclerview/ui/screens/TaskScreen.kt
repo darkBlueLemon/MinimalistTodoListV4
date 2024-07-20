@@ -4,8 +4,14 @@ import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.expandHorizontally
+import androidx.compose.animation.expandIn
+import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
+import androidx.compose.animation.shrinkOut
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -140,13 +146,6 @@ fun TaskScreen(
                                 .padding(8.dp),
                             colorFilter = ColorFilter.tint(PriorityColor.PRIORITY1.getColor(darkTheme))
                         )
-//                        Icon(
-//                            imageVector = Icons.Default.Lightbulb,
-//                            contentDescription = "Show Tutorial",
-//                            modifier = Modifier
-//                                .padding(8.dp),
-//                            tint = PriorityColor.PRIORITY1.getColor(darkTheme)
-//                        )
                     }
                 } else {
                     Spacer(modifier = Modifier.weight(1f))
@@ -349,12 +348,13 @@ fun TaskList(onEvent: (TaskEvent) -> Unit, onClearFilters: () -> Unit, taskState
         modifier = Modifier
             .fillMaxSize()
             .padding(padding)
-            .padding(top = 8.dp)
-        ,
+            .padding(top = 8.dp),
     ) {
         item {
             AnimatedVisibility(
-                visible = filterText.isNotEmpty()
+                visible = filterText.isNotEmpty(),
+                enter = expandVertically() + fadeIn(),
+                exit = shrinkOut() + fadeOut(),
             ) {
                 Text(
                     text = filterText,
@@ -365,15 +365,6 @@ fun TaskList(onEvent: (TaskEvent) -> Unit, onClearFilters: () -> Unit, taskState
                         .clickable { onClearFilters() }
                         .padding(horizontal = 32.dp, vertical = 8.dp)
                 )
-//                Row {
-//                    FilterChip(filterText = filterText) { onClearFilters() }
-//                    FilterChip(filterText = "Today") { onClearFilters() }
-//                }
-            }
-            AnimatedVisibility(
-                visible = filterText.isEmpty()
-            ) {
-                Spacer(modifier = Modifier.height(8.dp))
             }
         }
         items(taskState.tasks, key = { it.id }) { task ->
@@ -400,7 +391,7 @@ fun TaskList(onEvent: (TaskEvent) -> Unit, onClearFilters: () -> Unit, taskState
                             if (
                                 task.recurrenceType == RecurrenceType.NONE ||
                                 task.dueDate?.let { it <= System.currentTimeMillis() } == false
-                                ) {
+                            ) {
                                 visible = false
                             }
                         }
