@@ -166,7 +166,7 @@ fun FontWeightSelector(
         getDisplayString = { it.toDisplayString() },
         saveFilter = { vm, filter -> vm.saveFontWeight(filter) },
         collectFilter = { it.fontWeight },
-        initialValue = FontWeightType.LIGHT,
+        initialValue = FontWeightType.NORMAL,
         customDisplayContent = { option ->
             Text(
                 text = option.toDisplayString(),

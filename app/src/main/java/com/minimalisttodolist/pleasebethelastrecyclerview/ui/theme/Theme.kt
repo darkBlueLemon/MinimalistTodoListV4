@@ -64,7 +64,7 @@ fun MinimalistTodoListV4Theme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     fontFamilyType: FontFamilyType = FontFamilyType.DEFAULT,
     baseFontSize: Int = 16,
-    fontWeight: FontWeightType = FontWeightType.LIGHT,
+    fontWeight: FontWeightType = FontWeightType.NORMAL,
     content: @Composable () -> Unit
 ) {
     val colorScheme = if (darkTheme) DarkColorScheme2 else LightColorScheme2

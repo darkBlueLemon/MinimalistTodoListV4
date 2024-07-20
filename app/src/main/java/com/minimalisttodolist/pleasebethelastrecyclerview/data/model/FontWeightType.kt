@@ -9,7 +9,7 @@ enum class FontWeightType(val displayName: String) {
 
     companion object {
         fun fromDisplayName(displayName: String): FontWeightType {
-            return entries.firstOrNull { it.displayName == displayName } ?: LIGHT
+            return entries.firstOrNull { it.displayName == displayName } ?: NORMAL
         }
     }
 
