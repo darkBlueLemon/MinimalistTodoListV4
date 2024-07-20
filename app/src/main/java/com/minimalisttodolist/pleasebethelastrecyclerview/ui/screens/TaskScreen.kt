@@ -485,8 +485,11 @@ fun DueDate_Recurrence_Note(
                     append(dueDate)
                 }
                 if(task.recurrenceType != RecurrenceType.NONE) {
+                    withStyle(style = SpanStyle(color = textColor)) {
+                        append(", ")
+                    }
                     withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.tertiary)) {
-                        append(", " + task.recurrenceType.toDisplayString())
+                        append(task.recurrenceType.toDisplayString())
                     }
                 }
                 if (note.isNotBlank()) {
