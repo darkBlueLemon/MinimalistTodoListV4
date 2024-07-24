@@ -74,7 +74,6 @@ fun DatePicker(
     BasicAlertDialog(
         onDismissRequest = { closeSelection() },
         modifier = modifier
-            .background(Color.Red)
             .scale(scaleFactor)
             .wrapContentHeight()
         ,
