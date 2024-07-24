@@ -42,6 +42,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.Dp
@@ -67,9 +68,16 @@ fun DatePicker(
     val datePickerState = rememberDatePickerState(initialSelectedDateMillis = initialMillis)
     val dialogButtonsPadding = PaddingValues(bottom = 8.dp, end = 18.dp)
 
+    // Define a scale factor
+    val scaleFactor = 0.9f
+
     BasicAlertDialog(
         onDismissRequest = { closeSelection() },
-        modifier = modifier.wrapContentHeight(),
+        modifier = modifier
+            .background(Color.Red)
+            .scale(scaleFactor)
+            .wrapContentHeight()
+        ,
     ) {
         CustomBox(
             modifier = Modifier
@@ -164,10 +172,15 @@ fun TimePickerFromOldApp(
     )
     val dialogButtonsPadding = PaddingValues(bottom = 8.dp, end = 18.dp)
 
+    // Define a scale factor
+    val scaleFactor = 0.9f
+
     BasicAlertDialog(
         onDismissRequest = {
             closeSelection()
         },
+        modifier = Modifier
+            .scale(scaleFactor)
     ) {
         CustomBox(
             modifier = Modifier
