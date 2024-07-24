@@ -71,6 +71,8 @@ fun DatePicker(
     // Define a scale factor
     val scaleFactor = 0.9f
 
+    // A useless comment
+
     BasicAlertDialog(
         onDismissRequest = { closeSelection() },
         modifier = modifier
