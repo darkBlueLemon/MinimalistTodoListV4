@@ -18,6 +18,10 @@ import androidx.compose.runtime.getValue
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.lifecycleScope
 import androidx.room.Room
+import com.google.firebase.Firebase
+import com.google.firebase.analytics.FirebaseAnalytics
+import com.google.firebase.analytics.analytics
+import com.google.firebase.analytics.logEvent
 import com.minimalisttodolist.pleasebethelastrecyclerview.data.database.MIGRATION_1_2
 import com.minimalisttodolist.pleasebethelastrecyclerview.data.preferences.AppPreferences
 import com.minimalisttodolist.pleasebethelastrecyclerview.data.database.TaskDatabase
@@ -35,6 +39,8 @@ import com.minimalisttodolist.pleasebethelastrecyclerview.viewmodel.TaskViewMode
 import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
+    private lateinit var firebaseAnalytics: FirebaseAnalytics
+
     private lateinit var permissionManager: PermissionManager
     private lateinit var postNotificationPermissionLauncher: ActivityResultLauncher<String>
     private lateinit var appPreferences: AppPreferences
@@ -66,6 +72,9 @@ class MainActivity : ComponentActivity() {
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // Obtain the FirebaseAnalytics instance.
+        firebaseAnalytics = Firebase.analytics
 
         setupUI()
         initializeComponents()

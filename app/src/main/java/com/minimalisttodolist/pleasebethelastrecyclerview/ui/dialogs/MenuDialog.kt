@@ -51,6 +51,10 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.google.firebase.Firebase
+import com.google.firebase.analytics.analytics
+import com.google.firebase.analytics.logEvent
+import com.minimalisttodolist.pleasebethelastrecyclerview.AnalyticsEvents
 import com.minimalisttodolist.pleasebethelastrecyclerview.R
 import com.minimalisttodolist.pleasebethelastrecyclerview.data.model.ClockType
 import com.minimalisttodolist.pleasebethelastrecyclerview.data.model.DueDateFilterType
@@ -95,7 +99,11 @@ fun MenuDialog(
                     onAppEvent(AppEvent.ShowPersonalizeDialog)
                 })
                 RecurrenceSelector(
-                    onRecurrenceFilterChange = { onEvent(TaskEvent.SetRecurrenceFilter(it)) },
+                    onRecurrenceFilterChange = {
+                        onEvent(TaskEvent.SetRecurrenceFilter(it))
+                        Firebase.analytics.logEvent(AnalyticsEvents.REPEAT_FILTER_CLICKED){
+                            param("screen", "MenuDialog")
+                        } },
                     dataStoreViewModel = dataStoreViewModel
                 )
                 PrioritySelector(
@@ -103,7 +111,11 @@ fun MenuDialog(
                     dataStoreViewModel = dataStoreViewModel
                 )
                 DueDateFilterSelector(
-                    onDueDateFilterChange = { onEvent(TaskEvent.SetDueDateFilter(it)) },
+                    onDueDateFilterChange = {
+                        onEvent(TaskEvent.SetDueDateFilter(it))
+                        Firebase.analytics.logEvent(AnalyticsEvents.DUE_FILTER_CHANGE){
+                            param("screen", "MenuDialog")
+                        } },
                     dataStoreViewModel = dataStoreViewModel
                 )
                 History( onClick = { onAppEvent(AppEvent.ShowHistoryDialog) } )

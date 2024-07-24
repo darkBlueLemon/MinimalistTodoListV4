@@ -56,6 +56,12 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
+import com.google.firebase.Firebase
+import com.google.firebase.analytics.FirebaseAnalytics
+import com.google.firebase.analytics.analytics
+import com.google.firebase.analytics.ktx.analytics
+import com.google.firebase.analytics.logEvent
+import com.minimalisttodolist.pleasebethelastrecyclerview.AnalyticsEvents
 import com.minimalisttodolist.pleasebethelastrecyclerview.data.model.DueDateFilterType
 import com.minimalisttodolist.pleasebethelastrecyclerview.data.model.PriorityColor
 import com.minimalisttodolist.pleasebethelastrecyclerview.data.model.RecurrenceType
@@ -126,6 +132,9 @@ fun TaskScreen(
                         onClick = {
                             vibrate(context = context, strength = 1)
                             onAppEvent(AppEvent.ShowTutorialDialog)
+                            Firebase.analytics.logEvent(AnalyticsEvents.TUTORIAL_CLICKED){
+                                param("screen", "TaskScreen")
+                            }
                         },
                         elevation = FloatingActionButtonDefaults.elevation(0.dp, 0.dp, 0.dp, 0.dp),
                         modifier = Modifier
@@ -172,10 +181,16 @@ fun TaskScreen(
                             onLongClick = {
                                 vibrate(context = context, strength = 1)
                                 onAppEvent(AppEvent.ShowMenuDialog)
+                                Firebase.analytics.logEvent(AnalyticsEvents.MENU_CLICKED){
+                                    param("screen", "TaskScreen")
+                                }
                             },
                             onClick = {
                                 vibrate(context = context, strength = 1)
                                 onEvent(TaskEvent.ShowAddTaskDialog)
+                                Firebase.analytics.logEvent(AnalyticsEvents.ADD_TASK_CLICKED){
+                                    param("screen", "TaskScreen")
+                                }
                             }
                         )
                     )
@@ -287,46 +302,6 @@ fun TaskScreen(
     }
 }
 
-@Composable
-fun FilterChip(filterText: String, onClearFilters: () -> Unit) {
-    Surface(
-        shape = RoundedCornerShape(16.dp),
-//        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.6f),
-//        color = MaterialTheme.colorScheme.primary.copy(alpha = 0.1f),
-        color = Color.Blue.copy(alpha = 0.15f),
-        border = BorderStroke(1.dp, MaterialTheme.colorScheme.onBackground.copy(alpha = 0.25f)),
-        modifier = Modifier
-            .padding(horizontal = 4.dp, vertical = 8.dp)
-//            .wrapContentWidth(Alignment.Start)
-            .clickable(onClick = onClearFilters),
-    ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
-        ) {
-//            Icon(
-//                imageVector = Icons.Default.FilterList,
-//                contentDescription = "Active filters",
-//                tint = MaterialTheme.colorScheme.primary,
-//                modifier = Modifier.size(18.dp)
-//            )
-            Spacer(modifier = Modifier.width(8.dp))
-            Text(
-                text = filterText,
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.primary
-            )
-            Spacer(modifier = Modifier.width(8.dp))
-            Icon(
-                imageVector = Icons.Default.Close,
-                contentDescription = "Clear filters",
-                tint = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.size(18.dp)
-            )
-        }
-    }
-}
-
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun TaskList(onEvent: (TaskEvent) -> Unit, onClearFilters: () -> Unit, taskState: TaskState, viewModel: TaskViewModel, padding: PaddingValues, dataStoreViewModel: DataStoreViewModel) {
@@ -383,6 +358,9 @@ fun TaskList(onEvent: (TaskEvent) -> Unit, onClearFilters: () -> Unit, taskState
                     task = task,
                     onEdit = {
                         onEvent(TaskEvent.EditTask(it))
+                        Firebase.analytics.logEvent(AnalyticsEvents.EDIT_CLICKED){
+                            param("screen", "TaskScreen")
+                        }
                     },
                     onDelete = {
                         coroutineScope.launch {
@@ -450,7 +428,12 @@ fun TaskItem(task: Task, onEdit: (Task) -> Unit, onDelete: (Task) -> Unit, viewM
             DueDate_Recurrence_Note(task = task, viewModel = viewModel)
         }
         CompleteIcon(
-            onDelete = { onDelete(task) }
+            onDelete = {
+                onDelete(task)
+                Firebase.analytics.logEvent(AnalyticsEvents.COMPLETE_TASK_CLICKED){
+                    param("screen", "TaskScreen")
+                }
+            }
         )
     }
 }

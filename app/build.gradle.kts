@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
     id("kotlin-kapt")
+    id("com.google.gms.google-services")
 }
 
 android {
@@ -12,8 +13,8 @@ android {
         applicationId = "com.minimalisttodolist.pleasebethelastrecyclerview"
         minSdk = 24
         targetSdk = 34
-        versionCode = 23
-        versionName = "16.0.0"
+        versionCode = 24
+        versionName = "16.0.1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -98,4 +99,8 @@ dependencies {
 
     // Downloadable Fonts
     implementation (libs.androidx.ui.text.google.fonts)
+
+    // Firebase Analytics
+    implementation (platform(libs.firebase.bom))
+    implementation (libs.google.firebase.analytics)
 }
