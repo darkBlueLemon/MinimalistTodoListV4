@@ -199,6 +199,7 @@ class TaskViewModel(
             param("note", (task.note.isNotBlank()).toString() )
             param("dueDateTime", (task.dueDate != null).toString() )
             param("repeat", (task.recurrenceType != RecurrenceType.NONE).toString() )
+
         }
 
         viewModelScope.launch {
