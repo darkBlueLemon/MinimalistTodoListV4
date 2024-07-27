@@ -11,10 +11,10 @@ android {
 
     defaultConfig {
         applicationId = "com.minimalisttodolist.pleasebethelastrecyclerview"
-        minSdk = 24
+        minSdk = 26
         targetSdk = 34
-        versionCode = 25
-        versionName = "16.0.2"
+        versionCode = 55
+        versionName = "16.0.55"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {

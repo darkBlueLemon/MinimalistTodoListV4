@@ -8,6 +8,10 @@ import androidx.compose.runtime.getValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.Firebase
+import com.google.firebase.analytics.analytics
+import com.google.firebase.analytics.logEvent
+import com.minimalisttodolist.pleasebethelastrecyclerview.AnalyticsEvents
 import com.minimalisttodolist.pleasebethelastrecyclerview.util.NotificationHelper
 import com.minimalisttodolist.pleasebethelastrecyclerview.data.model.DeletedTask
 import com.minimalisttodolist.pleasebethelastrecyclerview.data.model.RecurrenceType
@@ -188,6 +192,14 @@ class TaskViewModel(
             dueDate = currentState.dueDate,
             recurrenceType = currentState.recurrenceType
         )
+
+        Firebase.analytics.logEvent(AnalyticsEvents.SAVE_TASK_CLICKED){
+            param("taskId", task.id.toString())
+            param("priority", (task.priority != 0).toString() )
+            param("note", (task.note.isNotBlank()).toString() )
+            param("dueDateTime", (task.dueDate != null).toString() )
+            param("repeat", (task.recurrenceType != RecurrenceType.NONE).toString() )
+        }
 
         viewModelScope.launch {
             val taskId = dao.upsertTask(task)

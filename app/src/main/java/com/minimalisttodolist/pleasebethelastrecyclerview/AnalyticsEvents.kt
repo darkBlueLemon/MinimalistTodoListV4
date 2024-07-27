@@ -1,6 +1,7 @@
 package com.minimalisttodolist.pleasebethelastrecyclerview
 
 object AnalyticsEvents {
+    const val SAVE_TASK_CLICKED = "save_task_clicked"
     const val ADD_TASK_CLICKED = "add_task_clicked"
     const val MENU_CLICKED = "menu_clicked"
     const val EDIT_CLICKED = "edit_clicked"
