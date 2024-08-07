@@ -1,17 +1,14 @@
 package com.minimalisttodolist.pleasebethelastrecyclerview.viewmodel
 
 import android.os.Build
-import android.util.Log
 import androidx.annotation.RequiresApi
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.Firebase
 import com.google.firebase.analytics.analytics
 import com.google.firebase.analytics.logEvent
-import com.minimalisttodolist.pleasebethelastrecyclerview.AnalyticsEvents
+import com.minimalisttodolist.pleasebethelastrecyclerview.util.AnalyticsEvents
 import com.minimalisttodolist.pleasebethelastrecyclerview.util.NotificationHelper
 import com.minimalisttodolist.pleasebethelastrecyclerview.data.model.DeletedTask
 import com.minimalisttodolist.pleasebethelastrecyclerview.data.model.RecurrenceType
@@ -33,10 +30,7 @@ import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
-import java.time.temporal.ChronoUnit
 import java.time.temporal.TemporalAdjusters
-import java.time.temporal.WeekFields
-import java.util.Locale
 
 @RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalCoroutinesApi::class)
