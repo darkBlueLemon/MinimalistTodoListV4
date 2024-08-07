@@ -1,7 +1,5 @@
 package com.minimalisttodolist.pleasebethelastrecyclerview.viewmodel
 
-import android.os.Build
-import androidx.annotation.RequiresApi
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope

@@ -1,7 +1,5 @@
 package com.minimalisttodolist.pleasebethelastrecyclerview.ui.screens
 
-import android.os.Build
-import androidx.annotation.RequiresApi
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.expandVertically
