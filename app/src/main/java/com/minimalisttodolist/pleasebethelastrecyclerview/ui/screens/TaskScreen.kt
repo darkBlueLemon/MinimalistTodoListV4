@@ -296,7 +296,6 @@ fun TaskScreen(
     }
 }
 
-@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun TaskList(onEvent: (TaskEvent) -> Unit, onClearFilters: () -> Unit, taskState: TaskState, viewModel: TaskViewModel, padding: PaddingValues, dataStoreViewModel: DataStoreViewModel, checkAndShowReview: () -> Unit) {
     val dueDateFilterType by dataStoreViewModel.dueDateFilter.collectAsState()
@@ -376,7 +375,6 @@ fun TaskList(onEvent: (TaskEvent) -> Unit, onClearFilters: () -> Unit, taskState
     }
 }
 
-@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun TaskItem(task: Task, onEdit: (Task) -> Unit, onDelete: (Task) -> Unit, viewModel: TaskViewModel) {
     val darkTheme = LocalDarkTheme.current
@@ -433,10 +431,8 @@ fun TaskItem(task: Task, onEdit: (Task) -> Unit, onDelete: (Task) -> Unit, viewM
     }
 }
 
-@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun DueDate_Recurrence_Note(
-    modifier: Modifier = Modifier,
     task: Task,
     viewModel: TaskViewModel
 ) {

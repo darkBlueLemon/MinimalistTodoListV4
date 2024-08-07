@@ -22,7 +22,6 @@ import com.google.android.play.core.review.ReviewManagerFactory
 import com.google.firebase.Firebase
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.analytics.analytics
-import com.google.firebase.analytics.logEvent
 import com.minimalisttodolist.pleasebethelastrecyclerview.data.database.MIGRATION_1_2
 import com.minimalisttodolist.pleasebethelastrecyclerview.data.preferences.AppPreferences
 import com.minimalisttodolist.pleasebethelastrecyclerview.data.database.TaskDatabase

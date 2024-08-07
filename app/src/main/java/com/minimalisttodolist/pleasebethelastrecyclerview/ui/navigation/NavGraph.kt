@@ -16,7 +16,6 @@ import com.minimalisttodolist.pleasebethelastrecyclerview.viewmodel.AppViewModel
 import com.minimalisttodolist.pleasebethelastrecyclerview.viewmodel.TaskViewModel
 import com.minimalisttodolist.pleasebethelastrecyclerview.ui.theme.NoRippleTheme
 
-@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun NavGraph(
     startDestination: String = "task_list",

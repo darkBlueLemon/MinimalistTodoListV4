@@ -33,7 +33,6 @@ import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.time.temporal.TemporalAdjusters
 
-@RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalCoroutinesApi::class)
 class TaskViewModel(
     private val dao: TaskDao,
@@ -80,7 +79,6 @@ class TaskViewModel(
         }
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
     fun onEvent(event: TaskEvent) {
         when (event) {
             is TaskEvent.DeleteTask -> handleDeleteTask(event.task)
@@ -122,7 +120,6 @@ class TaskViewModel(
         dataStoreViewModel.saveDueDateFilter(_dueDateFilterType.value)
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
     private fun handleDeleteTask(task: Task) {
         viewModelScope.launch {
             delay(500)
@@ -145,18 +142,17 @@ class TaskViewModel(
     }
 
     private suspend fun deleteTaskNormally(task: Task) {
-        notificationHelper.cancelNotification(task.id.toInt())
+        notificationHelper.cancelNotification(task.id)
         dao.deleteTask(task)
         dao.insertDeletedTask(task.toDeletedTask())
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
     private suspend fun updateTaskWithNewDueDate(task: Task) {
         val newDueDate = calculateNextDueDate(task.dueDate, task.recurrenceType)
         if (newDueDate != null) {
             val updatedTask = task.copy(dueDate = newDueDate)
             dao.upsertTask(updatedTask)
-            notificationHelper.cancelNotification(task.id.toInt())
+            notificationHelper.cancelNotification(task.id)
             notificationHelper.scheduleNotification(updatedTask)
         } else {
             // If we couldn't calculate a new due date, delete the task
@@ -164,14 +160,12 @@ class TaskViewModel(
         }
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
     fun isDueOrPast(dueDate: Long?): Boolean {
         if (dueDate == null) return false
         val now = Instant.now().toEpochMilli()
         return dueDate <= now
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
     private fun handleSaveTask() {
         val currentState = state.value
         if (currentState.title.isBlank()) {
@@ -227,7 +221,6 @@ class TaskViewModel(
         }
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
     private fun handleEditTask(task: Task) {
         _state.update {
             val dueDateOnly = getLocalDateFromEpochMilliWithNull(task.dueDate)
@@ -246,7 +239,6 @@ class TaskViewModel(
         }
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
     private fun handleSetDueDate(dueDate: LocalDate?) {
         _state.update {
             it.copy(dueDateOnly = dueDate).also { updatedState ->
@@ -255,7 +247,6 @@ class TaskViewModel(
         }
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
     private fun handleSetDueTime(dueTime: LocalTime) {
         _state.update {
             it.copy(dueTimeOnly = dueTime).also { updatedState ->
@@ -271,7 +262,6 @@ class TaskViewModel(
         }
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
     private fun handleUndoDeleteTask(deletedTask: DeletedTask) {
         viewModelScope.launch {
             delay(500)
@@ -301,7 +291,6 @@ class TaskViewModel(
         }
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
     fun reloadTasks() {
         viewModelScope.launch {
             combine(
@@ -336,7 +325,6 @@ class TaskViewModel(
         }
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
     private fun isWithinDueDateFilter(
         task: Task,
         filterType: DueDateFilterType,
@@ -364,7 +352,6 @@ class TaskViewModel(
         }
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
     private fun combineDateAndTime(state: TaskState) {
         val date = state.dueDateOnly
         val time = state.dueTimeOnly
@@ -403,7 +390,6 @@ class TaskViewModel(
         )
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
     fun formatDueDateWithDateTime(epochMilli: Long?): String {
         val formatter = when (dataStoreViewModel.clockType.value) {
             ClockType.TWELVE_HOUR -> DateTimeFormatter.ofPattern("MMM dd, yyyy hh:mm a")
@@ -479,25 +465,21 @@ class TaskViewModel(
         return dateTime.format(timeFormatter)
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
     fun getLocalDateFromEpochMilli(epochMilli: Long?): LocalDate {
         epochMilli ?: return LocalDate.now()
         return Instant.ofEpochMilli(epochMilli).atZone(ZoneId.systemDefault()).toLocalDate()
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
     fun getLocalTimeFromEpochMilli(epochMilli: Long?): LocalTime {
         epochMilli ?: return LocalTime.now()
         return Instant.ofEpochMilli(epochMilli).atZone(ZoneId.systemDefault()).toLocalTime()
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
     fun getLocalDateFromEpochMilliWithNull(epochMilli: Long?): LocalDate? {
         epochMilli ?: return null
         return Instant.ofEpochMilli(epochMilli).atZone(ZoneId.systemDefault()).toLocalDate()
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
     fun getLocalTimeFromEpochMilliWithNull(epochMilli: Long?): LocalTime? {
         epochMilli ?: return null
         return Instant.ofEpochMilli(epochMilli).atZone(ZoneId.systemDefault()).toLocalTime()
@@ -509,7 +491,6 @@ class TaskViewModelFactory(
     private val notificationHelper: NotificationHelper,
     private val dataStoreViewModel: DataStoreViewModel
 ) : ViewModelProvider.Factory {
-    @RequiresApi(Build.VERSION_CODES.O)
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(TaskViewModel::class.java)) {
             @Suppress("UNCHECKED_CAST")

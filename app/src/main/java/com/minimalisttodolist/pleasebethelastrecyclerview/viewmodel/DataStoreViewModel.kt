@@ -107,30 +107,6 @@ class DataStoreViewModel(private val appPreferences: AppPreferences) : ViewModel
     fun updateReviewState(reviewState: ReviewStateType) {
         viewModelScope.launch { appPreferences.updateReviewState(reviewState) }
     }
-
-    private fun fontWeightFromDisplayName(displayName: String): FontWeight {
-        return when (displayName) {
-            "Light" -> FontWeight.Light
-            "Thin" -> FontWeight.Thin
-            "Normal" -> FontWeight.Normal
-            "Medium" -> FontWeight.Medium
-            "Bold" -> FontWeight.Bold
-            "Black" -> FontWeight.Black
-            else -> FontWeight.Normal
-        }
-    }
-
-    private fun FontWeight.toDisplayString(): String {
-        return when (this) {
-            FontWeight.Light -> "Light"
-            FontWeight.Thin -> "Thin"
-            FontWeight.Normal -> "Normal"
-            FontWeight.Medium -> "Medium"
-            FontWeight.Bold -> "Bold"
-            FontWeight.Black -> "Black"
-            else -> "Normal"
-        }
-    }
 }
 
 
