@@ -22,7 +22,8 @@ fun NavGraph(
     startDestination: String = "task_list",
     taskViewModel: TaskViewModel,
     dataStoreViewModel: DataStoreViewModel,
-    appViewModel: AppViewModel
+    appViewModel: AppViewModel,
+    maybeShowReview: () -> Unit
 ) {
     val navController = rememberNavController()
     val taskState by taskViewModel.state.collectAsState()
@@ -41,6 +42,7 @@ fun NavGraph(
                     onAppEvent = appViewModel::onEvent,
                     taskViewModel = taskViewModel,
                     dataStoreViewModel = dataStoreViewModel,
+                    maybeShowReview = maybeShowReview
                 )
             }
         }

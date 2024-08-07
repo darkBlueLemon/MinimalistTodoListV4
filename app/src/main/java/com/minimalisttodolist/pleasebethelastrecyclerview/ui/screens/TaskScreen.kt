@@ -53,6 +53,7 @@ import com.minimalisttodolist.pleasebethelastrecyclerview.util.AnalyticsEvents
 import com.minimalisttodolist.pleasebethelastrecyclerview.data.model.DueDateFilterType
 import com.minimalisttodolist.pleasebethelastrecyclerview.data.model.PriorityColor
 import com.minimalisttodolist.pleasebethelastrecyclerview.data.model.RecurrenceType
+import com.minimalisttodolist.pleasebethelastrecyclerview.data.model.ReviewStateType
 import com.minimalisttodolist.pleasebethelastrecyclerview.data.model.Task
 import com.minimalisttodolist.pleasebethelastrecyclerview.ui.components.CompleteIcon
 import com.minimalisttodolist.pleasebethelastrecyclerview.ui.components.emptyStateMessages
@@ -85,6 +86,7 @@ fun TaskScreen(
     onAppEvent: (AppEvent) -> Unit,
     taskViewModel: TaskViewModel,
     dataStoreViewModel: DataStoreViewModel,
+    maybeShowReview: () -> Unit
 ) {
     val darkTheme = LocalDarkTheme.current
 
@@ -187,7 +189,11 @@ fun TaskScreen(
         },
     ) { padding ->
 
-        TaskList(onEvent, onClearFilters = { onEvent(TaskEvent.ClearFilters) }, taskState, taskViewModel, padding, dataStoreViewModel)
+        TaskList(onEvent, onClearFilters = { onEvent(TaskEvent.ClearFilters) }, taskState, taskViewModel, padding, dataStoreViewModel, checkAndShowReview = {
+            if (dataStoreViewModel.reviewStateType.value == ReviewStateType.READY) {
+                maybeShowReview()
+            }
+        })
 
         if (taskState.isAddTaskDialogVisible) {
             AddTaskDialog(taskState, onEvent, taskViewModel, dataStoreViewModel, onAppEvent, isEdit = taskState.editingTaskId != null)
@@ -292,7 +298,7 @@ fun TaskScreen(
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun TaskList(onEvent: (TaskEvent) -> Unit, onClearFilters: () -> Unit, taskState: TaskState, viewModel: TaskViewModel, padding: PaddingValues, dataStoreViewModel: DataStoreViewModel) {
+fun TaskList(onEvent: (TaskEvent) -> Unit, onClearFilters: () -> Unit, taskState: TaskState, viewModel: TaskViewModel, padding: PaddingValues, dataStoreViewModel: DataStoreViewModel, checkAndShowReview: () -> Unit) {
     val dueDateFilterType by dataStoreViewModel.dueDateFilter.collectAsState()
     val recurrenceType by dataStoreViewModel.recurrenceFilter.collectAsState()
     val filterText = buildString {
@@ -361,6 +367,7 @@ fun TaskList(onEvent: (TaskEvent) -> Unit, onClearFilters: () -> Unit, taskState
                                 visible = false
                             }
                         }
+                        checkAndShowReview()
                     },
                     viewModel = viewModel
                 )

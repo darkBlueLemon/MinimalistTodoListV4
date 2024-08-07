@@ -10,6 +10,7 @@ import com.minimalisttodolist.pleasebethelastrecyclerview.data.model.FirstDayOfT
 import com.minimalisttodolist.pleasebethelastrecyclerview.data.model.FontFamilyType
 import com.minimalisttodolist.pleasebethelastrecyclerview.data.model.FontWeightType
 import com.minimalisttodolist.pleasebethelastrecyclerview.data.model.RecurrenceType
+import com.minimalisttodolist.pleasebethelastrecyclerview.data.model.ReviewStateType
 import com.minimalisttodolist.pleasebethelastrecyclerview.data.model.SortType
 import com.minimalisttodolist.pleasebethelastrecyclerview.data.preferences.AppPreferences
 import com.minimalisttodolist.pleasebethelastrecyclerview.data.model.ThemeType
@@ -59,6 +60,10 @@ class DataStoreViewModel(private val appPreferences: AppPreferences) : ViewModel
         .map { it }
         .stateIn(viewModelScope, SharingStarted.Eagerly, FirstDayOfTheWeekType.MONDAY)
 
+    val reviewStateType: StateFlow<ReviewStateType> = appPreferences.reviewState
+        .map { it }
+        .stateIn(viewModelScope, SharingStarted.Eagerly, ReviewStateType.NOT_YET)
+
     fun saveTheme(themeType: ThemeType) {
         viewModelScope.launch { appPreferences.saveTheme(themeType) }
     }
@@ -97,6 +102,10 @@ class DataStoreViewModel(private val appPreferences: AppPreferences) : ViewModel
 
     fun saveFirstDayOfTheWeek(firstDayOfTheWeekType: FirstDayOfTheWeekType) {
         viewModelScope.launch { appPreferences.saveFirstDayOfTheWeekType(firstDayOfTheWeekType) }
+    }
+
+    fun updateReviewState(reviewState: ReviewStateType) {
+        viewModelScope.launch { appPreferences.updateReviewState(reviewState) }
     }
 
     private fun fontWeightFromDisplayName(displayName: String): FontWeight {

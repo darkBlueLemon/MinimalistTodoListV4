@@ -14,6 +14,7 @@ import com.minimalisttodolist.pleasebethelastrecyclerview.data.model.FirstDayOfT
 import com.minimalisttodolist.pleasebethelastrecyclerview.data.model.FontFamilyType
 import com.minimalisttodolist.pleasebethelastrecyclerview.data.model.FontWeightType
 import com.minimalisttodolist.pleasebethelastrecyclerview.data.model.RecurrenceType
+import com.minimalisttodolist.pleasebethelastrecyclerview.data.model.ReviewStateType
 import com.minimalisttodolist.pleasebethelastrecyclerview.data.model.SortType
 import com.minimalisttodolist.pleasebethelastrecyclerview.data.model.ThemeType
 import kotlinx.coroutines.flow.Flow
@@ -47,6 +48,7 @@ class AppPreferences private constructor(context: Context) {
         val TUTORIAL_VISIBILITY = booleanPreferencesKey("tutorial_visibility")
         val DUE_DATE_FILTER = stringPreferencesKey("due_date_filter")
         val FIRST_DAY_OF_THE_WEEK = stringPreferencesKey("first_day_of_the_week")
+        val REVIEW_STATE = stringPreferencesKey("review_state")
     }
 
     val theme: Flow<ThemeType> = dataStore.data.map { preferences ->
@@ -91,6 +93,10 @@ class AppPreferences private constructor(context: Context) {
 
     val firstDayOfTheWeekType: Flow<FirstDayOfTheWeekType> = dataStore.data.map { preferences ->
         FirstDayOfTheWeekType.fromDisplayName(preferences[PreferencesKeys.FIRST_DAY_OF_THE_WEEK] ?: FirstDayOfTheWeekType.MONDAY.displayName)
+    }
+
+    val reviewState: Flow<ReviewStateType> = dataStore.data.map { preferences ->
+        ReviewStateType.valueOf(preferences[PreferencesKeys.REVIEW_STATE] ?: ReviewStateType.NOT_YET.name)
     }
 
     suspend fun saveTheme(theme: ThemeType) {
@@ -142,5 +148,9 @@ class AppPreferences private constructor(context: Context) {
 
     suspend fun saveFirstDayOfTheWeekType(firstDayOfTheWeekType: FirstDayOfTheWeekType) {
         dataStore.edit { preferences -> preferences[PreferencesKeys.FIRST_DAY_OF_THE_WEEK] = firstDayOfTheWeekType.displayName }
+    }
+
+    suspend fun updateReviewState(reviewState: ReviewStateType) {
+        dataStore.edit { preferences -> preferences[PreferencesKeys.REVIEW_STATE] = reviewState.name }
     }
 }

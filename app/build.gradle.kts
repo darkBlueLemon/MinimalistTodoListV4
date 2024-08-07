@@ -103,4 +103,8 @@ dependencies {
     // Firebase Analytics
     implementation (platform(libs.firebase.bom))
     implementation (libs.google.firebase.analytics)
+
+    // In App Review
+    implementation (libs.review)
+    implementation (libs.review.ktx)
 }

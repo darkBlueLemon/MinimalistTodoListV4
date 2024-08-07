@@ -9,4 +9,5 @@ object AnalyticsEvents {
     const val COMPLETE_TASK_CLICKED = "complete_task_clicked"
     const val REPEAT_FILTER_CLICKED = "repeat_filter_change"
     const val DUE_FILTER_CHANGE = "due_filter_change"
+    const val MAYBE_REVIEW_SHOWN = "maybe_review_shown"
 }

@@ -18,6 +18,7 @@ import androidx.compose.runtime.getValue
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.lifecycleScope
 import androidx.room.Room
+import com.google.android.play.core.review.ReviewManagerFactory
 import com.google.firebase.Firebase
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.analytics.analytics
@@ -25,6 +26,7 @@ import com.google.firebase.analytics.logEvent
 import com.minimalisttodolist.pleasebethelastrecyclerview.data.database.MIGRATION_1_2
 import com.minimalisttodolist.pleasebethelastrecyclerview.data.preferences.AppPreferences
 import com.minimalisttodolist.pleasebethelastrecyclerview.data.database.TaskDatabase
+import com.minimalisttodolist.pleasebethelastrecyclerview.data.model.ReviewStateType
 import com.minimalisttodolist.pleasebethelastrecyclerview.data.model.ThemeType
 import com.minimalisttodolist.pleasebethelastrecyclerview.ui.navigation.NavGraph
 import com.minimalisttodolist.pleasebethelastrecyclerview.viewmodel.AppViewModel
@@ -137,8 +139,20 @@ class MainActivity : ComponentActivity() {
             NavGraph(
                 taskViewModel = taskViewModel,
                 dataStoreViewModel = dataStoreViewModel,
-                appViewModel = appViewModel
+                appViewModel = appViewModel,
+                maybeShowReview = { maybeShowReview() }
             )
+        }
+    }
+
+    private fun maybeShowReview() {
+        val manager = ReviewManagerFactory.create(applicationContext)
+        manager.requestReviewFlow().addOnCompleteListener {
+            if(it.isSuccessful) {
+                manager.launchReviewFlow(this, it.result)
+                dataStoreViewModel.updateReviewState(ReviewStateType.SHOWN)
+                taskViewModel.logReviewStatus(ReviewStateType.SHOWN)
+            }
         }
     }
 

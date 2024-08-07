@@ -18,6 +18,7 @@ import com.minimalisttodolist.pleasebethelastrecyclerview.data.database.TaskDao
 import com.minimalisttodolist.pleasebethelastrecyclerview.data.model.ClockType
 import com.minimalisttodolist.pleasebethelastrecyclerview.data.model.DueDateFilterType
 import com.minimalisttodolist.pleasebethelastrecyclerview.data.model.FirstDayOfTheWeekType
+import com.minimalisttodolist.pleasebethelastrecyclerview.data.model.ReviewStateType
 import com.minimalisttodolist.pleasebethelastrecyclerview.util.calculateNextDueDate
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
@@ -187,22 +188,43 @@ class TaskViewModel(
             recurrenceType = currentState.recurrenceType
         )
 
-        Firebase.analytics.logEvent(AnalyticsEvents.SAVE_TASK_CLICKED){
-            param("taskId", task.id.toString())
-            param("priority", (task.priority != 0).toString() )
-            param("note", (task.note.isNotBlank()).toString() )
-            param("dueDateTime", (task.dueDate != null).toString() )
-            param("repeat", (task.recurrenceType != RecurrenceType.NONE).toString() )
-
-        }
+        logTaskSaveAnalytics(task)
 
         viewModelScope.launch {
             val taskId = dao.upsertTask(task)
             val savedTask = dao.getTaskById(if (taskId.toInt() == -1) currentState.editingTaskId!! else taskId.toInt())
             savedTask?.let { notificationHelper.scheduleNotification(it) }
+
+            checkAndUpdateReviewState(taskId.toInt())
         }
 
         resetAddTaskDialog()
+    }
+
+    private fun checkAndUpdateReviewState(taskId: Int) {
+        val currentReviewState = dataStoreViewModel.reviewStateType.value
+
+        // 07/08/2024 current number of tasks saved by a user everyday = 5.1, reviewDialog shown after a week
+        if (currentReviewState == ReviewStateType.NOT_YET && taskId >= 35) {
+            dataStoreViewModel.updateReviewState(ReviewStateType.READY)
+            logReviewStatus(ReviewStateType.READY)
+        }
+    }
+
+    fun logReviewStatus(reviewStateType: ReviewStateType) {
+        Firebase.analytics.logEvent(AnalyticsEvents.MAYBE_REVIEW_SHOWN) {
+            param("reviewState", reviewStateType.toString())
+        }
+    }
+
+    private fun logTaskSaveAnalytics(task: Task) {
+        Firebase.analytics.logEvent(AnalyticsEvents.SAVE_TASK_CLICKED) {
+            param("taskId", task.id.toString())
+            param("priority", (task.priority != 0).toString())
+            param("note", (task.note.isNotBlank()).toString())
+            param("dueDateTime", (task.dueDate != null).toString())
+            param("repeat", (task.recurrenceType != RecurrenceType.NONE).toString())
+        }
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
