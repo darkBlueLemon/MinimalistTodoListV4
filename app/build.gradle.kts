@@ -16,6 +16,7 @@ android {
         versionCode = 56
         versionName = "16.1.0"
         // zip -d Archive.zip "__MACOSX*"
+        // lmao
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
