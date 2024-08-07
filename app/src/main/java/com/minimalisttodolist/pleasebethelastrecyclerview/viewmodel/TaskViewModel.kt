@@ -429,7 +429,6 @@ class TaskViewModel(
         }
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
     fun formatDueDateWithDateOnly(epochMilli: Long?): String {
         val dateFormatter = DateTimeFormatter.ofPattern("MMM dd, yyyy")
         val dateFormatterCurrentYear = DateTimeFormatter.ofPattern("MMM dd")
@@ -451,7 +450,6 @@ class TaskViewModel(
         }
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
     fun formatDueDateWithTimeOnly(epochMilli: Long?): String {
         val timeFormatter = when (dataStoreViewModel.clockType.value) {
             ClockType.TWELVE_HOUR -> DateTimeFormatter.ofPattern("hh:mm a")

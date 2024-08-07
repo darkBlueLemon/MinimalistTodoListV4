@@ -70,7 +70,6 @@ class MainActivity : ComponentActivity() {
         TaskViewModelFactory(db.dao, notificationHelper, dataStoreViewModel)
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -115,7 +114,6 @@ class MainActivity : ComponentActivity() {
         )
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
     @Composable
     private fun SetupTheme() {
         val theme by dataStoreViewModel.theme.collectAsState()
@@ -155,7 +153,6 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
     override fun onResume() {
         super.onResume()
         taskViewModel.reloadTasks()

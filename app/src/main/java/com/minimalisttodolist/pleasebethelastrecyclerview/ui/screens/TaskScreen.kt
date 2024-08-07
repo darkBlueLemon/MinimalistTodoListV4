@@ -77,7 +77,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalFoundationApi::class)
-@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun TaskScreen(
     taskState: TaskState,

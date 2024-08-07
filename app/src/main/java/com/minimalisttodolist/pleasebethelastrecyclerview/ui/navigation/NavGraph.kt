@@ -1,7 +1,5 @@
 package com.minimalisttodolist.pleasebethelastrecyclerview.ui.navigation
 
-import android.os.Build
-import androidx.annotation.RequiresApi
 import androidx.compose.material.ripple.LocalRippleTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider

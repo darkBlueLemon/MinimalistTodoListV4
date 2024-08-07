@@ -1,6 +1,5 @@
 package com.minimalisttodolist.pleasebethelastrecyclerview.viewmodel
 
-import androidx.compose.ui.text.font.FontWeight
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
