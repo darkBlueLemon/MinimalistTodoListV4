@@ -13,8 +13,9 @@ android {
         applicationId = "com.minimalisttodolist.pleasebethelastrecyclerview"
         minSdk = 26
         targetSdk = 34
-        versionCode = 55
-        versionName = "16.0.55"
+        versionCode = 56
+        versionName = "16.1.0"
+        // zip -d Archive.zip "__MACOSX*"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
