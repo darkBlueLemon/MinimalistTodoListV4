@@ -1,6 +1,5 @@
 package com.minimalisttodolist.pleasebethelastrecyclerview.viewmodel
 
-import androidx.compose.ui.text.font.FontWeight
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -10,6 +9,7 @@ import com.minimalisttodolist.pleasebethelastrecyclerview.data.model.FirstDayOfT
 import com.minimalisttodolist.pleasebethelastrecyclerview.data.model.FontFamilyType
 import com.minimalisttodolist.pleasebethelastrecyclerview.data.model.FontWeightType
 import com.minimalisttodolist.pleasebethelastrecyclerview.data.model.RecurrenceType
+import com.minimalisttodolist.pleasebethelastrecyclerview.data.model.ReviewStateType
 import com.minimalisttodolist.pleasebethelastrecyclerview.data.model.SortType
 import com.minimalisttodolist.pleasebethelastrecyclerview.data.preferences.AppPreferences
 import com.minimalisttodolist.pleasebethelastrecyclerview.data.model.ThemeType
@@ -59,6 +59,10 @@ class DataStoreViewModel(private val appPreferences: AppPreferences) : ViewModel
         .map { it }
         .stateIn(viewModelScope, SharingStarted.Eagerly, FirstDayOfTheWeekType.MONDAY)
 
+    val reviewStateType: StateFlow<ReviewStateType> = appPreferences.reviewState
+        .map { it }
+        .stateIn(viewModelScope, SharingStarted.Eagerly, ReviewStateType.NOT_YET)
+
     fun saveTheme(themeType: ThemeType) {
         viewModelScope.launch { appPreferences.saveTheme(themeType) }
     }
@@ -99,28 +103,8 @@ class DataStoreViewModel(private val appPreferences: AppPreferences) : ViewModel
         viewModelScope.launch { appPreferences.saveFirstDayOfTheWeekType(firstDayOfTheWeekType) }
     }
 
-    private fun fontWeightFromDisplayName(displayName: String): FontWeight {
-        return when (displayName) {
-            "Light" -> FontWeight.Light
-            "Thin" -> FontWeight.Thin
-            "Normal" -> FontWeight.Normal
-            "Medium" -> FontWeight.Medium
-            "Bold" -> FontWeight.Bold
-            "Black" -> FontWeight.Black
-            else -> FontWeight.Normal
-        }
-    }
-
-    private fun FontWeight.toDisplayString(): String {
-        return when (this) {
-            FontWeight.Light -> "Light"
-            FontWeight.Thin -> "Thin"
-            FontWeight.Normal -> "Normal"
-            FontWeight.Medium -> "Medium"
-            FontWeight.Bold -> "Bold"
-            FontWeight.Black -> "Black"
-            else -> "Normal"
-        }
+    fun updateReviewState(reviewState: ReviewStateType) {
+        viewModelScope.launch { appPreferences.updateReviewState(reviewState) }
     }
 }
 

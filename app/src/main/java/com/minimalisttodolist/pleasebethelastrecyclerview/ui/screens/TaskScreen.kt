@@ -1,7 +1,5 @@
 package com.minimalisttodolist.pleasebethelastrecyclerview.ui.screens
 
-import android.os.Build
-import androidx.annotation.RequiresApi
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.expandVertically
@@ -53,6 +51,7 @@ import com.minimalisttodolist.pleasebethelastrecyclerview.util.AnalyticsEvents
 import com.minimalisttodolist.pleasebethelastrecyclerview.data.model.DueDateFilterType
 import com.minimalisttodolist.pleasebethelastrecyclerview.data.model.PriorityColor
 import com.minimalisttodolist.pleasebethelastrecyclerview.data.model.RecurrenceType
+import com.minimalisttodolist.pleasebethelastrecyclerview.data.model.ReviewStateType
 import com.minimalisttodolist.pleasebethelastrecyclerview.data.model.Task
 import com.minimalisttodolist.pleasebethelastrecyclerview.ui.components.CompleteIcon
 import com.minimalisttodolist.pleasebethelastrecyclerview.ui.components.emptyStateMessages
@@ -76,7 +75,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalFoundationApi::class)
-@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun TaskScreen(
     taskState: TaskState,
@@ -85,6 +83,7 @@ fun TaskScreen(
     onAppEvent: (AppEvent) -> Unit,
     taskViewModel: TaskViewModel,
     dataStoreViewModel: DataStoreViewModel,
+    maybeShowReview: () -> Unit
 ) {
     val darkTheme = LocalDarkTheme.current
 
@@ -187,7 +186,11 @@ fun TaskScreen(
         },
     ) { padding ->
 
-        TaskList(onEvent, onClearFilters = { onEvent(TaskEvent.ClearFilters) }, taskState, taskViewModel, padding, dataStoreViewModel)
+        TaskList(onEvent, onClearFilters = { onEvent(TaskEvent.ClearFilters) }, taskState, taskViewModel, padding, dataStoreViewModel, checkAndShowReview = {
+            if (dataStoreViewModel.reviewStateType.value == ReviewStateType.READY) {
+                maybeShowReview()
+            }
+        })
 
         if (taskState.isAddTaskDialogVisible) {
             AddTaskDialog(taskState, onEvent, taskViewModel, dataStoreViewModel, onAppEvent, isEdit = taskState.editingTaskId != null)
@@ -290,9 +293,8 @@ fun TaskScreen(
     }
 }
 
-@RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun TaskList(onEvent: (TaskEvent) -> Unit, onClearFilters: () -> Unit, taskState: TaskState, viewModel: TaskViewModel, padding: PaddingValues, dataStoreViewModel: DataStoreViewModel) {
+fun TaskList(onEvent: (TaskEvent) -> Unit, onClearFilters: () -> Unit, taskState: TaskState, viewModel: TaskViewModel, padding: PaddingValues, dataStoreViewModel: DataStoreViewModel, checkAndShowReview: () -> Unit) {
     val dueDateFilterType by dataStoreViewModel.dueDateFilter.collectAsState()
     val recurrenceType by dataStoreViewModel.recurrenceFilter.collectAsState()
     val filterText = buildString {
@@ -361,6 +363,7 @@ fun TaskList(onEvent: (TaskEvent) -> Unit, onClearFilters: () -> Unit, taskState
                                 visible = false
                             }
                         }
+                        checkAndShowReview()
                     },
                     viewModel = viewModel
                 )
@@ -369,7 +372,6 @@ fun TaskList(onEvent: (TaskEvent) -> Unit, onClearFilters: () -> Unit, taskState
     }
 }
 
-@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun TaskItem(task: Task, onEdit: (Task) -> Unit, onDelete: (Task) -> Unit, viewModel: TaskViewModel) {
     val darkTheme = LocalDarkTheme.current
@@ -426,10 +428,8 @@ fun TaskItem(task: Task, onEdit: (Task) -> Unit, onDelete: (Task) -> Unit, viewM
     }
 }
 
-@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun DueDate_Recurrence_Note(
-    modifier: Modifier = Modifier,
     task: Task,
     viewModel: TaskViewModel
 ) {

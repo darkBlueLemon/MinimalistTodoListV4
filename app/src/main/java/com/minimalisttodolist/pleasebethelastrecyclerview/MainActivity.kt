@@ -1,7 +1,6 @@
 package com.minimalisttodolist.pleasebethelastrecyclerview
 
 import android.graphics.Color
-import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.SystemBarStyle
@@ -10,7 +9,6 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
-import androidx.annotation.RequiresApi
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -18,13 +16,14 @@ import androidx.compose.runtime.getValue
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.lifecycleScope
 import androidx.room.Room
+import com.google.android.play.core.review.ReviewManagerFactory
 import com.google.firebase.Firebase
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.analytics.analytics
-import com.google.firebase.analytics.logEvent
 import com.minimalisttodolist.pleasebethelastrecyclerview.data.database.MIGRATION_1_2
 import com.minimalisttodolist.pleasebethelastrecyclerview.data.preferences.AppPreferences
 import com.minimalisttodolist.pleasebethelastrecyclerview.data.database.TaskDatabase
+import com.minimalisttodolist.pleasebethelastrecyclerview.data.model.ReviewStateType
 import com.minimalisttodolist.pleasebethelastrecyclerview.data.model.ThemeType
 import com.minimalisttodolist.pleasebethelastrecyclerview.ui.navigation.NavGraph
 import com.minimalisttodolist.pleasebethelastrecyclerview.viewmodel.AppViewModel
@@ -69,7 +68,6 @@ class MainActivity : ComponentActivity() {
         TaskViewModelFactory(db.dao, notificationHelper, dataStoreViewModel)
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -114,7 +112,6 @@ class MainActivity : ComponentActivity() {
         )
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
     @Composable
     private fun SetupTheme() {
         val theme by dataStoreViewModel.theme.collectAsState()
@@ -137,12 +134,23 @@ class MainActivity : ComponentActivity() {
             NavGraph(
                 taskViewModel = taskViewModel,
                 dataStoreViewModel = dataStoreViewModel,
-                appViewModel = appViewModel
+                appViewModel = appViewModel,
+                maybeShowReview = { maybeShowReview() }
             )
         }
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
+    private fun maybeShowReview() {
+        val manager = ReviewManagerFactory.create(applicationContext)
+        manager.requestReviewFlow().addOnCompleteListener {
+            if(it.isSuccessful) {
+                manager.launchReviewFlow(this, it.result)
+                dataStoreViewModel.updateReviewState(ReviewStateType.SHOWN)
+                taskViewModel.logReviewStatus(ReviewStateType.SHOWN)
+            }
+        }
+    }
+
     override fun onResume() {
         super.onResume()
         taskViewModel.reloadTasks()
