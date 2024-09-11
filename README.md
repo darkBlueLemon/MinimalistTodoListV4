@@ -1,5 +1,7 @@
 # Minimalist To-Do List
 
+[Play Store Link](https://play.google.com/store/apps/details?id=com.minimalisttodolist.pleasebethelastrecyclerview)
+
 A sleek, efficient Android app for managing your tasks with ease.
 
 ## 📱 Features
