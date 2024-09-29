@@ -217,6 +217,25 @@ class TaskViewModel(
             param("dueDateTime", (task.dueDate != null).toString())
             param("repeat", (task.recurrenceType != RecurrenceType.NONE).toString())
         }
+
+        val eventMap = mapOf(
+            1000 to AnalyticsEvents.ABOVE_1000,
+            900 to AnalyticsEvents.ABOVE_900,
+            800 to AnalyticsEvents.ABOVE_800,
+            700 to AnalyticsEvents.ABOVE_700,
+            600 to AnalyticsEvents.ABOVE_600,
+            500 to AnalyticsEvents.ABOVE_500,
+            400 to AnalyticsEvents.ABOVE_400,
+            300 to AnalyticsEvents.ABOVE_300,
+            200 to AnalyticsEvents.ABOVE_200,
+            100 to AnalyticsEvents.ABOVE_100,
+            0 to AnalyticsEvents.ABOVE_0
+        )
+        eventMap.entries.firstOrNull { task.id > it.key }?.let { entry ->
+            Firebase.analytics.logEvent(entry.value) {
+                param("screen", "AddTaskDialog")
+            }
+        }
     }
 
     private fun handleEditTask(task: Task) {
