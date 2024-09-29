@@ -15,8 +15,10 @@ android {
         targetSdk = 34
         versionCode = 57
         versionName = "16.1.1"
+
+        // Project > app > build > intermediates > merged_native_libs > release > mergeReleaseNativeLibs > out > lib > (compress everything in this folder)
         // zip -d Archive.zip "__MACOSX*"
-        // lmao
+        // https://www.youtube.com/watch?v=3ieKwhmQg7I&t=191s
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
