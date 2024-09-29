@@ -13,8 +13,8 @@ android {
         applicationId = "com.minimalisttodolist.pleasebethelastrecyclerview"
         minSdk = 26
         targetSdk = 34
-        versionCode = 56
-        versionName = "16.1.0"
+        versionCode = 57
+        versionName = "16.1.1"
         // zip -d Archive.zip "__MACOSX*"
         // lmao
 
