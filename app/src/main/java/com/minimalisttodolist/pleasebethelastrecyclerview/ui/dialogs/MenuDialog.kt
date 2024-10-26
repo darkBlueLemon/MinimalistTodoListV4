@@ -81,7 +81,12 @@ fun MenuDialog(
                     dataStoreViewModel = dataStoreViewModel
                 )
                 History( onClick = { onAppEvent(AppEvent.ShowHistoryDialog) } )
-                Feedback( onClick = { onAppEvent(AppEvent.ShowFeedbackDialog) } )
+                Feedback( onClick = {
+                    onAppEvent(AppEvent.ShowFeedbackDialog)
+                    Firebase.analytics.logEvent(AnalyticsEvents.FEEDBACK_CLICKED){
+                        param("screen", "MenuDialog")
+                    }
+                } )
             }
         }
     }

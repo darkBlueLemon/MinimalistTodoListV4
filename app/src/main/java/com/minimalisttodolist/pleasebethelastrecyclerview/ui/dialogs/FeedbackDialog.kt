@@ -39,12 +39,16 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.google.firebase.analytics.analytics
+import com.google.firebase.analytics.ktx.analytics
+import com.google.firebase.analytics.logEvent
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.minimalisttodolist.pleasebethelastrecyclerview.data.model.PriorityColor
 import com.minimalisttodolist.pleasebethelastrecyclerview.ui.components.CustomBox
 import com.minimalisttodolist.pleasebethelastrecyclerview.ui.theme.LocalDarkTheme
+import com.minimalisttodolist.pleasebethelastrecyclerview.util.AnalyticsEvents
 import com.minimalisttodolist.pleasebethelastrecyclerview.viewmodel.AppEvent
 import com.minimalisttodolist.pleasebethelastrecyclerview.viewmodel.AppState
 import com.minimalisttodolist.pleasebethelastrecyclerview.viewmodel.AppViewModel
@@ -179,6 +183,9 @@ fun UploadFeedbackButton(
                 onAppEvent(AppEvent.UploadFeedbackText)
                 onAppEvent(AppEvent.ClearFeedbackText)
                 onHide()
+                Firebase.analytics.logEvent(AnalyticsEvents.FEEDBACK_SEND_CLICKED){
+                    param("screen", "FeedbackDialog")
+                }
             }
             .border(
                 width = 2.dp,

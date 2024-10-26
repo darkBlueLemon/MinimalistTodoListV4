@@ -21,4 +21,6 @@ object AnalyticsEvents {
     const val ABOVE_800 = "above_800"
     const val ABOVE_900 = "above_900"
     const val ABOVE_1000 = "above_1000"
+    const val FEEDBACK_CLICKED = "feedback_clicked"
+    const val FEEDBACK_SEND_CLICKED = "feedback_SEND_clicked"
 }
