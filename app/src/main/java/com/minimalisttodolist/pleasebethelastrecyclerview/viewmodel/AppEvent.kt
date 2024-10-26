@@ -23,4 +23,10 @@ sealed interface AppEvent {
     data object ShowScheduleExactAlarmPermissionIntent : AppEvent
     data object CheckNotificationPermissions : AppEvent
     data object IncrementPostNotificationDenialCount : AppEvent
+
+    data object ShowFeedbackDialog : AppEvent
+    data object HideFeedbackDialog : AppEvent
+    data object UploadFeedbackText : AppEvent
+    data object ClearFeedbackText : AppEvent
+    data class SetFeedbackText(val feedbackText: String) : AppEvent
 }

@@ -7,4 +7,6 @@ data class AppState(
     val isFontSettingsDialogVisible: Boolean = false,
     val isTutorialDialogVisible: Boolean = false,
     val isPersonalizeDialogVisible: Boolean = false,
+    val isFeedbackDialogVisible: Boolean = false,
+    val feedbackText: String = "",
 )

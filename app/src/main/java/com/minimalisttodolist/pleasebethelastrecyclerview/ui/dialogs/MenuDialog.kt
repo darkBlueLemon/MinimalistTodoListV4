@@ -81,6 +81,7 @@ fun MenuDialog(
                     dataStoreViewModel = dataStoreViewModel
                 )
                 History( onClick = { onAppEvent(AppEvent.ShowHistoryDialog) } )
+                Feedback( onClick = { onAppEvent(AppEvent.ShowFeedbackDialog) } )
             }
         }
     }
@@ -194,6 +195,31 @@ fun History(modifier: Modifier = Modifier, onClick: () -> Unit) {
         Icon(
             imageVector = Icons.Outlined.ChevronRight,
             contentDescription = "History Chevron",
+            tint = MaterialTheme.colorScheme.tertiary,
+        )
+    }
+}
+@Composable
+fun Feedback(modifier: Modifier = Modifier, onClick: () -> Unit) {
+    Row (
+        modifier = modifier
+            .fillMaxWidth()
+            .clickable {
+                onClick()
+            }
+            .padding(top = 16.dp, bottom = 16.dp)
+        ,
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = "Feedback",
+            style = MaterialTheme.typography.bodyLarge,
+            modifier = Modifier.padding(end = 10.dp)
+        )
+        Icon(
+            imageVector = Icons.Outlined.ChevronRight,
+            contentDescription = "Feedback Chevron",
             tint = MaterialTheme.colorScheme.tertiary,
         )
     }

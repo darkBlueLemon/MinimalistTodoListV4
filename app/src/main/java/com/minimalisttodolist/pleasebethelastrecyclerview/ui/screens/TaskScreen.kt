@@ -60,6 +60,7 @@ import com.minimalisttodolist.pleasebethelastrecyclerview.viewmodel.TaskEvent
 import com.minimalisttodolist.pleasebethelastrecyclerview.viewmodel.TaskState
 import com.minimalisttodolist.pleasebethelastrecyclerview.viewmodel.TaskViewModel
 import com.minimalisttodolist.pleasebethelastrecyclerview.ui.dialogs.AddTaskDialog
+import com.minimalisttodolist.pleasebethelastrecyclerview.ui.dialogs.FeedbackDialog
 import com.minimalisttodolist.pleasebethelastrecyclerview.ui.dialogs.Theme_FontSettingsDialog
 import com.minimalisttodolist.pleasebethelastrecyclerview.ui.dialogs.HistoryDialog
 import com.minimalisttodolist.pleasebethelastrecyclerview.ui.dialogs.MenuDialog
@@ -289,6 +290,22 @@ fun TaskScreen(
                         .padding(32.dp)
                 )
             }
+        }
+
+        if(appState.isFeedbackDialogVisible) {
+            FeedbackDialog(
+                onAppEvent = onAppEvent,
+                onBack = {
+                    onAppEvent(AppEvent.HideFeedbackDialog)
+                    onAppEvent(AppEvent.ShowMenuDialog)
+                },
+                onHide = {
+                    onAppEvent(AppEvent.HideFeedbackDialog)
+                },
+                appState = appState,
+                taskState = taskState,
+                onTaskEvent = onEvent
+            )
         }
     }
 }
