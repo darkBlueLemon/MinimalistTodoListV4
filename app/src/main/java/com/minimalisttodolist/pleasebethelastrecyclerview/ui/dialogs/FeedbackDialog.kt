@@ -64,7 +64,9 @@ fun FeedbackDialog(
     appState: AppState
 ) {
     BasicAlertDialog(
-        onDismissRequest = { onAppEvent(AppEvent.HideFeedbackDialog) },
+        onDismissRequest = {
+//            onAppEvent(AppEvent.HideFeedbackDialog)
+                           },
         modifier = Modifier
             .width(350.dp)
     ) {
